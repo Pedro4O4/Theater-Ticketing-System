@@ -4,8 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Homepage from './homepagedesign/Homepage.jsx';
 import { AuthProvider } from "./auth/AuthContext";
 import { useState, useEffect } from "react";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
+import AuthPage from "./components/AuthPage";
 import Navbar from "./components/shared/Navbar";
 import Footer from "./components/shared/Footer";
 import Loader from "./components/shared/Loader";
@@ -25,7 +24,7 @@ import UserBookingPage from "./components/Booking Component/UserBookingPage";
 import BookingDetails from "./components/Booking Component/BookingDetails";
 import BookingTicketForm from "./components/Booking Component/BookingTicketForm.jsx";
 import './index.css'
-import './styles.css'
+
 function App() {
     const [loading, setLoading] = useState(true);
 
@@ -51,8 +50,9 @@ function App() {
                 <div className="main-content">
                     <Routes>
                         {/* Auth routes */}
-                        <Route path="/login" element={<LoginForm />} />
-                        <Route path="/register" element={<RegisterForm />} />
+                        <Route path="/login" element={<AuthPage />} />
+                        <Route path="/register" element={<AuthPage />} />
+                        <Route path="/auth" element={<AuthPage />} />
                         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
 
                             <Route index element={<Homepage />} />

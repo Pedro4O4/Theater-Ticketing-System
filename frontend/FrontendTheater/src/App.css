@@ -1,12 +1,14 @@
-@tailwind utilities;
+
+/* Dark Animated Background */
 body {
   margin: 0;
   padding: 0;
-  background:white;
+  background: #0a0a0a;
+  background-image: linear-gradient(135deg, #0a0a0a 0%, #1a0000 100%);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   min-height: 100vh;
-  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-body);
 }
 
 @keyframes gradient {
@@ -16,13 +18,13 @@ body {
 }
 
 #root {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
   position: relative;
+  background: transparent;
 }
 
+/* Floating Background Shapes */
 .background-shapes {
   position: fixed;
   top: 0;
@@ -31,63 +33,111 @@ body {
   height: 100%;
   z-index: -1;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .shape {
   position: absolute;
-  opacity: 0.2;
-  border-radius: 50%;
-  animation: float 8s ease-in-out infinite;
+  opacity: 0.15;
+  border-radius: var(--radius-full);
+  animation: float 10s ease-in-out infinite;
+  filter: blur(40px);
 }
 
 .shape-1 {
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.1);
+  width: 400px;
+  height: 400px;
+  background: var(--gradient-primary);
   top: 10%;
   left: 10%;
   animation-delay: 0s;
 }
 
 .shape-2 {
-  width: 200px;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.15);
-  top: 70%;
-  left: 75%;
-  animation-delay: 2s;
+  width: 300px;
+  height: 300px;
+  background: var(--gradient-secondary);
+  top: 60%;
+  right: 10%;
+  animation-delay: 3s;
 }
 
 .shape-3 {
-  width: 150px;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.1);
-  top: 40%;
-  left: 25%;
-  animation-delay: 4s;
+  width: 250px;
+  height: 250px;
+  background: var(--gradient-primary);
+  bottom: 15%;
+  left: 20%;
+  animation-delay: 6s;
 }
 
 @keyframes float {
-  0% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-20px) rotate(5deg); }
-  100% { transform: translateY(0) rotate(0); }
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  33% { 
+    transform: translateY(-30px) rotate(10deg) scale(1.05);
+  }
+  66% { 
+    transform: translateY(20px) rotate(-10deg) scale(0.95);
+  }
 }
 
-.card, .login-card, .forgot-password-card {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+/* Glass Morphism Cards - Dark Theme */
+.card, 
+.login-card, 
+.forgot-password-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(26, 26, 26, 0.9);
+  border: 1px solid rgba(121, 40, 202, 0.3);
+  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
 }
 
+.card:hover,
+.login-card:hover,
+.forgot-password-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 50px rgba(121, 40, 202, 0.4);
+  border-color: var(--primary);
+  background: rgba(32, 32, 32, 0.95);
+}
+
+/* Enhanced Buttons */
 .btn-primary {
-  background: linear-gradient(135deg, #4f46e5, #2563eb);
-  transition: all 0.3s ease;
+  background: var(--gradient-primary);
+  transition: all var(--transition-normal);
   transform-origin: center;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .btn-primary:hover {
-  transform: scale(1.02) translateY(-3px);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 12px 30px rgba(121, 40, 202, 0.5);
+}
+
+.btn-primary:active {
+  transform: scale(0.98) translateY(0);
 }

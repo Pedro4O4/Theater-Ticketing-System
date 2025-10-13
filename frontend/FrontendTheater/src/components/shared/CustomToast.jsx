@@ -7,7 +7,7 @@ import './CustomToast.css';
 const CustomToast = () => {
     return (
         <ToastifyContainer
-            position="top-right"
+            position="bottom-right"
             autoClose={5000}
             hideProgressBar={false}
             newestOnTop
@@ -18,6 +18,7 @@ const CustomToast = () => {
             pauseOnHover
             theme="dark"
             className="custom-toast-container"
+            style={{ zIndex: 9999 }}
         />
     );
 };

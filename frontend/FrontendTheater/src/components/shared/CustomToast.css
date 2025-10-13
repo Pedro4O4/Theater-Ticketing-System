@@ -1,9 +1,13 @@
 /* src/components/shared/CustomToast.css */
+.custom-toast-container {
+    z-index: 9999 !important;
+}
+
 .custom-toast-container .Toastify__toast {
     backdrop-filter: blur(16px);
-    background: rgba(27, 27, 47, 0.85);
-    border: 1px solid rgba(157, 78, 221, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background: rgba(27, 27, 47, 0.95);
+    border: 1px solid rgba(157, 78, 221, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     padding: 16px;
     color: white;
@@ -43,11 +47,11 @@
 }
 
 /* Animation for toast notifications */
-.custom-toast-container .Toastify__bounce-enter--top-right {
+.custom-toast-container .Toastify__bounce-enter--bottom-right {
     animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
 
-.custom-toast-container .Toastify__bounce-exit--top-right {
+.custom-toast-container .Toastify__bounce-exit--bottom-right {
     animation: slideOutRight 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
 

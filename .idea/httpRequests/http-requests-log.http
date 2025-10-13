@@ -1,0 +1,826 @@
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 92
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonagehba",
+  "email": "bebonageh68921@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T171120.201.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 92
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonagehba",
+  "email": "bebonageh68921@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T171119.201.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 92
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonagehba",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T171114.409.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 92
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonagehba",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170901.409.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 92
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonagehba",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170855.201.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 92
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonagehba",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170755.500.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 90
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170632.500.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 90
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170619.500.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 90
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh68920@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170609.500.json
+
+###
+
+POST http://localhost:3000/api/v1/verify-otp-register
+Content-Type: application/json
+Content-Length: 59
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "email": "bebonageh6890@gmail.com",
+  "otp": "585182"
+}
+
+<> 2025-06-08T170107.200.json
+
+###
+
+POST http://localhost:3000/api/v1/verify-otp-register
+Content-Type: application/json
+Content-Length: 58
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "email": "bebonageh689@gmail.com",
+  "otp": "585182"
+}
+
+<> 2025-06-08T170057.400.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 89
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh6890@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170049.201.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 89
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh6897@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T170041.409.json
+
+###
+
+POST http://localhost:3000/api/v1/verify-otp-register
+Content-Type: application/json
+Content-Length: 58
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "email": "bebonageh689@gmail.com",
+  "otp": "240322"
+}
+
+<> 2025-06-08T165841.400.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 89
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh6897@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T165832.201.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 88
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh689@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T165812.409.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 88
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh689@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T165804.409.json
+
+###
+
+POST http://localhost:3000/api/v1/register
+Content-Type: application/json
+Content-Length: 88
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"name": "Bebonageh",
+  "email": "bebonageh689@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T165650.201.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5Mzg4NzczLCJleHAiOjE3NDkzOTk1NzN9.SRYpACu6bfvWRJOSOQy3BvUxZcIrsYqISn-3-jfcfGo
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "233608"
+}
+
+<> 2025-06-08T161933.400.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T161933.200.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "233608"
+}
+
+<> 2025-06-08T161908.405.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5Mzg4NzIyLCJleHAiOjE3NDkzOTk1MjJ9.lyx7CsOEUzGfEIT4GM3KTI5eUomhn-wz5lNmmvK1UW4
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "233608"
+}
+
+<> 2025-06-08T161842.400.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T161842.200.json
+
+###
+
+POST http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1/request-deletion-otp
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5Mzg4NjQ3LCJleHAiOjE3NDkzOTk0NDd9.gjUXqDltJjKP35-s58re3xT797pZEsWwaao9twjaewE
+content-length: 0
+
+<> 2025-06-08T161729.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T161727.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-08T161705.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T013357.500.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ5MDIyLCJleHAiOjE3NDkyNTk4MjJ9.Sf68IqwBifDR3kn0gu3eEv5IKk6grEg19wmbQkAIXIM
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "858045"
+}
+
+<> 2025-06-07T013024.400.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T013022.200.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "858045"
+}
+
+<> 2025-06-07T012959.405.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 58
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "85"
+}
+
+<> 2025-06-07T012948.405.json
+
+###
+
+POST http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1/request-deletion-otp
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4OTgxLCJleHAiOjE3NDkyNTk3ODF9.5gwOD4716b40mmsn3D-jksHPbcn4JCadUCyaayuI8iw
+content-length: 0
+
+<> 2025-06-07T012948.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012941.200.json
+
+###
+
+POST http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1/request-deletion-otp
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+content-length: 0
+
+<> 2025-06-07T012933.405.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012929.200.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4OTUwLCJleHAiOjE3NDkyNTk3NTB9.cOH-PYNPunQI-_GArKxRbGblgnbNv5cENRn36LzVxsI
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "683338"
+}
+
+<> 2025-06-07T012911.400.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012910.200.json
+
+###
+
+POST http://localhost:3000/api/v1/event/verify-deletion-otp
+Content-Type: application/json
+Content-Length: 62
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+  "eventId": "68435b2e9f569b004f1068e1",
+  "otp": "683338"
+}
+
+<> 2025-06-07T012859.405.json
+
+###
+
+POST http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1/request-deletion-otp
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4ODU2LCJleHAiOjE3NDkyNTk2NTZ9.Qnz0xF0EG7BzKeLsCBnahlYtX1VGBQo8IyV-d1vaauI
+content-length: 0
+
+<> 2025-06-07T012743.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012736.200.json
+
+###
+
+DELETE http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4NzI2LCJleHAiOjE3NDkyNTk1MjZ9.pt54uFnhVoctOxVRW--99QngPxq628nIqETD8xz3Ykc
+content-length: 0
+
+<> 2025-06-07T012527.400.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012526.200.json
+
+###
+
+DELETE http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1
+Content-Type: application/json
+Content-Length: 19
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4NTI0LCJleHAiOjE3NDkyNTkzMjR9.2hR7oRZ-0ZrtvX3g-SktJXHsBIBnYfo9xyG9qjx2MQY
+
+{
+"otp": "382125"
+}
+
+<> 2025-06-07T012205.400.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012204.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012138.200.json
+
+###
+
+DELETE http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1
+Content-Type: application/json
+Content-Length: 19
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+"otp": "922725"
+}
+
+<> 2025-06-07T012133.405.json
+
+###
+
+DELETE http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+content-length: 0
+
+<> 2025-06-07T012055.405.json
+
+###
+
+POST http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1/request-deletion-otp
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4NDI3LCJleHAiOjE3NDkyNTkyMjd9.vyfuWFy1x5lpe8dHxEXtGfZjOzxS1Y-WVzxLVSE9ZCA
+content-length: 0
+
+<> 2025-06-07T012038.200.json
+
+###
+
+POST http://localhost:3000/api/v1/login
+Content-Type: application/json
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+{
+
+  "email": "bebonageh68@gmail.com",
+  "password": "123456abc"
+
+}
+
+<> 2025-06-07T012027.200.json
+
+###
+
+DELETE http://localhost:3000/api/v1/event/68435b2e9f569b004f1068e1
+Content-Type: application/json
+User-Agent: IntelliJ HTTP Client/WebStorm 2024.3.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY4MmUzMGJlZTE1NmRkMGVkMzQ1YmMyMyIsInJvbGUiOiJPcmdhbml6ZXIifSwiaWF0IjoxNzQ5MjQ4MDU2LCJleHAiOjE3NDkyNTg4NTZ9.STH21cRrfonNfwSEcViVdGE5_ESaa-RJtY3fW9h-nu0
+content-length: 0
+
+<> 2025-06-07T011417.404.json
+
+###
+

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import CountUp from 'react-countup';
+import { useInView } from 'react-intersection-observer';
+import { FaTicketAlt, FaUsers, FaCalendarAlt, FaStar, FaTheaterMasks, FaTrophy, FaMusic, FaPalette } from 'react-icons/fa';
 import '.././index.css';
+import './Homepage.css';
 import { getImageUrl } from '../utils/imageHelper';
 
 const Homepage = () => {
@@ -14,7 +20,22 @@ const Homepage = () => {
     const [currentImage, setCurrentImage] = useState(null);
     const navigate = useNavigate();
 
+    // Refs for counting animation
+    const { ref: statsRef, inView: statsInView } = useInView({
+        triggerOnce: true,
+        threshold: 0.3
+    });
+
     const API_URL = 'http://localhost:3000';
+
+    // Initialize AOS
+    useEffect(() => {
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-out-cubic'
+        });
+    }, []);
 
     // Check if user is logged in
     const isLoggedIn = () => {
@@ -77,17 +98,82 @@ const Homepage = () => {
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
             }}>
-                <div className="hero-content">
-                    <h1 className="hero-title">Experience the Magic of Live Performance</h1>
-                    <p className="hero-subtitle">Discover extraordinary events that will leave you breathless</p>
-                    <div className="hero-buttons">
+                <div className="hero-content" data-aos="fade-up">
+                    <h1 className="hero-title" data-aos="fade-down" data-aos-delay="200">Experience the Magic of Live Performance</h1>
+                    <p className="hero-subtitle" data-aos="fade-up" data-aos-delay="400">Discover extraordinary events that will leave you breathless</p>
+                    <div className="hero-buttons" data-aos="zoom-in" data-aos-delay="600">
+                        <Link to="/events" className="btn-primary-hero">Browse Events</Link>
+                        {!isLoggedIn() && (
+                            <Link to="/register" className="btn-secondary-hero">Get Started</Link>
+                        )}
                     </div>
                 </div>
             </div>
 
+            {/* Statistics Section */}
+            <section className="stats-section" ref={statsRef} data-aos="fade-up">
+                <div className="stats-container">
+                    <div className="stat-item" data-aos="flip-left" data-aos-delay="100">
+                        <FaTicketAlt className="stat-icon" />
+                        <h3>{statsInView ? <CountUp end={50000} duration={2.5} separator="," /> : '0'}</h3>
+                        <p>Tickets Sold</p>
+                    </div>
+                    <div className="stat-item" data-aos="flip-left" data-aos-delay="200">
+                        <FaUsers className="stat-icon" />
+                        <h3>{statsInView ? <CountUp end={10000} duration={2.5} separator="," /> : '0'}+</h3>
+                        <p>Happy Customers</p>
+                    </div>
+                    <div className="stat-item" data-aos="flip-left" data-aos-delay="300">
+                        <FaCalendarAlt className="stat-icon" />
+                        <h3>{statsInView ? <CountUp end={500} duration={2.5} /> : '0'}+</h3>
+                        <p>Events Hosted</p>
+                    </div>
+                    <div className="stat-item" data-aos="flip-left" data-aos-delay="400">
+                        <FaStar className="stat-icon" />
+                        <h3>{statsInView ? <CountUp end={4.8} duration={2.5} decimals={1} /> : '0'}</h3>
+                        <p>Average Rating</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Why Choose Us Section */}
+            <section className="features-section" data-aos="fade-up">
+                <h2 className="section-title" data-aos="fade-down" data-aos-duration="1000">Why Choose EventTix?</h2>
+                <div className="features-grid">
+                    <div className="feature-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
+                        <div className="feature-icon">
+                            <FaTheaterMasks />
+                        </div>
+                        <h3>Premium Events</h3>
+                        <p>Access to the most exclusive and highly-rated events in your area</p>
+                    </div>
+                    <div className="feature-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
+                        <div className="feature-icon">
+                            <FaTrophy />
+                        </div>
+                        <h3>Best Prices</h3>
+                        <p>Competitive pricing with no hidden fees. What you see is what you pay</p>
+                    </div>
+                    <div className="feature-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
+                        <div className="feature-icon">
+                            <FaMusic />
+                        </div>
+                        <h3>Diverse Selection</h3>
+                        <p>From concerts to theater, sports to festivals - we have it all</p>
+                    </div>
+                    <div className="feature-card" data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
+                        <div className="feature-icon">
+                            <FaPalette />
+                        </div>
+                        <h3>Easy Booking</h3>
+                        <p>Simple, fast, and secure booking process in just a few clicks</p>
+                    </div>
+                </div>
+            </section>
+
             {/* Featured Events Section */}
-            <section className="featured-section">
-                <h2 className="section-title">Featured Shows</h2>
+            <section className="featured-section" data-aos="fade-up">
+                <h2 className="section-title" data-aos="fade-down">Featured Shows</h2>
                 {error ? (
                     <div className="error-message">{error}</div>
                 ) : featuredEvents.length === 0 ? (
@@ -95,8 +181,8 @@ const Homepage = () => {
                 ) : (
                     <>
                         <div className="events-grid">
-                            {featuredEvents.map(event => (
-                                <div key={event.id} className="event-card">
+                            {featuredEvents.map((event, index) => (
+                                <div key={event.id} className="event-card" data-aos="fade-up" data-aos-delay={index * 100}>
                                     <div className="event-image-container" onClick={(e) => openFullImage(event, e)}>
                                         <img
                                             src={event.image}
@@ -129,18 +215,6 @@ const Homepage = () => {
                                     </div>
                                 </div>
                             ))}
-                        </div>
-
-                        {/* Scroll Navigation Buttons */}
-                        <div className="scroll-nav">
-                            <button className="scroll-btn" onClick={() => {
-                                const container = document.querySelector('.events-grid');
-                                container.scrollBy({ left: -320, behavior: 'smooth' });
-                            }}>←</button>
-                            <button className="scroll-btn" onClick={() => {
-                                const container = document.querySelector('.events-grid');
-                                container.scrollBy({ left: 320, behavior: 'smooth' });
-                            }}>→</button>
                         </div>
                     </>
                 )}

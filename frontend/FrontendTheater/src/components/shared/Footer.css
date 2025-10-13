@@ -1,10 +1,10 @@
 .footer {
-  background-color: #0a0a0a;
-  background-image: linear-gradient(to right, #000000, #1a0000);
-  color: #f0f0f0;
-  padding: 40px 0 20px;
+  background: var(--gradient-dark);
+  color: var(--text-primary);
+  padding: 50px 0 25px;
   margin-top: auto;
-  box-shadow: 0 -4px 15px rgba(229, 9, 20, 0.1);
+  box-shadow: 0 -4px 20px rgba(121, 40, 202, 0.2);
+  border-top: 1px solid rgba(121, 40, 202, 0.2);
 }
 
 .footer-container {
@@ -18,17 +18,18 @@
 
 .footer-section {
   flex: 1;
-  min-width: 200px;
-  margin-bottom: 20px;
+  min-width: 220px;
+  margin-bottom: 30px;
   padding: 0 15px;
 }
 
 .footer-section h3 {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  color: #e50914; /* Netflix red */
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: var(--primary);
   position: relative;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
+  font-weight: 700;
 }
 
 .footer-section h3::after {
@@ -36,9 +37,10 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(to right, #e50914, transparent);
+  width: 50px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
 }
 
 .footer-section ul {
@@ -52,25 +54,27 @@
 }
 
 .footer-section a {
-  color: #ccc;
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all var(--transition-fast);
   position: relative;
+  font-weight: 500;
 }
 
 .footer-section a:hover {
-  color: #ff3d47;
+  color: var(--primary-light);
+  padding-left: 5px;
 }
 
 .footer-section a::after {
   content: '';
   position: absolute;
   width: 0;
-  height: 1px;
-  bottom: -2px;
+  height: 2px;
+  bottom: -3px;
   left: 0;
-  background-color: #e50914;
-  transition: width 0.3s ease;
+  background: var(--gradient-primary);
+  transition: width var(--transition-normal);
 }
 
 .footer-section a:hover::after {
@@ -92,17 +96,18 @@
 }
 
 .social-links a:hover {
-  color: #e50914;
-  text-shadow: 0 0 5px rgba(229, 9, 20, 0.3);
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(121, 40, 202, 0.5);
+  transform: translateY(-3px);
 }
 
 .footer-bottom {
   text-align: center;
-  padding-top: 20px;
-  margin-top: 20px;
-  border-top: 1px solid #331111;
-  color: #999;
-  font-size: 0.9rem;
+  padding-top: 25px;
+  margin-top: 30px;
+  border-top: 1px solid rgba(121, 40, 202, 0.2);
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
 @media (max-width: 768px) {

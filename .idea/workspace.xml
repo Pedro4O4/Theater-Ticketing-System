@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="db6a31df-a283-4d6a-bebd-bc61fdb116e5" name="Changes" comment="add console.log" />
+    <list id="c8605a3f-78a0-4dbc-af3b-605a536658e5" name="Changes by Lenovo" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="master" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="pedro" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="SYNC" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {}
+}</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOOC0t3M6NTRIi&quot;,
+        &quot;number&quot;: 5
+      },
+      &quot;lastSeen&quot;: 1741091424126
+    },
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOOC0t3M6WxZyq&quot;,
+        &quot;number&quot;: 31
+      },
+      &quot;lastSeen&quot;: 1747767546533
+    }
+  ]
+}</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="58ec9031-ea0c-49f0-8484-820be831366e" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Pedro4O4/masr7.git&quot;,
+    &quot;accountId&quot;: &quot;58ec9031-ea0c-49f0-8484-820be831366e&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;Pedro4O4&quot;,
+    &quot;repository&quot;: &quot;masr7&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///JetClient Request Console" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2tqGbsFRokrnt1191qSI6eQTkZu" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;HTTP Request. | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Create Event.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Forget Password (1).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Forget Password.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | L.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Login.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Reset Password.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Test User Registration.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | User Login.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Verify OTP.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | da.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | event.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | fa.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | fas.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | fs.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | log in.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | login.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | organizer (1).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | organizer.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.All in  (1).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.All in .executor&quot;: &quot;Run&quot;,
+    &quot;Jest.app.js.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.authenticationMiddleware.test.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.Booking.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.Event.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.User.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.app.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.authenticationMiddleware.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.connection.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#47 on master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.14.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.14.1&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/pedroSWE&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;D:/Projects/pedroSWE/node_modules/jest&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.deploy.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.lint.executor&quot;: &quot;Run&quot;,
+    &quot;npm.scripts.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start:authz.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.3.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="QodanaReportsService">
+    <option name="descriptions">
+      <ReportDescription localRun="true" path="C:\Users\bebon\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="fb9f1854-1ccb-4fa7-adc3-527ef3d7abf6" reportId="pedroSWE/qodana/2025-04-26" />
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Projects\pedroSWE\frontend\FrontendTheater\src\components" />
+      <recent name="D:\Projects\pedroSWE\frontend\FrontendTheater\src" />
+      <recent name="D:\Projects\pedroSWE\frontend\FrontendTheater\src\homepagedesign" />
+      <recent name="D:\Projects\pedroSWE\backend" />
+      <recent name="D:\Projects\pedroSWE\frontend\FrontendTheater" />
+    </key>
+  </component>
+  <component name="RunManager" selected="HTTP Request. | Forget Password">
+    <configuration name=" | Forget Password" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/backend/.rest" executionIdentifier="Forget Password" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name=" | da" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/backend/.rest" executionIdentifier="da" index="3" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name=" | fas" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/backend/.rest" executionIdentifier="fas" index="3" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name=" | fs" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/backend/.rest" executionIdentifier="fs" index="2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="All in " type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/backend/.rest">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.All in " />
+        <item itemvalue="HTTP Request. | fs" />
+        <item itemvalue="HTTP Request. | Forget Password" />
+        <item itemvalue="HTTP Request. | fas" />
+        <item itemvalue="HTTP Request. | da" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-WS-243.24978.60" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="db6a31df-a283-4d6a-bebd-bc61fdb116e5" name="Changes" comment="" />
+      <created>1741072266117</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741072266117</updated>
+      <workItem from="1741072267215" duration="5653000" />
+      <workItem from="1741103044223" duration="1731000" />
+      <workItem from="1741105196373" duration="13000" />
+      <workItem from="1741161494843" duration="720000" />
+      <workItem from="1741163227287" duration="1059000" />
+      <workItem from="1741257915301" duration="26000" />
+      <workItem from="1741780383757" duration="283000" />
+      <workItem from="1741782308681" duration="842000" />
+      <workItem from="1742461897167" duration="130000" />
+      <workItem from="1743271304255" duration="4000" />
+      <workItem from="1744015002174" duration="1389000" />
+      <workItem from="1744016694917" duration="540000" />
+      <workItem from="1744563506246" duration="859000" />
+      <workItem from="1744649000848" duration="4762000" />
+      <workItem from="1744752989889" duration="2688000" />
+      <workItem from="1744785752961" duration="11300000" />
+      <workItem from="1744808223185" duration="1729000" />
+      <workItem from="1744810005665" duration="1676000" />
+      <workItem from="1744901375033" duration="214000" />
+      <workItem from="1744901902753" duration="5000" />
+      <workItem from="1744904414897" duration="47000" />
+      <workItem from="1744906281230" duration="2219000" />
+      <workItem from="1745195079705" duration="2052000" />
+      <workItem from="1745197995802" duration="547000" />
+      <workItem from="1745198593901" duration="1685000" />
+      <workItem from="1745201238696" duration="133000" />
+      <workItem from="1745201386549" duration="5876000" />
+      <workItem from="1745226801963" duration="8356000" />
+      <workItem from="1745396405830" duration="4549000" />
+      <workItem from="1745410368344" duration="475000" />
+      <workItem from="1745430625460" duration="881000" />
+      <workItem from="1745431585657" duration="4611000" />
+      <workItem from="1745657782614" duration="1687000" />
+      <workItem from="1745669090079" duration="6199000" />
+      <workItem from="1745685774998" duration="2671000" />
+      <workItem from="1745704739491" duration="2518000" />
+      <workItem from="1745707438415" duration="471000" />
+      <workItem from="1745744111832" duration="325000" />
+      <workItem from="1745782247041" duration="4165000" />
+      <workItem from="1745787537743" duration="3582000" />
+      <workItem from="1745791304874" duration="754000" />
+      <workItem from="1745822880098" duration="159000" />
+      <workItem from="1745838382046" duration="8644000" />
+      <workItem from="1745860437236" duration="4633000" />
+      <workItem from="1745911002983" duration="479000" />
+      <workItem from="1745962413175" duration="955000" />
+      <workItem from="1746101437683" duration="159000" />
+      <workItem from="1746101621229" duration="1528000" />
+      <workItem from="1746184870853" duration="1598000" />
+      <workItem from="1746187089479" duration="3534000" />
+      <workItem from="1746217281560" duration="857000" />
+      <workItem from="1746275961867" duration="773000" />
+      <workItem from="1746285778891" duration="5246000" />
+      <workItem from="1746314315234" duration="903000" />
+      <workItem from="1746337721747" duration="906000" />
+      <workItem from="1746395545864" duration="21000" />
+      <workItem from="1746428616636" duration="360000" />
+      <workItem from="1746429906204" duration="592000" />
+      <workItem from="1746525344693" duration="888000" />
+      <workItem from="1746527629532" duration="187000" />
+      <workItem from="1746527826956" duration="702000" />
+      <workItem from="1746541365907" duration="278000" />
+      <workItem from="1746599741693" duration="729000" />
+      <workItem from="1746639792600" duration="1744000" />
+      <workItem from="1746704538580" duration="396000" />
+      <workItem from="1746798490776" duration="569000" />
+      <workItem from="1746805524882" duration="791000" />
+      <workItem from="1747073976625" duration="141000" />
+      <workItem from="1747113523535" duration="1238000" />
+      <workItem from="1747123015554" duration="5000" />
+      <workItem from="1747161852630" duration="769000" />
+      <workItem from="1747199854327" duration="9000" />
+      <workItem from="1747389057626" duration="5805000" />
+      <workItem from="1747664547388" duration="289000" />
+      <workItem from="1747664867878" duration="3772000" />
+      <workItem from="1747668780380" duration="9082000" />
+      <workItem from="1747678072676" duration="2804000" />
+      <workItem from="1747726988396" duration="1080000" />
+      <workItem from="1747730672647" duration="1377000" />
+      <workItem from="1747758539225" duration="9476000" />
+      <workItem from="1747819063902" duration="2784000" />
+      <workItem from="1747822931992" duration="184000" />
+      <workItem from="1747823135750" duration="6772000" />
+      <workItem from="1747837269765" duration="8423000" />
+      <workItem from="1747845883164" duration="128000" />
+      <workItem from="1747846028356" duration="1441000" />
+      <workItem from="1747847737054" duration="277000" />
+      <workItem from="1747854510440" duration="9011000" />
+      <workItem from="1747929179716" duration="16002000" />
+      <workItem from="1747988341400" duration="13592000" />
+      <workItem from="1748003894067" duration="886000" />
+      <workItem from="1748013067343" duration="2785000" />
+      <workItem from="1748028056407" duration="1348000" />
+      <workItem from="1748033558450" duration="6244000" />
+      <workItem from="1748077794268" duration="10014000" />
+      <workItem from="1748099489191" duration="562000" />
+      <workItem from="1748100102772" duration="11282000" />
+      <workItem from="1748119916137" duration="4572000" />
+      <workItem from="1748168504378" duration="2195000" />
+      <workItem from="1748177633243" duration="3360000" />
+      <workItem from="1748201949428" duration="3146000" />
+      <workItem from="1748206602153" duration="12265000" />
+      <workItem from="1748219418399" duration="7237000" />
+      <workItem from="1748229614720" duration="14000" />
+      <workItem from="1748242829028" duration="12873000" />
+      <workItem from="1748267995761" duration="3234000" />
+      <workItem from="1748271319515" duration="1772000" />
+      <workItem from="1748273171259" duration="2931000" />
+      <workItem from="1748276315662" duration="9786000" />
+      <workItem from="1748286611699" duration="55000" />
+      <workItem from="1748286877553" duration="5572000" />
+      <workItem from="1748293999810" duration="270000" />
+      <workItem from="1748294863717" duration="650000" />
+      <workItem from="1748333558261" duration="3533000" />
+      <workItem from="1748337289098" duration="614000" />
+      <workItem from="1748344531878" duration="4074000" />
+      <workItem from="1748355351841" duration="754000" />
+      <workItem from="1748373709953" duration="4328000" />
+      <workItem from="1748398938206" duration="1671000" />
+      <workItem from="1748407180178" duration="668000" />
+      <workItem from="1748438627424" duration="2436000" />
+      <workItem from="1748470538903" duration="1541000" />
+      <workItem from="1748510507929" duration="5943000" />
+      <workItem from="1748552547601" duration="4525000" />
+      <workItem from="1748600686434" duration="5151000" />
+      <workItem from="1748643035962" duration="350000" />
+      <workItem from="1748708966277" duration="34000" />
+      <workItem from="1748710758013" duration="399000" />
+      <workItem from="1748857135880" duration="4235000" />
+      <workItem from="1749049569554" duration="10275000" />
+      <workItem from="1749105443122" duration="1914000" />
+      <workItem from="1749142458253" duration="628000" />
+      <workItem from="1749154444957" duration="3347000" />
+      <workItem from="1749197401809" duration="7424000" />
+      <workItem from="1749241835751" duration="3381000" />
+      <workItem from="1749246212470" duration="329000" />
+      <workItem from="1749246672024" duration="2540000" />
+      <workItem from="1749388438341" duration="6234000" />
+      <workItem from="1749474831124" duration="8566000" />
+      <workItem from="1749495784057" duration="271000" />
+      <workItem from="1749496079364" duration="1399000" />
+      <workItem from="1749555235384" duration="909000" />
+      <workItem from="1749612808712" duration="741000" />
+      <workItem from="1749996676493" duration="157000" />
+      <workItem from="1750201077934" duration="1435000" />
+      <workItem from="1750545079682" duration="2085000" />
+      <workItem from="1750598873546" duration="3259000" />
+      <workItem from="1751976546791" duration="4000" />
+      <workItem from="1751981442508" duration="385000" />
+      <workItem from="1752068470317" duration="128000" />
+      <workItem from="1752068620604" duration="1997000" />
+      <workItem from="1752323566089" duration="3637000" />
+      <workItem from="1752482223885" duration="1292000" />
+      <workItem from="1752998378345" duration="302000" />
+      <workItem from="1753559135873" duration="99000" />
+      <workItem from="1753959293493" duration="3000" />
+      <workItem from="1756717334126" duration="2000" />
+      <workItem from="1758295425119" duration="950000" />
+      <workItem from="1758612537901" duration="21000" />
+      <workItem from="1758612600814" duration="3652000" />
+      <workItem from="1758635854414" duration="2477000" />
+    </task>
+    <task id="LOCAL-00079" summary="deploy3">
+      <option name="closed" value="true" />
+      <created>1748223766042</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1748223766043</updated>
+    </task>
+    <task id="LOCAL-00080" summary="deploy3">
+      <option name="closed" value="true" />
+      <created>1748224099939</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1748224099939</updated>
+    </task>
+    <task id="LOCAL-00081" summary="handling deploy">
+      <option name="closed" value="true" />
+      <created>1748225894207</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1748225894207</updated>
+    </task>
+    <task id="LOCAL-00082" summary="handling deploy">
+      <option name="closed" value="true" />
+      <created>1748226373083</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1748226373083</updated>
+    </task>
+    <task id="LOCAL-00083" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748226869241</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1748226869241</updated>
+    </task>
+    <task id="LOCAL-00084" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748245807989</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1748245807989</updated>
+    </task>
+    <task id="LOCAL-00085" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748248507569</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1748248507569</updated>
+    </task>
+    <task id="LOCAL-00086" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748249498476</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1748249498476</updated>
+    </task>
+    <task id="LOCAL-00087" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748250057933</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1748250057934</updated>
+    </task>
+    <task id="LOCAL-00088" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748250981630</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1748250981631</updated>
+    </task>
+    <task id="LOCAL-00089" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748251403874</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1748251403874</updated>
+    </task>
+    <task id="LOCAL-00090" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748252243187</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1748252243187</updated>
+    </task>
+    <task id="LOCAL-00091" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748253267277</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1748253267277</updated>
+    </task>
+    <task id="LOCAL-00092" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748254004932</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1748254004932</updated>
+    </task>
+    <task id="LOCAL-00093" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748254173001</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1748254173001</updated>
+    </task>
+    <task id="LOCAL-00094" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748254447751</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1748254447751</updated>
+    </task>
+    <task id="LOCAL-00095" summary="handling">
+      <option name="closed" value="true" />
+      <created>1748269368982</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1748269368982</updated>
+    </task>
+    <task id="LOCAL-00096" summary="mr7ban bkom">
+      <option name="closed" value="true" />
+      <created>1748272939422</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1748272939425</updated>
+    </task>
+    <task id="LOCAL-00097" summary="mr7ban bkom">
+      <option name="closed" value="true" />
+      <created>1748273237060</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1748273237060</updated>
+    </task>
+    <task id="LOCAL-00098" summary="handling meta.env">
+      <option name="closed" value="true" />
+      <created>1748276980191</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1748276980191</updated>
+    </task>
+    <task id="LOCAL-00099" summary="start to deploy next commit">
+      <option name="closed" value="true" />
+      <created>1748277490844</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1748277490844</updated>
+    </task>
+    <task id="LOCAL-00100" summary="start to deploy next commit">
+      <option name="closed" value="true" />
+      <created>1748278324721</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1748278324721</updated>
+    </task>
+    <task id="LOCAL-00101" summary="start to deploy next commit">
+      <option name="closed" value="true" />
+      <created>1748279042196</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1748279042196</updated>
+    </task>
+    <task id="LOCAL-00102" summary="start to deploy next commit">
+      <option name="closed" value="true" />
+      <created>1748279356329</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1748279356330</updated>
+    </task>
+    <task id="LOCAL-00103" summary="deploy">
+      <option name="closed" value="true" />
+      <created>1748282257280</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1748282257280</updated>
+    </task>
+    <task id="LOCAL-00104" summary="return">
+      <option name="closed" value="true" />
+      <created>1748282676704</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1748282676704</updated>
+    </task>
+    <task id="LOCAL-00105" summary="handle booking component and event component">
+      <option name="closed" value="true" />
+      <created>1748336946461</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1748336946461</updated>
+    </task>
+    <task id="LOCAL-00106" summary="handle otp for LoginForm.jsx">
+      <option name="closed" value="true" />
+      <created>1748345594072</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1748345594073</updated>
+    </task>
+    <task id="LOCAL-00107" summary="remove button edit from details event">
+      <option name="closed" value="true" />
+      <created>1748399944784</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1748399944785</updated>
+    </task>
+    <task id="LOCAL-00108" summary="handle details page and handle to put limited when remaining tickets&lt;50 and sold out">
+      <option name="closed" value="true" />
+      <created>1748605196926</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605196927</updated>
+    </task>
+    <task id="LOCAL-00109" summary="handle when the user click on cancel booking make loading and cant click on this button again this problem was make double tickets which canceld">
+      <option name="closed" value="true" />
+      <created>1748605281831</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605281831</updated>
+    </task>
+    <task id="LOCAL-00110" summary="update shape of RegisterForm.jsx">
+      <option name="closed" value="true" />
+      <created>1748605309033</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605309033</updated>
+    </task>
+    <task id="LOCAL-00111" summary="make the organizer cant edit or delete his event if it approved">
+      <option name="closed" value="true" />
+      <created>1748605339881</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605339881</updated>
+    </task>
+    <task id="LOCAL-00112" summary="test thing">
+      <option name="closed" value="true" />
+      <created>1748605842133</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605842133</updated>
+    </task>
+    <task id="LOCAL-00113" summary="test thing">
+      <option name="closed" value="true" />
+      <created>1748605937184</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605937184</updated>
+    </task>
+    <task id="LOCAL-00114" summary="test thing">
+      <option name="closed" value="true" />
+      <created>1748605947392</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1748605947392</updated>
+    </task>
+    <task id="LOCAL-00115" summary="handle css index to make a home full page">
+      <option name="closed" value="true" />
+      <created>1748861474571</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1748861474572</updated>
+    </task>
+    <task id="LOCAL-00116" summary="make the css mix red and dark and make nav bar dynamic when scroll down">
+      <option name="closed" value="true" />
+      <created>1749053427811</created>
+      <option name="number" value="00116" />
+      <option name="presentableId" value="LOCAL-00116" />
+      <option name="project" value="LOCAL" />
+      <updated>1749053427811</updated>
+    </task>
+    <task id="LOCAL-00117" summary="handling css">
+      <option name="closed" value="true" />
+      <created>1749156905614</created>
+      <option name="number" value="00117" />
+      <option name="presentableId" value="LOCAL-00117" />
+      <option name="project" value="LOCAL" />
+      <updated>1749156905615</updated>
+    </task>
+    <task id="LOCAL-00118" summary="env">
+      <option name="closed" value="true" />
+      <created>1749197818900</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1749197818900</updated>
+    </task>
+    <task id="LOCAL-00119" summary="env">
+      <option name="closed" value="true" />
+      <created>1749197893370</created>
+      <option name="number" value="00119" />
+      <option name="presentableId" value="LOCAL-00119" />
+      <option name="project" value="LOCAL" />
+      <updated>1749197893370</updated>
+    </task>
+    <task id="LOCAL-00120" summary="remove .rest">
+      <option name="closed" value="true" />
+      <created>1749197985750</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1749197985750</updated>
+    </task>
+    <task id="LOCAL-00121" summary="handle when event delete any booking related with this event delete">
+      <option name="closed" value="true" />
+      <created>1749205005777</created>
+      <option name="number" value="00121" />
+      <option name="presentableId" value="LOCAL-00121" />
+      <option name="project" value="LOCAL" />
+      <updated>1749205005777</updated>
+    </task>
+    <task id="LOCAL-00122" summary="handle send otp for organizer to delete his event which is approved">
+      <option name="closed" value="true" />
+      <created>1749390549913</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1749390549914</updated>
+    </task>
+    <task id="LOCAL-00123" summary="put isverified in user model to make sure this is real email by send otp in gmail and if not put otp cant login and will send another otp to verify the account and make resend code if not send">
+      <option name="closed" value="true" />
+      <created>1749394804082</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1749394804082</updated>
+    </task>
+    <task id="LOCAL-00124" summary="now user can put profile picture in his profile and create profile banner showing his data and when click on this banner it will go to profile and handle all css to make more beauty">
+      <option name="closed" value="true" />
+      <created>1749479536058</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1749479536059</updated>
+    </task>
+    <task id="LOCAL-00125" summary="handle css to make it mix red and dark">
+      <option name="closed" value="true" />
+      <created>1749484622226</created>
+      <option name="number" value="00125" />
+      <option name="presentableId" value="LOCAL-00125" />
+      <option name="project" value="LOCAL" />
+      <updated>1749484622226</updated>
+    </task>
+    <task id="LOCAL-00126" summary="app.js handle">
+      <option name="closed" value="true" />
+      <created>1750604091614</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1750604091615</updated>
+    </task>
+    <task id="LOCAL-00127" summary="add console.log">
+      <option name="closed" value="true" />
+      <created>1752327355947</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1752327355947</updated>
+    </task>
+    <option name="localTasksCounter" value="128" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/backend" />
+      <path value="$PROJECT_DIR$/frontend/FrontendTheater" />
+    </ignored-roots>
+    <MESSAGE value="handling meta.env" />
+    <MESSAGE value="start to deploy next commit" />
+    <MESSAGE value="deploy" />
+    <MESSAGE value="return" />
+    <MESSAGE value="handle booking component and event component" />
+    <MESSAGE value="handle otp for LoginForm.jsx" />
+    <MESSAGE value="remove button edit from details event" />
+    <MESSAGE value="handle details page and handle to put limited when remaining tickets&lt;50 and sold out" />
+    <MESSAGE value="handle when the user click on cancel booking make loading and cant click on this button again this problem was make double tickets which canceld" />
+    <MESSAGE value="update shape of RegisterForm.jsx" />
+    <MESSAGE value="make the organizer cant edit or delete his event if it approved" />
+    <MESSAGE value="test thing" />
+    <MESSAGE value="handle css index to make a home full page" />
+    <MESSAGE value="make the css mix red and dark and make nav bar dynamic when scroll down" />
+    <MESSAGE value="handling css" />
+    <MESSAGE value="env" />
+    <MESSAGE value="remove .rest" />
+    <MESSAGE value="handle when event delete any booking related with this event delete" />
+    <MESSAGE value="handle send otp for organizer to delete his event which is approved" />
+    <MESSAGE value="put isverified in user model to make sure this is real email by send otp in gmail and if not put otp cant login and will send another otp to verify the account" />
+    <MESSAGE value="put isverified in user model to make sure this is real email by send otp in gmail and if not put otp cant login and will send another otp to verify the account and make resend code if not send" />
+    <MESSAGE value="now user can put profile picture in his profile and create profile banner showing his data and when click on this banner it will go to profile and handle all css to make more beauty" />
+    <MESSAGE value="handle css to make it mix red and dark" />
+    <MESSAGE value="app.js handle" />
+    <MESSAGE value="add console.log" />
+    <option name="LAST_COMMIT_MESSAGE" value="add console.log" />
+  </component>
+</project>

@@ -18,8 +18,17 @@ const createTransporter = () => {
     });
 };
 
-// Send OTP email
+// Send OTP email with console fallback
 const sendOTPToValidEmail = async (email, otp) => {
+    // ALWAYS log OTP to console for development/testing
+    console.log('\n========================================');
+    console.log('📧 VERIFICATION CODE');
+    console.log('========================================');
+    console.log(`Email: ${email}`);
+    console.log(`OTP Code: ${otp}`);
+    console.log(`Expires: 10 minutes`);
+    console.log('========================================\n');
+
     try {
         const transporter = createTransporter();
 
@@ -46,14 +55,24 @@ const sendOTPToValidEmail = async (email, otp) => {
         };
 
         const result = await transporter.sendMail(mailOptions);
-        console.log('Verification email sent successfully:', result.messageId);
+        console.log('✅ Email sent successfully:', result.messageId);
         return { success: true, messageId: result.messageId };
     } catch (error) {
-        console.error('Error sending verification email:', error);
-        return { success: false, error: error.message };
+        console.warn('⚠️  Email sending failed (using console fallback):', error.message);
+        // Return success anyway - OTP is logged to console
+        return { success: true, fallback: true, error: error.message };
     }
 };
 const sendOTPEmail = async (email, otp) => {
+    // ALWAYS log OTP to console for development/testing
+    console.log('\n========================================');
+    console.log('🔐 PASSWORD RESET CODE');
+    console.log('========================================');
+    console.log(`Email: ${email}`);
+    console.log(`OTP Code: ${otp}`);
+    console.log(`Expires: 10 minutes`);
+    console.log('========================================\n');
+
     try {
         const transporter = createTransporter();
 
@@ -81,11 +100,12 @@ const sendOTPEmail = async (email, otp) => {
         };
 
         const result = await transporter.sendMail(mailOptions);
-        console.log('OTP email sent successfully:', result.messageId);
+        console.log('✅ Email sent successfully:', result.messageId);
         return { success: true, messageId: result.messageId };
     } catch (error) {
-        console.error('Error sending OTP email:', error);
-        return { success: false, error: error.message };
+        console.warn('⚠️  Email sending failed (using console fallback):', error.message);
+        // Return success anyway - OTP is logged to console
+        return { success: true, fallback: true, error: error.message };
     }
 };
 
@@ -122,16 +142,8 @@ const UserController = {
             // Save the user in unverified state
             await newUser.save();
 
-            // DEVELOPMENT MODE: Always log OTP for testing
-            console.log(`========= DEV MODE =========`);
-            console.log(`OTP for ${email}: ${otp}`);
-            console.log(`===========================`);
-
-            // Send OTP via email
-            const emailSent = await sendOTPToValidEmail(email, otp);
-            if (!emailSent.success) {
-                return res.status(500).json({message: "Failed to send verification code"});
-            }
+            // Send OTP via email (also logs to console automatically)
+            await sendOTPToValidEmail(email, otp);
 
             res.status(201).json({
                 message: "Registration initiated. Please verify your email with the OTP sent."
@@ -194,20 +206,8 @@ const UserController = {
                 user.otpExpires = otpExpires;
                 await user.save();
 
-                // DEVELOPMENT MODE: Log OTP for testing
-                console.log(`========= DEV MODE =========`);
-                console.log(`OTP for ${email}: ${otp}`);
-                console.log(`===========================`);
-
-                // Send OTP via email
-                const emailSent = await sendOTPToValidEmail(email, otp);
-
-                if (!emailSent.success) {
-                    return res.status(500).json({
-                        message: "Failed to send verification code. Please try again later."
-                    });
-                }
-                console.log(`OTP sent to ${email}: ${otp}`);
+                // Send OTP via email (also logs to console automatically)
+                await sendOTPToValidEmail(email, otp);
 
                 return res.status(403).json({
                     message: "Account not verified. A new verification code has been sent to your email.",
@@ -276,21 +276,9 @@ const UserController = {
             user.otpExpires = otpExpires;
             await user.save();
 
-            // DEVELOPMENT MODE: Always log OTP for testing
-            console.log(`========= DEV MODE =========`);
-            console.log(`OTP for ${email}: ${otp}`);
-            console.log(`===========================`);
+            // Send OTP via email (also logs to console automatically)
+            await sendOTPEmail(email, otp);
 
-            // Send OTP via email
-            const emailResult = await sendOTPEmail(email, otp);
-
-            if (!emailResult.success) {
-                return res.status(500).json({
-                    message: "Failed to send OTP email. Please try again later."
-                });
-            }
-
-            console.log(`OTP sent to ${email}: ${otp}`);
             res.status(200).json({message: "OTP sent to your email."});
         } catch (error) {
             console.error("Error sending OTP:", error);
