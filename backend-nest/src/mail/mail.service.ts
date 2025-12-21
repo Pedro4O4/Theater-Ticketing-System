@@ -1,29 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
-    private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter;
 
-    constructor(private configService: ConfigService) {
-        this.transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: this.configService.get<string>('EMAIL_USER'),
-                pass: this.configService.get<string>('EMAIL_APP_PASSWORD'),
-            },
-        });
-    }
+  constructor(private configService: ConfigService) {
+    const emailUser = this.configService.get<string>('EMAIL_USER');
+    const emailPass = this.configService.get<string>('EMAIL_APP_PASSWORD');
 
-    async sendVerificationOTP(email: string, otp: string) {
-        this.logOTPTerminal(email, otp, 'VERIFICATION CODE');
+    console.log('📧 Mail Service Initializing...');
+    console.log(`   EMAIL_USER: ${emailUser ? emailUser : '❌ NOT SET'}`);
+    console.log(`   EMAIL_APP_PASSWORD: ${emailPass ? '✅ SET (' + emailPass.length + ' chars)' : '❌ NOT SET'}`);
 
-        const mailOptions = {
-            from: this.configService.get<string>('EMAIL_USER'),
-            to: email,
-            subject: 'Account Verification - EventTix',
-            html: `
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass,
+      },
+    });
+  }
+
+  async sendVerificationOTP(email: string, otp: string) {
+    this.logOTPTerminal(email, otp, 'VERIFICATION CODE');
+
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_USER'),
+      to: email,
+      subject: 'Account Verification - EventTix',
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #8B5CF6;">Account Verification</h2>
           <p>Hello,</p>
@@ -39,19 +46,19 @@ export class MailService {
           </p>
         </div>
       `,
-        };
+    };
 
-        return this.sendMail(mailOptions);
-    }
+    return this.sendMail(mailOptions);
+  }
 
-    async sendPasswordResetOTP(email: string, otp: string) {
-        this.logOTPTerminal(email, otp, 'PASSWORD RESET CODE');
+  async sendPasswordResetOTP(email: string, otp: string) {
+    this.logOTPTerminal(email, otp, 'PASSWORD RESET CODE');
 
-        const mailOptions = {
-            from: this.configService.get<string>('EMAIL_USER'),
-            to: email,
-            subject: 'Password Reset OTP - EventTix',
-            html: `
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_USER'),
+      to: email,
+      subject: 'Password Reset OTP - EventTix',
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #8B5CF6;">Password Reset Request</h2>
           <p>Hello,</p>
@@ -68,29 +75,41 @@ export class MailService {
           </p>
         </div>
       `,
-        };
+    };
 
-        return this.sendMail(mailOptions);
+    return this.sendMail(mailOptions);
+  }
+
+  private async sendMail(mailOptions: nodemailer.SendMailOptions) {
+    const emailUser = this.configService.get<string>('EMAIL_USER');
+    const emailPass = this.configService.get<string>('EMAIL_APP_PASSWORD');
+
+    if (!emailUser || !emailPass) {
+      console.error('❌ Email configuration missing: EMAIL_USER or EMAIL_APP_PASSWORD not set in .env');
+      throw new InternalServerErrorException(
+        'Email service is not configured. Please contact support.',
+      );
     }
 
-    private async sendMail(mailOptions: nodemailer.SendMailOptions) {
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            console.log('✅ Email sent:', info.messageId);
-            return { success: true, messageId: info.messageId };
-        } catch (error) {
-            console.warn('⚠️ Email sending failed:', error.message);
-            return { success: true, fallback: true, error: error.message };
-        }
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('✅ Email sent:', info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error('❌ Email sending failed:', error.message);
+      throw new InternalServerErrorException(
+        'Failed to send email. Please try again later or contact support.',
+      );
     }
+  }
 
-    private logOTPTerminal(email: string, otp: string, type: string) {
-        console.log('\n========================================');
-        console.log(`📧 ${type}`);
-        console.log('========================================');
-        console.log(`Email: ${email}`);
-        console.log(`OTP Code: ${otp}`);
-        console.log(`Expires: 10 minutes`);
-        console.log('========================================\n');
-    }
+  private logOTPTerminal(email: string, otp: string, type: string) {
+    console.log('\n========================================');
+    console.log(`📧 ${type}`);
+    console.log('========================================');
+    console.log(`Email: ${email}`);
+    console.log(`OTP Code: ${otp}`);
+    console.log(`Expires: 10 minutes`);
+    console.log('========================================\n');
+  }
 }

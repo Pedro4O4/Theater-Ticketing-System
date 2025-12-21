@@ -6,24 +6,10 @@ export declare class MailService {
     sendVerificationOTP(email: string, otp: string): Promise<{
         success: boolean;
         messageId: any;
-        fallback?: undefined;
-        error?: undefined;
-    } | {
-        success: boolean;
-        fallback: boolean;
-        error: any;
-        messageId?: undefined;
     }>;
     sendPasswordResetOTP(email: string, otp: string): Promise<{
         success: boolean;
         messageId: any;
-        fallback?: undefined;
-        error?: undefined;
-    } | {
-        success: boolean;
-        fallback: boolean;
-        error: any;
-        messageId?: undefined;
     }>;
     private sendMail;
     private logOTPTerminal;

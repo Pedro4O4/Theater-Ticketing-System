@@ -9,6 +9,7 @@ import {
     FiLayers, FiSearch, FiX, FiChevronRight
 } from 'react-icons/fi';
 import api from '@/services/api';
+import ConfirmationDialog from './ConfirmationDialog';
 import './TheaterListPage.css';
 
 interface TheaterLayout {
@@ -290,42 +291,17 @@ const TheaterListPage = () => {
                 </AnimatePresence >
             </div >
 
-            <AnimatePresence>
-                {deleteConfirm && (
-                    <motion.div
-                        className="modal-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setDeleteConfirm(null)}
-                    >
-                        <motion.div
-                            className="confirm-modal"
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            onClick={(e: MouseEvent) => e.stopPropagation()}
-                        >
-                            <h3>Delete Theater?</h3>
-                            <p>This action will permanently delete the theater from the database. This cannot be undone.</p>
-                            <div className="modal-actions">
-                                <button
-                                    className="modal-btn cancel"
-                                    onClick={() => setDeleteConfirm(null)}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    className="modal-btn delete"
-                                    onClick={() => handleDelete(deleteConfirm)}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <ConfirmationDialog
+                isOpen={!!deleteConfirm}
+                title="Delete Theater"
+                message="Are you sure you want to permanently delete this theater?"
+                itemName={theaters.find(t => t._id === deleteConfirm)?.name}
+                confirmText="Delete Theater"
+                cancelText="Cancel"
+                variant="danger"
+                onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+                onCancel={() => setDeleteConfirm(null)}
+            />
 
             <AnimatePresence>
                 {previewTheater && (

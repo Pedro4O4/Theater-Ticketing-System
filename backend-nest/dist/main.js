@@ -37,7 +37,8 @@ async function bootstrap() {
         credentials: true,
         allowedHeaders: 'Content-Type, Authorization',
     });
-    await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
+    await app.listen(3001, '0.0.0.0');
+    console.log('🚀 Backend running on http://localhost:3001');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

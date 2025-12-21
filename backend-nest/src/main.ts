@@ -46,6 +46,7 @@ async function bootstrap() {
   });
 
   // Listen on 0.0.0.0 to accept connections from any network interface
-  await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
+  await app.listen(3001, '0.0.0.0');
+  console.log('🚀 Backend running on http://localhost:3001');
 }
 bootstrap();

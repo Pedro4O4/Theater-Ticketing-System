@@ -7,11 +7,13 @@ import ConfirmationDialog from '@/components/AdminComponent/ConfirmationDialog';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { Booking, Event } from '@/types/event';
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 import { FiAlertCircle, FiArrowRight, FiTrash2 } from 'react-icons/fi';
 import '@/components/Booking component/BookingDetails.css';
 
 import { getImageUrl } from '@/utils/imageHelper';
 import SeatSelector from '@/components/Booking component/SeatSelector';
+import '@/components/Booking component/BookingTicketForm.css';
 
 const BookingDetailsPage = () => {
     const params = useParams();
@@ -22,6 +24,7 @@ const BookingDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [theaterLayout, setTheaterLayout] = useState<any>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -39,6 +42,20 @@ const BookingDetailsPage = () => {
                     const eResp = await api.get<any>(`/event/${bData.eventId}`);
                     const eData = eResp.data.success ? eResp.data.data : eResp.data;
                     setEvent(eData);
+                }
+
+                // Fetch theater layout if hasTheaterSeating
+                const eventIdStr = typeof bData.eventId === 'object' ? bData.eventId._id : bData.eventId;
+                if (bData.hasTheaterSeating && eventIdStr) {
+                    try {
+                        const seatsResp = await api.get<any>(`/booking/event/${eventIdStr}/seats`);
+                        const seatsData = seatsResp.data.success ? seatsResp.data.data : seatsResp.data;
+                        if (seatsData?.theater?.layout) {
+                            setTheaterLayout(seatsData.theater.layout);
+                        }
+                    } catch (theaterErr) {
+                        console.error('Error fetching theater layout:', theaterErr);
+                    }
                 }
             } catch (err: any) {
                 console.error("Error fetching details:", err);
@@ -81,6 +98,84 @@ const BookingDetailsPage = () => {
     const eventId = eventData._id || eventData.id || booking.eventId;
     const imageUrl = getImageUrl(eventData.image);
 
+    // For theater bookings, use fullpage layout like booking page
+    if (booking.hasTheaterSeating && eventId) {
+        return (
+            <ProtectedRoute requiredRole="Standard User">
+                <motion.div className="booking-page fullpage-theater" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <div className="booking-bg-effect"></div>
+                    <div className="theater-fullpage-container">
+                        {/* Compact Header Bar - Same style as booking page */}
+                        <motion.div className="theater-header-bar" initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+                            <motion.button className="back-btn-compact" onClick={() => router.push('/bookings')} whileHover={{ x: -3 }}>
+                                <FiArrowRight style={{ transform: 'rotate(180deg)' }} /><span>Back</span>
+                            </motion.button>
+                            <div className="event-info-compact">
+                                <img src={imageUrl} alt="" className="event-thumb" />
+                                <div>
+                                    <h2>{eventData.title}</h2>
+                                    <div className="event-meta-compact">
+                                        <span>📍 {eventData.location || 'TBA'}</span>
+                                        <span>📅 {new Date(eventData.date).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="booking-summary-compact">
+                                <span className={`booking-status ${booking.status?.toLowerCase()}`} style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600 }}>
+                                    {isCancelled ? '❌ Cancelled' : '✅ Confirmed'}
+                                </span>
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                    {booking.selectedSeats?.slice(0, 5).map((s, i) => (
+                                        <span key={i} className="seats-count" style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#a78bfa' }}>
+                                            {s.row}{s.seatNumber}
+                                        </span>
+                                    ))}
+                                    {(booking.selectedSeats?.length || 0) > 5 && (
+                                        <span className="seats-count">+{(booking.selectedSeats?.length || 0) - 5} more</span>
+                                    )}
+                                </div>
+                                <span className="total-amount">${booking.totalPrice?.toFixed(2)}</span>
+                                {!isCancelled && (
+                                    <motion.button
+                                        className="cancel-booking-btn"
+                                        onClick={() => setShowCancelConfirm(true)}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        style={{ padding: '8px 16px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+                                    >
+                                        <FiTrash2 size={14} /> Cancel
+                                    </motion.button>
+                                )}
+                            </div>
+                        </motion.div>
+
+                        {/* Full Page Seat Selector - Same as booking page */}
+                        <div className="theater-seat-area">
+                            <SeatSelector
+                                eventId={eventId}
+                                readOnly={true}
+                                highlightedSeats={booking.selectedSeats?.map(s => ({
+                                    row: s.row,
+                                    seatNumber: s.seatNumber,
+                                    section: s.section || 'main'
+                                })) || []}
+                            />
+                        </div>
+                    </div>
+
+                    <ConfirmationDialog
+                        isOpen={showCancelConfirm}
+                        title="Cancel Booking"
+                        message="Are you sure you want to cancel this booking? This action cannot be undone."
+                        onConfirm={handleCancel}
+                        onCancel={() => setShowCancelConfirm(false)}
+                    />
+                </motion.div>
+            </ProtectedRoute>
+        );
+    }
+
+    // For non-theater bookings, use card layout
     return (
         <ProtectedRoute requiredRole="Standard User">
             <div className="booking-details-container">
@@ -126,19 +221,6 @@ const BookingDetailsPage = () => {
                             </div>
                         </div>
 
-                        {booking.hasTheaterSeating && booking.selectedSeats && (
-                            <div className="seats-display-section">
-                                <h4>🪑 Your Booked Seats</h4>
-                                <div className="seat-chips-list">
-                                    {booking.selectedSeats.map((s, i) => (
-                                        <span key={i} className="seat-chip">
-                                            {s.row}{s.seatNumber} <small>({s.seatType})</small>
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
                         <div className="booking-actions">
                             <Link href="/bookings" className="back-button">
                                 <FiArrowRight style={{ transform: 'rotate(180deg)' }} /> Back to My Bookings
@@ -150,22 +232,6 @@ const BookingDetailsPage = () => {
                             )}
                         </div>
                     </div>
-
-                    {booking.hasTheaterSeating && eventId && (
-                        <div className="theater-view-section">
-                            <div className="section-header">
-                                <h3>Theater Layout</h3>
-                                <p>Your seats are highlighted in purple below</p>
-                            </div>
-                            <div className="theater-details-container">
-                                <SeatSelector
-                                    eventId={typeof eventId === 'object' ? (eventId as any)._id : eventId}
-                                    readOnly={true}
-                                    highlightedSeats={booking.selectedSeats}
-                                />
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <ConfirmationDialog

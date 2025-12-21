@@ -57,16 +57,30 @@ let BookingsService = class BookingsService {
             if (!theater) {
                 throw new common_1.NotFoundException('Theater not found for this event');
             }
+            const mergedSeatConfig = [...(theater.seatConfig || [])];
+            if (event.seatConfig && event.seatConfig.length > 0) {
+                event.seatConfig.forEach((eventSeat) => {
+                    const existingIdx = mergedSeatConfig.findIndex((ts) => String(ts.row).trim().toLowerCase() === String(eventSeat.row).trim().toLowerCase() &&
+                        Number(ts.seatNumber) === Number(eventSeat.seatNumber) &&
+                        (String(ts.section || 'main').toLowerCase()) === (String(eventSeat.section || 'main').toLowerCase()));
+                    if (existingIdx >= 0) {
+                        mergedSeatConfig[existingIdx] = eventSeat;
+                    }
+                    else {
+                        mergedSeatConfig.push(eventSeat);
+                    }
+                });
+            }
             const seatsWithPrices = selectedSeats.map((seat) => {
-                const seatConfig = theater.seatConfig.find((s) => s.row === seat.row &&
-                    s.seatNumber === seat.seatNumber &&
-                    s.section === seat.section);
-                const seatType = seatConfig?.seatType || 'standard';
-                const pricing = event.seatPricing.find((p) => p.seatType === seatType);
-                const price = pricing?.price || event.ticketPrice || 0;
+                const seatConfig = mergedSeatConfig.find((s) => String(s.row).trim().toLowerCase() === String(seat.row).trim().toLowerCase() &&
+                    Number(s.seatNumber) === Number(seat.seatNumber) &&
+                    (String(s.section || 'main').toLowerCase()) === (String(seat.section || 'main').toLowerCase()));
+                const seatType = (seatConfig?.seatType || 'standard').toLowerCase();
+                const pricing = event.seatPricing.find((p) => String(p.seatType).toLowerCase() === seatType);
+                const price = pricing ? pricing.price : (event.ticketPrice || 0);
                 return {
-                    row: seat.row,
-                    seatNumber: seat.seatNumber,
+                    row: String(seat.row),
+                    seatNumber: Number(seat.seatNumber),
                     section: seat.section || 'main',
                     seatType,
                     price,
@@ -164,9 +178,9 @@ let BookingsService = class BookingsService {
         const mergedSeatConfig = [...(theater.seatConfig || [])];
         if (event.seatConfig && event.seatConfig.length > 0) {
             event.seatConfig.forEach((eventSeat) => {
-                const existingIdx = mergedSeatConfig.findIndex((ts) => ts.row === eventSeat.row &&
-                    ts.seatNumber === eventSeat.seatNumber &&
-                    ts.section === eventSeat.section);
+                const existingIdx = mergedSeatConfig.findIndex((ts) => String(ts.row).trim().toLowerCase() === String(eventSeat.row).trim().toLowerCase() &&
+                    Number(ts.seatNumber) === Number(eventSeat.seatNumber) &&
+                    (String(ts.section || 'main').toLowerCase()) === (String(eventSeat.section || 'main').toLowerCase()));
                 if (existingIdx >= 0) {
                     mergedSeatConfig[existingIdx] = eventSeat;
                 }
@@ -186,10 +200,13 @@ let BookingsService = class BookingsService {
                 const seatKey = `main-${rowLabel}-${s}`;
                 if (removedSeatsSet.has(seatKey))
                     continue;
-                const seatConfig = mergedSeatConfig.find((sc) => sc.row === rowLabel && sc.seatNumber === s && sc.section === 'main');
+                const seatConfig = mergedSeatConfig.find((sc) => String(sc.row).trim().toLowerCase() === String(rowLabel).trim().toLowerCase() &&
+                    Number(sc.seatNumber) === Number(s) &&
+                    (String(sc.section || 'main').toLowerCase()) === 'main');
                 const isDisabled = disabledSeatsSet.has(seatKey);
                 const isActive = !isDisabled && seatConfig?.isActive !== false;
-                const seatType = seatConfig?.seatType || 'standard';
+                const seatType = (seatConfig?.seatType || 'standard').toLowerCase();
+                const pricingRecord = event.seatPricing.find((p) => String(p.seatType).toLowerCase() === seatType);
                 allSeats.push({
                     row: rowLabel,
                     seatNumber: s,
@@ -197,8 +214,7 @@ let BookingsService = class BookingsService {
                     seatType,
                     isActive,
                     isBooked: bookedSeatsSet.has(seatKey),
-                    price: event.seatPricing.find((p) => p.seatType === seatType)?.price ||
-                        event.ticketPrice,
+                    price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                 });
             }
         }
@@ -211,12 +227,13 @@ let BookingsService = class BookingsService {
                     const seatKey = `balcony-${rowLabel}-${s}`;
                     if (removedSeatsSet.has(seatKey))
                         continue;
-                    const seatConfig = mergedSeatConfig.find((sc) => sc.row === rowLabel &&
-                        sc.seatNumber === s &&
-                        sc.section === 'balcony');
+                    const seatConfig = mergedSeatConfig.find((sc) => String(sc.row).trim().toLowerCase() === String(rowLabel).trim().toLowerCase() &&
+                        Number(sc.seatNumber) === Number(s) &&
+                        (String(sc.section || 'main').toLowerCase()) === 'balcony');
                     const isDisabled = disabledSeatsSet.has(seatKey);
                     const isActive = !isDisabled && seatConfig?.isActive !== false;
-                    const seatType = seatConfig?.seatType || 'standard';
+                    const seatType = (seatConfig?.seatType || 'standard').toLowerCase();
+                    const pricingRecord = event.seatPricing.find((p) => String(p.seatType).toLowerCase() === seatType);
                     allSeats.push({
                         row: rowLabel,
                         seatNumber: s,
@@ -224,8 +241,7 @@ let BookingsService = class BookingsService {
                         seatType,
                         isActive,
                         isBooked: bookedSeatsSet.has(seatKey),
-                        price: event.seatPricing.find((p) => p.seatType === seatType)
-                            ?.price || event.ticketPrice,
+                        price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                     });
                 }
             }

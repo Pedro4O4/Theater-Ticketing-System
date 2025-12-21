@@ -217,6 +217,7 @@ const TheaterFormPage = ({ id }: TheaterFormPageProps) => {
                 <TheaterDesigner
                     initialLayout={initialLayout as any}
                     onSave={handleSave}
+                    showLabelAccents={true}
                 />
             </motion.div>
         </div>

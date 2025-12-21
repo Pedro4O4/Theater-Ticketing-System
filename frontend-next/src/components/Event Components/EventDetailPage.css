@@ -327,8 +327,6 @@
     color: #94A3B8;
     line-height: 1.8;
     font-size: 1rem;
-    max-height: 180px;
-    overflow-y: auto;
     padding-right: 10px;
 }
 
@@ -887,13 +885,41 @@
     color: #EF4444;
 }
 
+.theater-preview-container {
+    margin-top: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
 .theater-seat-container {
     flex: 1;
-    padding: 20px;
+    padding: 0;
     overflow: auto;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    max-height: 850px;
+    /* Increased to show more of the theater */
+    width: 100%;
+    position: relative;
+}
+
+/* SeatSelector handles its own scaling internally; don't double-scale here */
+.theater-seat-container .seat-selector {
+    transform: none;
+    width: 100%;
+}
+
+.theater-seat-container .theater-frame {
+    margin-bottom: 0;
+    overflow: visible;
+    /* Prevent clipping labels */
+}
+
+.theater-seat-container .theater-frame {
+    margin-bottom: 0;
 }
 
 /* Compact Info Grid for split layout */

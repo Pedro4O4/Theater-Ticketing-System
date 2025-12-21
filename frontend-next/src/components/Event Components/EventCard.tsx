@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCalendar, FiMapPin, FiTag, FiX, FiMaximize2, FiShoppingCart, FiInfo } from 'react-icons/fi';
@@ -76,13 +77,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
                             </div>
                         )}
 
-                        <motion.img
+                        <img
                             src={getImageUrl(event.image)}
                             alt={event.title}
                             className={`card-image ${imageLoaded ? 'loaded' : ''}`}
                             onLoad={() => setImageLoaded(true)}
-                            whileHover={{ scale: 1.08 }}
-                            transition={{ duration: 0.6, ease: "easeOut" }}
                         />
                         <div className="image-gradient-overlay"></div>
                         <div className={`ticket-badge ${ticketStatus.class}`}>{ticketStatus.text}</div>
@@ -162,37 +161,39 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
                 <div className="card-glow"></div>
             </motion.div>
 
-            <AnimatePresence>
-                {showFullImage && (
-                    <motion.div
-                        className="image-modal-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setShowFullImage(false)}
-                    >
+            {typeof window !== 'undefined' && createPortal(
+                <AnimatePresence>
+                    {showFullImage && (
                         <motion.div
-                            className="image-modal-content"
-                            initial={{ scale: 0.8, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.8, opacity: 0 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            onClick={(e) => e.stopPropagation()}
+                            className="image-modal-overlay"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                         >
-                            <img src={getImageUrl(event.image)} alt={event.title} className="modal-image" />
-                            <motion.button
-                                className="modal-close-btn"
-                                onClick={() => setShowFullImage(false)}
-                                whileHover={{ scale: 1.1, rotate: 90 }}
-                                whileTap={{ scale: 0.9 }}
+                            <motion.div
+                                className="image-modal-content"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.8, opacity: 0 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <FiX size={24} />
-                            </motion.button>
-                            <div className="modal-title">{event.title}</div>
+                                <img src={getImageUrl(event.image)} alt={event.title} className="modal-image" />
+                                <motion.button
+                                    className="modal-close-btn"
+                                    onClick={() => setShowFullImage(false)}
+                                    whileHover={{ scale: 1.1, rotate: 90 }}
+                                    whileTap={{ scale: 0.9 }}
+                                >
+                                    <FiX size={24} />
+                                </motion.button>
+                                <div className="modal-title">{event.title}</div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </>
     );
 };

@@ -46,6 +46,7 @@ interface TheaterLabel {
     height?: number;
     isNew?: boolean;
     isPixelBased?: boolean;
+    section?: 'main' | 'balcony';
 }
 
 interface LabelPreset {
@@ -81,6 +82,14 @@ interface TheaterDesignerProps {
     initialLayout?: TheaterLayout | null;
     onSave?: (data: SaveData) => void;
     isPreviewMode?: boolean;
+    // Category selection mode props (for EventSeatConfigurator)
+    isCategoryMode?: boolean;
+    seatCategoryMap?: Record<string, string>;  // Map of seatKey -> category
+    currentCategory?: string;
+    onSeatClick?: (section: string, row: string, seatNum: number) => void;
+    onRowClick?: (section: string, row: string, seatsPerRow: number) => void;
+    showLabelAccents?: boolean;
+    allowLabelDragging?: boolean;
 }
 
 // Tool modes for admin
@@ -121,7 +130,14 @@ const LABEL_PRESETS: LabelPreset[] = [
 const TheaterDesigner = ({
     initialLayout = null,
     onSave,
-    isPreviewMode = false
+    isPreviewMode = false,
+    isCategoryMode = false,
+    seatCategoryMap = {},
+    currentCategory = 'standard',
+    onSeatClick,
+    onRowClick,
+    showLabelAccents = false,
+    allowLabelDragging = false
 }: TheaterDesignerProps) => {
     // Default layout
     const defaultLayout: TheaterLayout = {
@@ -149,6 +165,7 @@ const TheaterDesigner = ({
     const [currentTool, setCurrentTool] = useState<ToolType>(TOOLS.SELECT);
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [zoomLevel, setZoomLevel] = useState<number>(1);
+    const [activeSection, setActiveSection] = useState<'main' | 'balcony'>('main');
 
 
 
@@ -686,7 +703,8 @@ const TheaterDesigner = ({
             id: Date.now(),
             text: '',
             position: position,
-            isNew: true
+            isNew: true,
+            section: activeSection // Assign to current section when creating
         });
         setNewLabelText('');
         setSelectedLabelPreset(null);
@@ -703,24 +721,25 @@ const TheaterDesigner = ({
         if (!labelText.trim()) return;
 
         saveToHistory();
-        const labelData = {
+        const labelData: TheaterLabel = {
             id: editingLabel.id,
             text: labelText.trim(),
             icon: selectedLabelPreset?.icon || '📍',
-            position: editingLabel.position
+            position: editingLabel.position,
+            section: editingLabel.section || activeSection // Use existing section or current active section
         };
 
         if (editingLabel.isNew) {
             setLabels(prev => [...prev, labelData]);
         } else {
-            setLabels(prev => prev.map(l => l.id === editingLabel.id ? labelData : l));
+            setLabels(prev => prev.map(l => l.id === editingLabel.id ? { ...labelData, section: l.section || activeSection } : l));
         }
 
         setShowLabelModal(false);
         setEditingLabel(null);
         setNewLabelText('');
         setSelectedLabelPreset(null);
-    }, [editingLabel, newLabelText, selectedLabelPreset, saveToHistory]);
+    }, [editingLabel, newLabelText, selectedLabelPreset, saveToHistory, activeSection]);
 
     const deleteLabel = useCallback((labelId: number) => {
         saveToHistory();
@@ -799,18 +818,29 @@ const TheaterDesigner = ({
                 </div>
             );
         } else {
-            // Normal seat
-            const category = seatCategories[seatKey] || SEAT_TYPES.STANDARD;
+            // Normal seat - use seatCategoryMap in category mode, otherwise internal seatCategories
+            const category = isCategoryMode
+                ? (seatCategoryMap[seatKey] || SEAT_TYPES.STANDARD)
+                : (seatCategories[seatKey] || SEAT_TYPES.STANDARD);
+
+            const handleClick = (e: React.MouseEvent) => {
+                if (isCategoryMode && onSeatClick) {
+                    onSeatClick(section, row, seatNum);
+                } else {
+                    handleSeatClick(row, seatNum, section, e);
+                }
+            };
+
             seatElement = (
                 <motion.div
                     key={seatKey}
-                    className={`seat ${category} ${isSelected ? 'selected' : ''} ${currentTool === TOOLS.REMOVE ? 'remove-mode' : ''} ${currentTool === TOOLS.DISABLE ? 'disable-mode' : ''}`}
-                    onClick={(e) => handleSeatClick(row, seatNum, section, e)}
-                    draggable={currentTool === TOOLS.SELECT}
+                    className={`seat ${category} ${isSelected ? 'selected' : ''} ${currentTool === TOOLS.REMOVE ? 'remove-mode' : ''} ${currentTool === TOOLS.DISABLE ? 'disable-mode' : ''} ${isCategoryMode ? 'category-mode' : ''}`}
+                    onClick={handleClick}
+                    draggable={!isCategoryMode && currentTool === TOOLS.SELECT}
                     onDragStart={(e) => handleDragStart(e as unknown as MouseEvent | TouchEvent | PointerEvent, seatKey)}
                     onDragEnd={handleDragEnd}
                     whileTap={{ scale: 0.95 }}
-                    title={`${row}${seatNum} - ${category.toUpperCase()} ${currentTool === TOOLS.REMOVE ? 'Click to remove' : currentTool === TOOLS.DISABLE ? 'Click to disable' : ''}`}
+                    title={`${row}${seatNum} - ${category.toUpperCase()} ${isCategoryMode ? `Click to set ${currentCategory}` : (currentTool === TOOLS.REMOVE ? 'Click to remove' : currentTool === TOOLS.DISABLE ? 'Click to disable' : '')}`}
                 >
                     <span className="seat-number">{seatNum}</span>
                 </motion.div>
@@ -939,11 +969,31 @@ const TheaterDesigner = ({
         return (
             <React.Fragment key={`${section}-${rowLabel}`}>
                 <div className="seat-row">
-                    <div className="row-label">{rowLabel}</div>
+                    {isCategoryMode && onRowClick ? (
+                        <button
+                            className="row-label row-label-btn"
+                            onClick={() => onRowClick(section, rowLabel, seatsPerRow)}
+                            title={`Click to set entire row ${rowLabel} to ${currentCategory}`}
+                        >
+                            {rowLabel}
+                        </button>
+                    ) : (
+                        <div className="row-label">{rowLabel}</div>
+                    )}
                     <div className="seats-container">
                         {seats}
                     </div>
-                    <div className="row-label">{rowLabel}</div>
+                    {isCategoryMode && onRowClick ? (
+                        <button
+                            className="row-label row-label-btn"
+                            onClick={() => onRowClick(section, rowLabel, seatsPerRow)}
+                            title={`Click to set entire row ${rowLabel} to ${currentCategory}`}
+                        >
+                            {rowLabel}
+                        </button>
+                    ) : (
+                        <div className="row-label">{rowLabel}</div>
+                    )}
                 </div>
                 {renderHCorridorSlot(section, rowIndex)}
             </React.Fragment>
@@ -1228,33 +1278,23 @@ const TheaterDesigner = ({
 
             {/* Theater Frame */}
             <div className="theater-frame">
+                {/* Section Switcher Header */}
                 <div className="theater-frame-header">
-                    {layout.stage.position === 'top' ? (
-                        <>
-                            <div className="frame-header-item main-item">
-                                <FiGrid />
-                                <span>MAIN FLOOR</span>
-                            </div>
-                            {layout.hasBalcony && (
-                                <div className="frame-header-item balcony-item">
-                                    <FiChevronsUp />
-                                    <span>BALCONY</span>
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <>
-                            {layout.hasBalcony && (
-                                <div className="frame-header-item balcony-item">
-                                    <FiChevronsDown />
-                                    <span>BALCONY</span>
-                                </div>
-                            )}
-                            <div className="frame-header-item main-item">
-                                <FiGrid />
-                                <span>MAIN FLOOR</span>
-                            </div>
-                        </>
+                    <button
+                        className={`section-switcher-btn ${activeSection === 'main' ? 'active' : ''}`}
+                        onClick={() => setActiveSection('main')}
+                    >
+                        <FiGrid />
+                        <span>MAIN FLOOR</span>
+                    </button>
+                    {layout.hasBalcony && (
+                        <button
+                            className={`section-switcher-btn ${activeSection === 'balcony' ? 'active' : ''}`}
+                            onClick={() => setActiveSection('balcony')}
+                        >
+                            <FiChevronsUp />
+                            <span>BALCONY</span>
+                        </button>
                     )}
                 </div>
 
@@ -1283,15 +1323,16 @@ const TheaterDesigner = ({
                             </motion.div>
                         )}
 
-                        {/* Sections in order based on Stage position */}
-                        {layout.stage.position === 'top' ? (
-                            <>
-                                {/* Main Floor Section */}
+                        {/* Render only the active section */}
+                        <AnimatePresence mode="wait">
+                            {activeSection === 'main' && (
                                 <motion.div
+                                    key="main-section"
                                     className="section main-section"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
                                 >
                                     <div className="seats-grid">
                                         {renderHCorridorSlot('main', -1)}
@@ -1306,81 +1347,32 @@ const TheaterDesigner = ({
                                         )}
                                     </div>
                                 </motion.div>
+                            )}
 
-                                {/* Balcony Section */}
-                                <AnimatePresence>
-                                    {layout.hasBalcony && (
-                                        <motion.div
-                                            className="section balcony-section"
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                        >
-                                            <div className="seats-grid">
-                                                {renderHCorridorSlot('balcony', -1)}
-                                                {balconyRowLabels.map((rowLabel, idx) =>
-                                                    renderRow(
-                                                        rowLabel,
-                                                        idx,
-                                                        layout.balcony.seatsPerRow,
-                                                        'balcony',
-                                                        layout.balcony.rows
-                                                    )
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </>
-                        ) : (
-                            <>
-                                {/* Balcony Section (Above Main if Stage Bottom) */}
-                                <AnimatePresence>
-                                    {layout.hasBalcony && (
-                                        <motion.div
-                                            className="section balcony-section"
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                        >
-                                            <div className="seats-grid">
-                                                {renderHCorridorSlot('balcony', -1)}
-                                                {balconyRowLabels.map((rowLabel, idx) =>
-                                                    renderRow(
-                                                        rowLabel,
-                                                        idx,
-                                                        layout.balcony.seatsPerRow,
-                                                        'balcony',
-                                                        layout.balcony.rows
-                                                    )
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                {/* Main Floor Section */}
+                            {activeSection === 'balcony' && layout.hasBalcony && (
                                 <motion.div
-                                    className="section main-section"
+                                    key="balcony-section"
+                                    className="section balcony-section"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
                                 >
                                     <div className="seats-grid">
-                                        {renderHCorridorSlot('main', -1)}
-                                        {mainRowLabels.map((rowLabel, idx) =>
+                                        {renderHCorridorSlot('balcony', -1)}
+                                        {balconyRowLabels.map((rowLabel, idx) =>
                                             renderRow(
                                                 rowLabel,
                                                 idx,
-                                                layout.mainFloor.seatsPerRow,
-                                                'main',
-                                                layout.mainFloor.rows
+                                                layout.balcony.seatsPerRow,
+                                                'balcony',
+                                                layout.balcony.rows
                                             )
                                         )}
                                     </div>
                                 </motion.div>
-                            </>
-                        )}
+                            )}
+                        </AnimatePresence>
 
                         {/* Stage at bottom */}
                         {layout.stage.position === 'bottom' && (
@@ -1397,74 +1389,89 @@ const TheaterDesigner = ({
 
                         {/* Dedicated Labels Overlay - MUST BE INSIDE CANVAS for correct scaling */}
                         <div className="labels-overlay">
-                            {labels.map(label => (
-                                <motion.div
-                                    key={label.id}
-                                    className={`theater-label ${draggingLabel === label.id ? 'dragging' : ''} ${currentTool === TOOLS.REMOVE ? 'remove-mode' : ''}`}
-                                    style={{
-                                        left: label.isPixelBased
-                                            ? `calc(50% + ${label.position.x}px)`
-                                            : `${label.position.x}%`,
-                                        top: label.isPixelBased
-                                            ? `${label.position.y}px`
-                                            : `${label.position.y}%`,
-                                        width: label.width || 'auto',
-                                        height: label.height || 'auto',
-                                        minWidth: label.width ? undefined : 'auto'
-                                    }}
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: draggingLabel === label.id ? 1.05 : 1 }}
-                                    whileHover={{ scale: draggingLabel ? 1 : 1.05 }}
-                                    onMouseDown={(e) => {
-                                        e.stopPropagation();
-                                        if (e.button === 0 && currentTool !== TOOLS.REMOVE) {
-                                            e.preventDefault();
-                                            if (!draggingLabel) saveToHistory();
-                                            wasDragging.current = false;
-                                            setDraggingLabel(label.id);
-                                        }
-                                    }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (currentTool === TOOLS.REMOVE) {
-                                            deleteLabel(label.id);
-                                        }
-                                    }}
-                                >
-                                    {label.icon && <span className="label-icon">{label.icon}</span>}
-                                    <span className="label-text">{label.text}</span>
+                            {labels.filter(label => (label.section || 'main') === activeSection).map(label => {
+                                const isEntry = label.text?.toUpperCase().includes('ENTRY');
+                                const isExit = label.text?.toUpperCase().includes('EXIT');
 
-                                    {/* Resize Handles - Show on hover via CSS, disable in remove mode */}
-                                    {currentTool !== TOOLS.REMOVE && (
-                                        <>
-                                            <div
-                                                className="label-resize-handle label-resize-width"
-                                                onMouseDown={(e) => {
+                                return (
+                                    <motion.div
+                                        key={label.id}
+                                        className={`theater-label ${showLabelAccents ? 'has-accent' : ''} ${draggingLabel === label.id ? 'dragging' : ''} ${(currentTool === TOOLS.LABEL || allowLabelDragging) ? 'interactive' : ''} ${currentTool === TOOLS.REMOVE ? 'remove-mode' : ''} ${showLabelAccents && isEntry ? 'label-entry' : ''} ${showLabelAccents && isExit ? 'label-exit' : ''}`}
+                                        style={{
+                                            left: label.isPixelBased
+                                                ? `calc(50% + ${label.position.x}px)`
+                                                : `${label.position.x}%`,
+                                            top: label.isPixelBased
+                                                ? `${label.position.y}px`
+                                                : `${label.position.y}%`,
+                                            width: label.width || 'auto',
+                                            height: label.height || 'auto',
+                                            minWidth: label.width ? undefined : 'auto'
+                                        }}
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: draggingLabel === label.id ? 1.05 : 1 }}
+                                        whileHover={{ scale: draggingLabel ? 1 : 1.05 }}
+                                        onMouseDown={(e) => {
+                                            // Normal editing mode
+                                            if (!isCategoryMode && !isPreviewMode) {
+                                                if (e.button === 0 && currentTool !== TOOLS.REMOVE) {
                                                     e.stopPropagation();
-                                                    saveToHistory();
-                                                    setResizingLabel({ id: label.id, type: 'width' });
-                                                }}
-                                                title="Resize Width"
-                                            />
-                                            <div
-                                                className="label-resize-handle label-resize-height"
-                                                onMouseDown={(e) => {
-                                                    e.stopPropagation();
-                                                    saveToHistory();
-                                                    setResizingLabel({ id: label.id, type: 'height' });
-                                                }}
-                                                title="Resize Height"
-                                            />
-                                        </>
-                                    )}
+                                                    e.preventDefault();
+                                                    if (!draggingLabel) saveToHistory();
+                                                    wasDragging.current = false;
+                                                    setDraggingLabel(label.id);
+                                                }
+                                            }
+                                            // Handle interaction mode (even in category/preview mode)
+                                            else if (allowLabelDragging && e.button === 0) {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                wasDragging.current = false;
+                                                setDraggingLabel(label.id);
+                                            }
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (currentTool === TOOLS.REMOVE && !isCategoryMode && !isPreviewMode) {
+                                                deleteLabel(label.id);
+                                            }
+                                        }}
+                                    >
+                                        {label.icon && <span className="label-icon">{label.icon}</span>}
+                                        <span className="label-text">{label.text}</span>
 
-                                    {draggingLabel === label.id && (
-                                        <div className="label-drag-handle">
-                                            <FiMove />
-                                        </div>
-                                    )}
-                                </motion.div>
-                            ))}
+                                        {/* Resize Handles - Show on hover via CSS, disable in remove mode and category/preview mode */}
+                                        {((currentTool !== TOOLS.REMOVE && !isCategoryMode && !isPreviewMode) || allowLabelDragging) && (
+                                            <>
+                                                <div
+                                                    className="label-resize-handle label-resize-width"
+                                                    onMouseDown={(e) => {
+                                                        e.stopPropagation();
+                                                        if (!isPreviewMode) saveToHistory();
+                                                        setResizingLabel({ id: label.id, type: 'width' });
+                                                    }}
+                                                    title="Resize Width"
+                                                />
+                                                <div
+                                                    className="label-resize-handle label-resize-height"
+                                                    onMouseDown={(e) => {
+                                                        e.stopPropagation();
+                                                        if (!isPreviewMode) saveToHistory();
+                                                        setResizingLabel({ id: label.id, type: 'height' });
+                                                    }}
+                                                    title="Resize Height"
+                                                />
+                                            </>
+                                        )}
+
+                                        {draggingLabel === label.id && (
+                                            <div className="label-drag-handle">
+                                                <FiMove />
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

@@ -4,17 +4,19 @@ import api from '@/services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiUsers, FiDollarSign, FiCheck, FiX, FiAlertCircle,
-    FiChevronUp, FiLoader
+    FiChevronUp, FiLoader, FiChevronsUp, FiChevronsDown,
+    FiMinus, FiPlus
 } from 'react-icons/fi';
 import { Theater } from '@/types/theater';
 import { Seat, SeatPricing } from '@/types/booking';
 import './SeatSelector.css';
 
+// Match TheaterDesigner colors for consistency
 const SEAT_TYPE_COLORS: Record<string, { bg: string; border: string; label: string }> = {
-    standard: { bg: '#4B5563', border: '#6B7280', label: 'Standard' },
-    vip: { bg: '#D97706', border: '#F59E0B', label: 'VIP' },
-    premium: { bg: '#7C3AED', border: '#8B5CF6', label: 'Premium' },
-    wheelchair: { bg: '#2563EB', border: '#3B82F6', label: 'Wheelchair' }
+    standard: { bg: '#6B7280', border: '#94A3B8', label: 'Standard' },
+    vip: { bg: '#F59E0B', border: '#FCD34D', label: 'VIP' },
+    premium: { bg: '#6366F1', border: '#A5B4FC', label: 'Premium' },
+    wheelchair: { bg: '#0EA5E9', border: '#7DD3FC', label: 'Wheelchair' }
 };
 
 interface SeatSelectorProps {
@@ -39,6 +41,9 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
     const [seatPricing, setSeatPricing] = useState<SeatPricing[]>([]);
     const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
     const [hoveredSeat, setHoveredSeat] = useState<Seat | null>(null);
+    const [scale, setScale] = useState(1);
+    const [activeSection, setActiveSection] = useState<'main' | 'balcony'>('main');
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Fetch seat availability
     useEffect(() => {
@@ -53,6 +58,11 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                     setTheaterData(data.theater);
                     setSeats(data.seats);
                     setSeatPricing(data.seatPricing);
+
+                    // DEBUG: Log booked seats
+                    const bookedSeats = data.seats.filter((s: any) => s.isBooked);
+                    console.log('[SeatSelector] Total seats:', data.seats.length);
+                    console.log('[SeatSelector] Booked seats:', bookedSeats.length, bookedSeats.map((s: any) => `${s.section}-${s.row}-${s.seatNumber}`));
                 }
             } catch (err: any) {
                 console.error('Error fetching seats:', err);
@@ -137,6 +147,56 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
     const clearSelection = () => setSelectedSeats([]);
 
+    // Auto-scale logic
+    useEffect(() => {
+        if (!theaterData) return;
+
+        const calculateScale = () => {
+            if (containerRef.current && theaterData?.layout) {
+                // Account for the padding in .theater-canvas-container
+                const containerWidth = containerRef.current.offsetWidth - 80;
+
+                // Estimate theater width based on layout
+                const mainFloor = theaterData.layout.mainFloor;
+                const seatsPerRow = mainFloor?.seatsPerRow || 12;
+                const seatSize = 28; // compact size
+                const seatGap = 2;   // tight gap
+
+                // Count vertical corridors
+                const vCorridors = theaterData.layout.vCorridors || {};
+                let totalCorridorWidth = 0;
+                Object.values(vCorridors).forEach((count: any) => {
+                    totalCorridorWidth += count * 20; // 20px per corridor segment
+                });
+
+                const gridWidth = (seatsPerRow * seatSize) + ((seatsPerRow - 1) * seatGap) + totalCorridorWidth + 100; // row labels + buffer
+
+                // Account for labels that might be outside the grid
+                const labels = theaterData.layout.labels || [];
+                let maxLabelExtentX = gridWidth / 2;
+
+                labels.forEach((label: any) => {
+                    if (label.isPixelBased) {
+                        // x is offset from center
+                        const labelWidth = typeof label.width === 'number' ? label.width : 100;
+                        const extent = Math.abs(label.position?.x || 0) + (labelWidth / 2);
+                        maxLabelExtentX = Math.max(maxLabelExtentX, extent);
+                    }
+                });
+
+                // The theater is centered, so maxLabelExtentX defines the minimum half-width needed
+                const totalWidthRequired = (maxLabelExtentX * 2) + 120; // Add some side buffer
+
+                const newScale = Math.min(1.2, containerWidth / totalWidthRequired);
+                setScale(newScale);
+            }
+        };
+
+        calculateScale();
+        window.addEventListener('resize', calculateScale);
+        return () => window.removeEventListener('resize', calculateScale);
+    }, [theaterData]);
+
     // Render single seat
     const renderSeatSlot = (section: string, rowLabel: string, seatNum: number) => {
         const seatKey = `${section}-${rowLabel}-${seatNum}`;
@@ -173,13 +233,23 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
         const typeColors = SEAT_TYPE_COLORS[seat.seatType] || SEAT_TYPE_COLORS.standard;
 
+        // Force inline styles for booked seats to ensure visibility
+        const bookedStyles = (seat.isBooked && !isHighlighted) ? {
+            background: '#2d1f1f',
+            borderColor: '#6b3a3a',
+            opacity: 0.7,
+            cursor: 'not-allowed',
+            pointerEvents: 'none' as const,
+        } : {};
+
         return (
             <React.Fragment key={seatKey}>
                 <motion.button
                     className={`seat-btn ${seat.seatType} ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${seat.isBooked && !isHighlighted ? 'booked' : ''} ${!seat.isActive ? 'disabled' : ''}`}
                     style={{
                         '--seat-bg': typeColors.bg,
-                        '--seat-border': typeColors.border
+                        '--seat-border': typeColors.border,
+                        ...bookedStyles
                     } as any}
                     onClick={() => handleSeatClick(seat)}
                     onMouseEnter={() => !readOnly && setHoveredSeat(seat)}
@@ -188,9 +258,11 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                     whileHover={!seat.isBooked && seat.isActive && !readOnly ? { scale: 1.15 } : {}}
                     whileTap={!seat.isBooked && seat.isActive && !readOnly ? { scale: 0.95 } : {}}
                 >
-                    {(isSelected || isHighlighted) && <FiCheck className="check-icon" />}
-                    {seat.isBooked && !isHighlighted && <FiX className="booked-icon" />}
-                    {!isSelected && !isHighlighted && !seat.isBooked && (
+                    {(isSelected || isHighlighted) ? (
+                        <FiCheck className="check-icon" />
+                    ) : seat.isBooked && !isHighlighted ? (
+                        <FiX style={{ color: '#ef4444', fontSize: '1rem' }} />
+                    ) : (
                         <span className="seat-num">{seat.seatNumber}</span>
                     )}
                 </motion.button>
@@ -227,11 +299,11 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
         return (
             <React.Fragment key={`${section}-${rowLabel}`}>
                 <div className="seat-row">
-                    <span className="row-label">{rowLabel}</span>
-                    <div className="row-seats">
+                    <div className="row-label">{rowLabel}</div>
+                    <div className="seats-container">
                         {slots}
                     </div>
-                    <span className="row-label">{rowLabel}</span>
+                    <div className="row-label">{rowLabel}</div>
                 </div>
                 {renderHCorridorGap(section, rowIndex)}
             </React.Fragment>
@@ -245,11 +317,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
         return (
             <div key={sectionName} className={`section ${sectionName}-section`}>
-                <div className="section-label">
-                    {sectionName === 'balcony' && <FiChevronUp />}
-                    {sectionName.toUpperCase()}
-                </div>
-                <div className="section-seats grid-layout">
+                <div className="seats-grid">
                     {renderHCorridorGap(sectionName, -1)}
                     {rows.map((row, idx) => renderRow(sectionName, row, idx))}
                 </div>
@@ -262,40 +330,95 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
     return (
         <div className="seat-selector">
-            {(theaterData?.layout.stage?.position || 'top') === 'top' && (
-                <motion.div className="stage" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-                    <span>STAGE</span>
-                </motion.div>
+            {/* Section Switcher - only show if theater has balcony */}
+            {theaterData?.layout.hasBalcony && (
+                <div className="section-switcher">
+                    <button
+                        className={`section-btn ${activeSection === 'main' ? 'active' : ''}`}
+                        onClick={() => setActiveSection('main')}
+                    >
+                        🎭 Main Floor
+                    </button>
+                    <button
+                        className={`section-btn ${activeSection === 'balcony' ? 'active' : ''}`}
+                        onClick={() => setActiveSection('balcony')}
+                    >
+                        🏛️ Balcony
+                    </button>
+                </div>
             )}
 
-            <div className="seat-map-container">
-                <div className="seat-map">
-                    {theaterData?.layout.hasBalcony && renderSection('balcony')}
-                    {renderSection('main')}
+            <div className="theater-frame">
+                <div className="theater-canvas-container" ref={containerRef}>
+                    <div className="theater-canvas" style={{ transform: `scale(${scale})` }}>
+                        {/* Stage at top */}
+                        {(theaterData?.layout.stage?.position || 'top') === 'top' && (
+                            <motion.div
+                                className="stage stage-top"
+                                style={{ width: `${theaterData?.layout.stage?.width || 60}%` }}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                            >
+                                <span>STAGE</span>
+                                <FiChevronsUp className="stage-icon" />
+                            </motion.div>
+                        )}
 
-                    {theaterData?.layout.labels?.map(label => (
-                        <div
-                            key={label.id}
-                            className="theater-label"
-                            style={{
-                                left: `${label.position.x}%`,
-                                top: `${label.position.y}%`,
-                                width: label.width || 'auto',
-                                height: label.height || 'auto'
-                            }}
-                        >
-                            <span className="label-icon">{label.icon}</span>
-                            <span className="label-text">{label.text}</span>
+                        {/* Render only the active section */}
+                        {activeSection === 'main' && renderSection('main')}
+                        {activeSection === 'balcony' && theaterData?.layout.hasBalcony && renderSection('balcony')}
+
+                        {/* Stage at bottom */}
+                        {theaterData?.layout.stage?.position === 'bottom' && (
+                            <motion.div
+                                className="stage stage-bottom"
+                                style={{ width: `${theaterData?.layout.stage?.width || 60}%` }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                            >
+                                <span>STAGE</span>
+                                <FiChevronsDown className="stage-icon" />
+                            </motion.div>
+                        )}
+
+                        {/* Labels Overlay */}
+                        <div className="labels-overlay">
+                            {theaterData?.layout.labels?.filter((label: any) => (label.section || 'main') === activeSection).map((label: any) => {
+                                const style: React.CSSProperties = {
+                                    width: label.width || 'auto',
+                                    height: label.height || 'auto'
+                                };
+
+                                if (label.isPixelBased) {
+                                    // Pixel-based: x is offset from center, y is from top
+                                    style.left = `calc(50% + ${label.position?.x || 0}px)`;
+                                    style.top = `${label.position?.y || 0}px`;
+                                } else {
+                                    // Legacy percentage-based positioning
+                                    style.left = `${label.position?.x || 0}%`;
+                                    style.top = `${label.position?.y || 0}%`;
+                                }
+
+                                return (
+                                    <motion.div
+                                        key={label.id}
+                                        className="theater-label"
+                                        style={{
+                                            ...style,
+                                            minWidth: label.width ? undefined : 'auto'
+                                        }}
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                    >
+                                        {label.icon && <span className="label-icon">{label.icon}</span>}
+                                        <span className="label-text">{label.text}</span>
+                                    </motion.div>
+                                );
+                            })}
                         </div>
-                    ))}
+                    </div>
                 </div>
             </div>
-
-            {theaterData?.layout.stage?.position === 'bottom' && (
-                <motion.div className="stage stage-bottom" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                    <span>STAGE</span>
-                </motion.div>
-            )}
 
             <div className="seat-legend">
                 {Object.entries(SEAT_TYPE_COLORS).map(([type, colors]) => {

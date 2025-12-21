@@ -257,9 +257,11 @@ const UserBookingsPage = () => {
             <ConfirmationDialog
                 isOpen={showDeleteConfirm}
                 title="Cancel Booking"
-                message="Are you sure you want to cancel this booking? This action cannot be undone and your seats will be released."
+                message="Are you sure you want to cancel this booking? Your seats will be released."
+                itemName={eventDetails[bookings.find(b => b._id === deleteBookingId)?.eventId || '']?.title}
                 confirmText={cancellationLoading ? "Cancelling..." : "Yes, Cancel Booking"}
                 cancelText="Keep Booking"
+                variant="danger"
                 onConfirm={confirmCancel}
                 onCancel={() => setShowDeleteConfirm(false)}
                 isLoading={cancellationLoading}

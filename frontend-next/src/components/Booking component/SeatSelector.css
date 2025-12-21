@@ -1,16 +1,15 @@
-/* SeatSelector.css - User seat selection component */
+/* SeatSelector.css - User seat selection component - Matching TheaterDesigner styling */
 
 .seat-selector {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 30px 20px;
-    background: linear-gradient(180deg, rgba(30, 30, 50, 0.6), rgba(20, 20, 35, 0.8));
-    border-radius: 20px;
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    padding: 20px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%);
+    border-radius: 12px;
     position: relative;
-    min-height: 70vh;
     width: 100%;
+    isolation: isolate;
 }
 
 .seat-selector.loading,
@@ -36,99 +35,202 @@
     }
 }
 
-/* ===== Stage ===== */
-.stage {
-    width: 70%;
-    max-width: 400px;
-    padding: 15px 40px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
-    border: 2px solid rgba(139, 92, 246, 0.5);
-    border-radius: 0 0 50% 50%;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: #c4b5fd;
-    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.2);
-}
-
-.stage.stage-bottom {
-    border-radius: 50% 50% 0 0;
-    margin-bottom: 0;
-    margin-top: 30px;
-}
-
-/* ===== Seat Map ===== */
-.seat-map {
+/* ===== Section Switcher ===== */
+.section-switcher {
     display: flex;
-    flex-direction: column;
-    gap: 30px;
-    width: 100%;
-    position: relative;
-}
-
-.seat-map-container {
-    width: 100%;
-    overflow-x: auto;
-    padding: 20px 0;
-    display: flex;
-    justify-content: center;
-}
-
-.section {
-    background: rgba(0, 0, 0, 0.2);
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 12px;
-    padding: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
-.section-label {
+.section-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.section-btn:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: #e2e8f0;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.section-btn.active {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(99, 102, 241, 0.3));
+    border-color: #8b5cf6;
+    color: #f8fafc;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+/* ===== Stage - Matching TheaterDesigner styling exactly ===== */
+.stage {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #94a3b8;
-    margin-bottom: 15px;
+    gap: 10px;
+    padding: 20px 40px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+    border: 2px solid rgba(139, 92, 246, 0.5);
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #c4b5fd;
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.2), inset 0 0 20px rgba(139, 92, 246, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.stage-top {
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-top: none;
+}
+
+.stage-bottom {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-bottom: none;
+    margin-top: 20px;
+}
+
+.stage-icon {
+    font-size: 1.5rem;
+}
+
+/* ===== Theater Frame & Canvas - Matching TheaterDesigner structure ===== */
+.theater-frame {
+    background: rgba(15, 15, 23, 0.4);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.theater-canvas-container {
+    position: relative;
+    overflow: auto;
+    width: 100%;
+    min-height: 400px;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.theater-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.theater-canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: fit-content;
+    min-width: 100%;
+    transform-origin: top center;
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.section {
+    width: 100%;
+    max-width: 95%;
+    margin: 0 auto;
+    background: rgba(30, 30, 50, 0.5);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    position: relative;
+    z-index: 1;
 }
 
 .balcony-section {
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.1), transparent);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.1), rgba(30, 30, 50, 0.5));
+    border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
-.section-seats {
+.seats-grid {
     display: flex;
     flex-direction: column;
-    gap: 0px;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.seats-container {
+    display: flex;
+    gap: 4px;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
 }
 
 .seat-row {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 2px;
+    position: relative;
+}
+
+/* Left row label - sticky when scrolling - matching TheaterDesigner colors */
+.seat-row>.row-label:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background: linear-gradient(90deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
+    padding-right: 8px;
+}
+
+/* Right row label - sticky when scrolling - matching TheaterDesigner colors */
+.seat-row>.row-label:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 20;
+    background: linear-gradient(270deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
+    padding-left: 8px;
 }
 
 .row-label {
-    width: 35px;
+    width: 32px;
+    min-width: 32px;
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #64748b;
+    font-weight: 700;
+    color: #94A3B8;
     text-align: center;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .row-seats {
     display: flex;
     align-items: center;
+    gap: 4px;
 }
 
 .seat-slot {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,90 +243,139 @@
 }
 
 .h-corridor-space {
-    height: 30px;
-    margin: 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.08), transparent);
-    border-top: 1px dashed rgba(245, 158, 11, 0.2);
-    border-bottom: 1px dashed rgba(245, 158, 11, 0.2);
+    height: 35px;
+    margin: 8px 0;
+    width: 100%;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.02) 0%, rgba(245, 158, 11, 0.1) 50%, rgba(245, 158, 11, 0.02) 100%);
+    border-top: 1px dashed rgba(245, 158, 11, 0.3);
+    border-bottom: 1px dashed rgba(245, 158, 11, 0.3);
+    transition: all 0.2s;
 }
 
 /* Vertical corridor space - gaps between seat columns */
 .v-corridor-space {
     width: 20px;
-    height: 30px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.05), transparent);
-    flex-shrink: 0;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+    border-left: 1px dashed rgba(34, 211, 238, 0.3);
+    border-right: 1px dashed rgba(34, 211, 238, 0.3);
+    margin: 0 2px;
+    transition: all 0.2s;
 }
 
 .corridor-label {
-    font-size: 0.6rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     letter-spacing: 2px;
     color: #fbbf24;
-    opacity: 0.4;
+    opacity: 0.6;
+}
+
+.labels-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .theater-label {
     position: absolute;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 15px;
-    background: rgba(30, 30, 50, 0.8);
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(20, 20, 35, 0.95);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(139, 92, 246, 0.3);
-    border-radius: 10px;
-    color: #f8fafc;
-    font-size: 0.85rem;
+    border-left: 4px solid #8b5cf6;
+    /* Default purple accent */
+    border-radius: 6px;
+    transform: translate(-50%, -50%);
+    z-index: 1 !important;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    user-select: none;
     pointer-events: none;
-    z-index: 5;
+    overflow: visible;
+}
+
+.theater-label.label-entry {
+    border-left-color: #f59e0b;
+    /* Orange accent */
+}
+
+.theater-label.label-exit {
+    border-left-color: #ef4444;
+    /* Red accent */
 }
 
 .label-icon {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
 }
 
-/* ===== Seat Button ===== */
+.label-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #f8fafc;
+    white-space: nowrap;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Seat Button - Matching TheaterDesigner styling ===== */
 .seat-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--seat-bg, #4B5563);
-    border: 2px solid var(--seat-border, #6B7280);
+    background: #6B7280;
     border-radius: 6px 6px 8px 8px;
     cursor: pointer;
-    color: white;
-    font-size: 0.6rem;
-    transition: all 0.2s ease;
     position: relative;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
 }
 
-/* Seat Type Colors - Override for VIP, Premium, etc */
+.seat-btn:hover:not(.booked):not(.disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Seat Type Colors - Matching TheaterDesigner colors */
 .seat-btn.standard {
-    background: #4B5563;
-    border-color: #6B7280;
+    background: #6B7280;
 }
 
 .seat-btn.vip {
-    background: linear-gradient(135deg, #D97706, #F59E0B) !important;
-    border-color: #FBBF24 !important;
-    box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+    background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+    border-color: #fcd34d !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
 }
 
 .seat-btn.premium {
-    background: linear-gradient(135deg, #7C3AED, #8B5CF6) !important;
-    border-color: #A78BFA !important;
-    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, #818cf8, #6366f1) !important;
+    border-color: #a5b4fc !important;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
 }
 
 .seat-btn.wheelchair {
-    background: linear-gradient(135deg, #2563EB, #3B82F6) !important;
-    border-color: #60A5FA !important;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+    border-color: #7dd3fc !important;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
 }
 
 .seat-btn:not(.booked):not(.disabled):hover {
@@ -329,8 +480,10 @@
     gap: 15px;
     margin-top: 25px;
     padding: 15px;
-    background: rgba(0, 0, 0, 0.2);
+    background: #1a1a2e;
     border-radius: 10px;
+    position: relative;
+    z-index: 50;
 }
 
 .legend-item {
@@ -527,69 +680,30 @@
     }
 }
 
-/* ===== Compact Mode for Event Details Page ===== */
+/* ===== Event Details Page - Match Booking Page Style ===== */
 .theater-seat-container .seat-selector {
     min-height: auto;
-    padding: 20px 15px;
+    padding: 0;
     background: transparent;
     border: none;
 }
 
-.theater-seat-container .stage {
-    width: 65%;
-    max-width: 280px;
-    padding: 10px 30px;
-    margin-bottom: 20px;
-    font-size: 0.8rem;
-    letter-spacing: 2px;
+/* Let the theater render at natural size without scaling */
+.theater-seat-container .theater-canvas-container {
+    padding: 20px;
+    min-height: 400px;
+    overflow: visible;
 }
 
-.theater-seat-container .seat-map {
-    gap: 20px;
+/* Let scaling work on detail page too */
+.theater-seat-container .theater-canvas {
+    /* transform: none; */
+    /* REMOVED: allow dynamic scaling from SeatSelector.tsx */
 }
 
-.theater-seat-container .section {
-    padding: 15px;
-}
-
-.theater-seat-container .section-label {
-    font-size: 0.75rem;
-    margin-bottom: 12px;
-}
-
-.theater-seat-container .seat-btn {
-    width: 26px;
-    height: 26px;
-    font-size: 0.55rem;
-    border-radius: 5px 5px 6px 6px;
-}
-
-.theater-seat-container .seat-slot {
-    width: 26px;
-    height: 26px;
-}
-
-.theater-seat-container .v-corridor-space {
-    width: 16px;
-    height: 26px;
-}
-
-.theater-seat-container .h-corridor-space {
-    height: 22px;
-    margin: 8px 0;
-}
-
-.theater-seat-container .row-label {
-    width: 28px;
-    font-size: 0.7rem;
-}
-
-.theater-seat-container .seat-row {
-    gap: 6px;
-}
-
+/* Show legend but hide selection tools */
 .theater-seat-container .seat-legend {
-    display: none;
+    display: flex;
 }
 
 .theater-seat-container .selection-summary {
@@ -597,5 +711,14 @@
 }
 
 .theater-seat-container .seat-tooltip {
-    display: none;
+    display: flex;
+}
+
+/* Fix for Booking page redundant scrollbars */
+.theater-seat-area .theater-canvas-container {
+    overflow: visible !important;
+}
+
+.theater-seat-area .theater-frame {
+    overflow: visible !important;
 }

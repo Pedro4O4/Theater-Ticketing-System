@@ -57,20 +57,43 @@ export class BookingsService {
                 throw new NotFoundException('Theater not found for this event');
             }
 
+            const mergedSeatConfig = [...(theater.seatConfig || [])];
+            if (event.seatConfig && event.seatConfig.length > 0) {
+                event.seatConfig.forEach((eventSeat: any) => {
+                    const existingIdx = mergedSeatConfig.findIndex(
+                        (ts: any) =>
+                            String(ts.row).trim().toLowerCase() === String(eventSeat.row).trim().toLowerCase() &&
+                            Number(ts.seatNumber) === Number(eventSeat.seatNumber) &&
+                            (String(ts.section || 'main').toLowerCase()) === (String(eventSeat.section || 'main').toLowerCase()),
+                    );
+                    if (existingIdx >= 0) {
+                        mergedSeatConfig[existingIdx] = eventSeat;
+                    } else {
+                        mergedSeatConfig.push(eventSeat);
+                    }
+                });
+            }
+
             const seatsWithPrices = selectedSeats.map((seat: any) => {
-                const seatConfig = theater.seatConfig.find(
+                const seatConfig = mergedSeatConfig.find(
                     (s: any) =>
-                        s.row === seat.row &&
-                        s.seatNumber === seat.seatNumber &&
-                        s.section === seat.section,
+                        String(s.row).trim().toLowerCase() === String(seat.row).trim().toLowerCase() &&
+                        Number(s.seatNumber) === Number(seat.seatNumber) &&
+                        (String(s.section || 'main').toLowerCase()) === (String(seat.section || 'main').toLowerCase()),
                 );
-                const seatType = seatConfig?.seatType || 'standard';
-                const pricing = event.seatPricing.find((p: any) => p.seatType === seatType);
-                const price = pricing?.price || event.ticketPrice || 0;
+
+                const seatType = (seatConfig?.seatType || 'standard').toLowerCase();
+
+                // Case-insensitive pricing lookup
+                const pricing = event.seatPricing.find(
+                    (p: any) => String(p.seatType).toLowerCase() === seatType
+                );
+
+                const price = pricing ? pricing.price : (event.ticketPrice || 0);
 
                 return {
-                    row: seat.row,
-                    seatNumber: seat.seatNumber,
+                    row: String(seat.row),
+                    seatNumber: Number(seat.seatNumber),
                     section: seat.section || 'main',
                     seatType,
                     price,
@@ -194,9 +217,9 @@ export class BookingsService {
             event.seatConfig.forEach((eventSeat: any) => {
                 const existingIdx = mergedSeatConfig.findIndex(
                     (ts: any) =>
-                        ts.row === eventSeat.row &&
-                        ts.seatNumber === eventSeat.seatNumber &&
-                        ts.section === eventSeat.section,
+                        String(ts.row).trim().toLowerCase() === String(eventSeat.row).trim().toLowerCase() &&
+                        Number(ts.seatNumber) === Number(eventSeat.seatNumber) &&
+                        (String(ts.section || 'main').toLowerCase()) === (String(eventSeat.section || 'main').toLowerCase()),
                 );
                 if (existingIdx >= 0) {
                     mergedSeatConfig[existingIdx] = eventSeat;
@@ -221,11 +244,17 @@ export class BookingsService {
 
                 const seatConfig = mergedSeatConfig.find(
                     (sc: any) =>
-                        sc.row === rowLabel && sc.seatNumber === s && sc.section === 'main',
+                        String(sc.row).trim().toLowerCase() === String(rowLabel).trim().toLowerCase() &&
+                        Number(sc.seatNumber) === Number(s) &&
+                        (String(sc.section || 'main').toLowerCase()) === 'main',
                 );
                 const isDisabled = disabledSeatsSet.has(seatKey);
                 const isActive = !isDisabled && seatConfig?.isActive !== false;
-                const seatType = seatConfig?.seatType || 'standard';
+                const seatType = (seatConfig?.seatType || 'standard').toLowerCase();
+
+                const pricingRecord = event.seatPricing.find(
+                    (p: any) => String(p.seatType).toLowerCase() === seatType
+                );
 
                 allSeats.push({
                     row: rowLabel,
@@ -234,9 +263,7 @@ export class BookingsService {
                     seatType,
                     isActive,
                     isBooked: bookedSeatsSet.has(seatKey),
-                    price:
-                        event.seatPricing.find((p: any) => p.seatType === seatType)?.price ||
-                        event.ticketPrice,
+                    price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                 });
             }
         }
@@ -253,13 +280,17 @@ export class BookingsService {
 
                     const seatConfig = mergedSeatConfig.find(
                         (sc: any) =>
-                            sc.row === rowLabel &&
-                            sc.seatNumber === s &&
-                            sc.section === 'balcony',
+                            String(sc.row).trim().toLowerCase() === String(rowLabel).trim().toLowerCase() &&
+                            Number(sc.seatNumber) === Number(s) &&
+                            (String(sc.section || 'main').toLowerCase()) === 'balcony',
                     );
                     const isDisabled = disabledSeatsSet.has(seatKey);
                     const isActive = !isDisabled && seatConfig?.isActive !== false;
-                    const seatType = seatConfig?.seatType || 'standard';
+                    const seatType = (seatConfig?.seatType || 'standard').toLowerCase();
+
+                    const pricingRecord = event.seatPricing.find(
+                        (p: any) => String(p.seatType).toLowerCase() === seatType
+                    );
 
                     allSeats.push({
                         row: rowLabel,
@@ -268,9 +299,7 @@ export class BookingsService {
                         seatType,
                         isActive,
                         isBooked: bookedSeatsSet.has(seatKey),
-                        price:
-                            event.seatPricing.find((p: any) => p.seatType === seatType)
-                                ?.price || event.ticketPrice,
+                        price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                     });
                 }
             }

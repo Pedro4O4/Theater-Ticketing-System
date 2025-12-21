@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthContext';
 import api from '@/services/api';
 import EventCard from './EventCard';
+import ConfirmationDialog from '../AdminComponent/ConfirmationDialog';
 import { Event } from '@/types/event';
 import './MyEventPage.css';
 
@@ -20,6 +21,7 @@ const MyEventsPage = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ eventId: string; eventName: string; isApproved: boolean } | null>(null);
     const router = useRouter();
     const { user } = useAuth();
 
@@ -68,11 +70,14 @@ const MyEventsPage = () => {
         setSearchTerm(e.target.value);
     };
 
-    const handleDelete = async (eventId: string, isApproved: boolean) => {
-        if (!window.confirm('Are you sure you want to delete this event?')) {
-            return;
-        }
+    const handleDeleteClick = (eventId: string, eventName: string, isApproved: boolean) => {
+        setDeleteConfirm({ eventId, eventName, isApproved });
+    };
 
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm) return;
+
+        const { eventId, isApproved } = deleteConfirm;
         setIsDeleting(true);
 
         try {
@@ -97,6 +102,7 @@ const MyEventsPage = () => {
             alert('Failed to delete event: ' + errorMessage);
         } finally {
             setIsDeleting(false);
+            setDeleteConfirm(null);
         }
     };
 
@@ -217,7 +223,11 @@ const MyEventsPage = () => {
 
                                 <div className="button-tooltip-container">
                                     <button
-                                        onClick={() => handleDelete(event.id || event._id || '', event.status === 'approved')}
+                                        onClick={() => handleDeleteClick(
+                                            event.id || event._id || '',
+                                            event.title || event.name || 'this event',
+                                            event.status === 'approved'
+                                        )}
                                         className="delete-button"
                                         disabled={isDeleting}
                                     >
@@ -300,6 +310,19 @@ const MyEventsPage = () => {
                     </div>
                 </div>
             )}
+
+            <ConfirmationDialog
+                isOpen={!!deleteConfirm}
+                title="Delete Event"
+                message="Are you sure you want to permanently delete this event?"
+                itemName={deleteConfirm?.eventName}
+                confirmText="Delete Event"
+                cancelText="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteConfirm(null)}
+            />
         </div>
     );
 };

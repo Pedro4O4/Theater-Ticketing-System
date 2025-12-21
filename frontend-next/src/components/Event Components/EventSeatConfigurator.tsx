@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiCheck, FiX, FiDollarSign } from 'react-icons/fi';
 import { TheaterLayout } from '@/types/theater';
+import TheaterDesigner from '../Theater/TheaterDesigner';
 import './EventSeatConfigurator.css';
 
 const SEAT_TYPES = {
@@ -109,111 +110,47 @@ const EventSeatConfigurator: React.FC<EventSeatConfiguratorProps> = ({
         onSave(configArray, pricingArray);
     };
 
-    const getRowLabel = (index: number, prefix = '') => {
-        if (index < 26) return prefix + String.fromCharCode(65 + index);
-        return prefix + 'R' + (index + 1);
+    // Convert theaterLayout to the format expected by TheaterDesigner
+    const designerLayout = {
+        stage: {
+            position: (theaterLayout?.stage?.position || 'top') as 'top' | 'bottom',
+            width: theaterLayout?.stage?.width ?? 80,
+            height: theaterLayout?.stage?.height ?? 60
+        },
+        mainFloor: {
+            rows: theaterLayout?.mainFloor?.rows || 10,
+            seatsPerRow: theaterLayout?.mainFloor?.seatsPerRow || 12,
+            aislePositions: theaterLayout?.mainFloor?.aislePositions || []
+        },
+        hasBalcony: theaterLayout?.hasBalcony || false,
+        balcony: {
+            rows: theaterLayout?.balcony?.rows || 0,
+            seatsPerRow: theaterLayout?.balcony?.seatsPerRow || 0,
+            aislePositions: theaterLayout?.balcony?.aislePositions || []
+        },
+        removedSeats: theaterLayout?.removedSeats || [],
+        disabledSeats: theaterLayout?.disabledSeats || [],
+        hCorridors: theaterLayout?.hCorridors || {},
+        vCorridors: theaterLayout?.vCorridors || {},
+        seatCategories: theaterLayout?.seatCategories || {},
+        labels: theaterLayout?.labels || []
     };
-
-    const renderSeat = (section: string, rowLabel: string, seatIndex: number) => {
-        const seatNum = seatIndex + 1;
-        const key = `${section}-${rowLabel}-${seatNum}`;
-        if (isSeatRemoved(section, rowLabel, seatNum)) return <div key={key} className="seat-slot empty" />;
-        const isDisabled = isSeatDisabled(section, rowLabel, seatNum);
-        const seatType = seatMap[key] || SEAT_TYPES.STANDARD;
-        return (
-            <div key={key} className={`seat ${seatType} ${isDisabled ? 'disabled-seat' : ''}`} onClick={() => !isDisabled && handleSeatClick(section, rowLabel, seatNum)} title={`${rowLabel}${seatNum} - ${seatType.toUpperCase()}${isDisabled ? ' (Disabled)' : ''} - $${pricing[seatType]}`}>
-                <span className="seat-number">{seatNum}</span>
-            </div>
-        );
-    };
-
-    const renderRow = (section: string, rowLabel: string, seatsPerRow: number, rowIndex: number) => {
-        const seats = [];
-        for (let i = 0; i < seatsPerRow; i++) {
-            seats.push(renderSeat(section, rowLabel, i));
-            const vCorr = theaterLayout?.vCorridors?.[`${section}-v-${i + 1}`] || 0;
-            for (let c = 0; c < vCorr; c++) seats.push(<div key={`vcorr-${rowLabel}-${i + 1}-${c}`} className="v-corridor" />);
-        }
-        const hCorr = theaterLayout?.hCorridors?.[`${section}-${rowIndex}`] || 0;
-        return (
-            <React.Fragment key={`row-${section}-${rowLabel}`}>
-                <div className="seating-row">
-                    <button className="row-label row-label-btn" onClick={() => handleRowClick(section, rowLabel, seatsPerRow)}>{rowLabel}</button>
-                    <div className="seats-container">
-                        {/* column 0 vertical corridor (left-most) */}
-                        {(() => {
-                            const vCorr0 = theaterLayout?.vCorridors?.[`${section}-v-0`] || 0;
-                            return Array.from({ length: vCorr0 }).map((_, c) => <div key={`vcorr-${rowLabel}-0-${c}`} className="v-corridor" />);
-                        })()}
-                        {seats}
-                    </div>
-                    <button className="row-label row-label-btn" onClick={() => handleRowClick(section, rowLabel, seatsPerRow)}>{rowLabel}</button>
-                </div>
-                {Array.from({ length: hCorr }).map((_, idx) => <div key={`hcorr-${section}-${rowIndex}-${idx}`} className="h-corridor"><span className="corridor-label">CORRIDOR</span></div>)}
-            </React.Fragment>
-        );
-    };
-
-    const renderLabels = () => {
-        if (!theaterLayout?.labels || theaterLayout.labels.length === 0) return null;
-        return (
-            <div className="theater-labels-overlay">
-                {(theaterLayout.labels as any[]).map((label: any) => {
-                    // Handle transition from percentage to pixels if necessary
-                    // (Top-center anchored pixels: x is offset from center, y is absolute from top)
-                    let style: React.CSSProperties = {
-                        position: 'absolute',
-                        width: label.width || 'auto',
-                        height: label.height || 'auto'
-                    };
-
-                    // Simple heuristic: if x/y are very small and no isPixelBased flag, might be old percentages
-                    // But in EventSeatConfigurator, we just render what we have.
-                    // New logic: left: 50% + x px, top: y px
-                    if (label.isPixelBased) {
-                        style.left = `calc(50% + ${label.position?.x || 0}px)`;
-                        style.top = `${label.position?.y || 0}px`;
-                    } else {
-                        // Compatibility for old percentage-based labels (0-100 range)
-                        // If stage is at bottom, Row A should be at the bottom, 
-                        // so maybe the entire theater scale/transform needs to handle this.
-                        style.left = `${label.position?.x || 0}%`;
-                        style.top = `${label.position?.y || 0}%`;
-                    }
-
-                    return (
-                        <div key={label.id} className="theater-label" style={style}>
-                            {label.icon && <span className="label-icon">{label.icon}</span>}
-                            <span className="label-text">{label.text}</span>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
-
-    const mainFloorRows = theaterLayout?.mainFloor?.rows || 10;
-    const mainFloorSeats = theaterLayout?.mainFloor?.seatsPerRow || 12;
-
-    // Synchronized row numbering: Row 'A' always closest to stage
-    const mainRowLabels = (() => {
-        const labels = Array.from({ length: mainFloorRows }, (_, i) => getRowLabel(i));
-        const isStageAtBottom = theaterLayout?.stage?.position?.toLowerCase() === 'bottom';
-        return isStageAtBottom ? [...labels].reverse() : labels;
-    })();
-
-    const balconyRows = theaterLayout?.balcony?.rows || 0;
-    const balconyRowLabels = (() => {
-        const labels = Array.from({ length: balconyRows }, (_, i) => getRowLabel(i, 'B'));
-        const isStageAtBottom = theaterLayout?.stage?.position?.toLowerCase() === 'bottom';
-        return isStageAtBottom ? [...labels].reverse() : labels;
-    })();
 
     return (
         <div className="event-seat-configurator fullpage">
             <div className="configurator-header">
-                <div className="header-left"><h3>Configure Event Seating & Pricing</h3><p>Select categories, set prices, and click seats to customize.</p></div>
-                <div className="header-actions"><button className="secondary-btn" onClick={onCancel}><FiX /> Cancel</button><button className="primary-btn" onClick={handleSave}><FiCheck /> Save Configuration</button></div>
+                <div className="header-left">
+                    <h3>Configure Event Seating & Pricing</h3>
+                    <p>Select categories, set prices, and click seats to customize.</p>
+                </div>
+                <div className="header-actions">
+                    <button className="secondary-btn" onClick={onCancel}>
+                        <FiX /> Cancel
+                    </button>
+                    <button className="primary-btn" onClick={handleSave}>
+                        <FiCheck /> Save Configuration
+                    </button>
+                </div>
             </div>
             <div className="configurator-main">
                 <div className="configurator-sidebar">
@@ -222,8 +159,14 @@ const EventSeatConfigurator: React.FC<EventSeatConfiguratorProps> = ({
                         <p className="section-hint">Select a category, then click seats to apply</p>
                         <div className="category-list">
                             {Object.values(SEAT_TYPES).map(type => (
-                                <button key={type} className={`category-select-btn type-${type} ${currentCategory === type ? 'active' : ''}`} onClick={() => setCurrentCategory(type)}>
-                                    <span className="cat-color"></span><span className="cat-name">{type.charAt(0).toUpperCase() + type.slice(1)}</span>{currentCategory === type && <FiCheck className="cat-check" />}
+                                <button
+                                    key={type}
+                                    className={`category-select-btn type-${type} ${currentCategory === type ? 'active' : ''}`}
+                                    onClick={() => setCurrentCategory(type)}
+                                >
+                                    <span className="cat-color"></span>
+                                    <span className="cat-name">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                                    {currentCategory === type && <FiCheck className="cat-check" />}
                                 </button>
                             ))}
                         </div>
@@ -234,8 +177,18 @@ const EventSeatConfigurator: React.FC<EventSeatConfiguratorProps> = ({
                         <div className="pricing-inputs">
                             {Object.values(SEAT_TYPES).map(type => (
                                 <div key={type} className={`price-input-row type-${type}`}>
-                                    <span className="price-cat-color"></span><label>{type.charAt(0).toUpperCase() + type.slice(1)}</label>
-                                    <div className="price-input-wrapper"><span className="currency">$</span><input type="text" inputMode="decimal" value={pricing[type] || ''} onChange={(e) => handlePriceChange(type, e.target.value)} placeholder="0.00" /></div>
+                                    <span className="price-cat-color"></span>
+                                    <label>{type.charAt(0).toUpperCase() + type.slice(1)}</label>
+                                    <div className="price-input-wrapper">
+                                        <span className="currency">$</span>
+                                        <input
+                                            type="text"
+                                            inputMode="decimal"
+                                            value={pricing[type] || ''}
+                                            onChange={(e) => handlePriceChange(type, e.target.value)}
+                                            placeholder="0.00"
+                                        />
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -252,61 +205,17 @@ const EventSeatConfigurator: React.FC<EventSeatConfiguratorProps> = ({
                     </div>
                 </div>
                 <div className="configurator-canvas-area">
-                    <div className="canvas-scroll-container">
-                        <div className="theater-canvas" style={{ position: 'relative' }}>
-                            {theaterLayout?.stage?.position === 'top' && (
-                                <div className="stage-area stage-top" style={{ width: `${theaterLayout?.stage?.width || 80}%`, height: `${theaterLayout?.stage?.height || 60}px` }}>STAGE</div>
-                            )}
-                            {renderLabels()}
-
-                            {/* Render order depends on stage position to keep Main Floor closest to stage */}
-                            {theaterLayout?.stage?.position === 'top' ? (
-                                <>
-                                    <div className="seating-grid main-floor">
-                                        {mainRowLabels.map((rowLabel, idx) => {
-                                            const isStageAtBottom = theaterLayout?.stage?.position?.toLowerCase() === 'bottom';
-                                            const displayLabel = isStageAtBottom ? rowLabel : (theaterLayout?.mainFloor?.rowLabels?.[idx] || rowLabel);
-                                            return renderRow('main', displayLabel, mainFloorSeats, idx);
-                                        })}
-                                    </div>
-                                    {theaterLayout?.hasBalcony && (
-                                        <div className="seating-grid balcony-floor">
-                                            <div className="balcony-divider">Balcony</div>
-                                            {balconyRowLabels.map((rowLabel, idx) => {
-                                                const isStageAtBottom = theaterLayout?.stage?.position?.toLowerCase() === 'bottom';
-                                                const displayLabel = isStageAtBottom ? rowLabel : (theaterLayout?.balcony?.rowLabels?.[idx] || rowLabel);
-                                                return renderRow('balcony', displayLabel, theaterLayout.balcony?.seatsPerRow || 0, idx);
-                                            })}
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    {theaterLayout?.hasBalcony && (
-                                        <div className="seating-grid balcony-floor">
-                                            <div className="balcony-divider">Balcony</div>
-                                            {balconyRowLabels.map((rowLabel, idx) => {
-                                                const isStageAtBottom = theaterLayout?.stage?.position?.toLowerCase() === 'bottom';
-                                                const displayLabel = isStageAtBottom ? rowLabel : (theaterLayout?.balcony?.rowLabels?.[idx] || rowLabel);
-                                                return renderRow('balcony', displayLabel, theaterLayout.balcony?.seatsPerRow || 0, idx);
-                                            })}
-                                        </div>
-                                    )}
-                                    <div className="seating-grid main-floor">
-                                        {mainRowLabels.map((rowLabel, idx) => {
-                                            const isStageAtBottom = theaterLayout?.stage?.position?.toLowerCase() === 'bottom';
-                                            const displayLabel = isStageAtBottom ? rowLabel : (theaterLayout?.mainFloor?.rowLabels?.[idx] || rowLabel);
-                                            return renderRow('main', displayLabel, mainFloorSeats, idx);
-                                        })}
-                                    </div>
-                                </>
-                            )}
-
-                            {theaterLayout?.stage?.position === 'bottom' && (
-                                <div className="stage-area stage-bottom" style={{ width: `${theaterLayout?.stage?.width || 80}%`, height: `${theaterLayout?.stage?.height || 60}px` }}>STAGE</div>
-                            )}
-                        </div>
-                    </div>
+                    <TheaterDesigner
+                        initialLayout={designerLayout as any}
+                        isPreviewMode={true}
+                        isCategoryMode={true}
+                        seatCategoryMap={seatMap}
+                        currentCategory={currentCategory}
+                        onSeatClick={handleSeatClick}
+                        onRowClick={handleRowClick}
+                        showLabelAccents={true}
+                        allowLabelDragging={true}
+                    />
                 </div>
             </div>
         </div>

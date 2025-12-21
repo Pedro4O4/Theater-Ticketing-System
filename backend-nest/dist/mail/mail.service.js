@@ -51,11 +51,16 @@ let MailService = class MailService {
     transporter;
     constructor(configService) {
         this.configService = configService;
+        const emailUser = this.configService.get('EMAIL_USER');
+        const emailPass = this.configService.get('EMAIL_APP_PASSWORD');
+        console.log('📧 Mail Service Initializing...');
+        console.log(`   EMAIL_USER: ${emailUser ? emailUser : '❌ NOT SET'}`);
+        console.log(`   EMAIL_APP_PASSWORD: ${emailPass ? '✅ SET (' + emailPass.length + ' chars)' : '❌ NOT SET'}`);
         this.transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: this.configService.get('EMAIL_USER'),
-                pass: this.configService.get('EMAIL_APP_PASSWORD'),
+                user: emailUser,
+                pass: emailPass,
             },
         });
     }
@@ -111,14 +116,20 @@ let MailService = class MailService {
         return this.sendMail(mailOptions);
     }
     async sendMail(mailOptions) {
+        const emailUser = this.configService.get('EMAIL_USER');
+        const emailPass = this.configService.get('EMAIL_APP_PASSWORD');
+        if (!emailUser || !emailPass) {
+            console.error('❌ Email configuration missing: EMAIL_USER or EMAIL_APP_PASSWORD not set in .env');
+            throw new common_1.InternalServerErrorException('Email service is not configured. Please contact support.');
+        }
         try {
             const info = await this.transporter.sendMail(mailOptions);
             console.log('✅ Email sent:', info.messageId);
             return { success: true, messageId: info.messageId };
         }
         catch (error) {
-            console.warn('⚠️ Email sending failed:', error.message);
-            return { success: true, fallback: true, error: error.message };
+            console.error('❌ Email sending failed:', error.message);
+            throw new common_1.InternalServerErrorException('Failed to send email. Please try again later or contact support.');
         }
     }
     logOTPTerminal(email, otp, type) {

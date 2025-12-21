@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/auth/AuthContext';
 import api from '@/services/api';
 import { getImageUrl } from '@/utils/imageHelper';
+import SeatSelector from '@/components/Booking component/SeatSelector';
 import './EventDetailPage.css';
 
 interface SeatPricing {
@@ -22,6 +23,10 @@ interface SeatData {
     availableCount: number;
     bookedCount: number;
     seats?: any[];
+    bookedSeatKeys?: string[];  // Array of seat keys that are booked
+    theater?: {
+        layout?: any;
+    };
 }
 
 interface Event {
@@ -242,13 +247,11 @@ const EventDetailsPage = ({ id }: EventDetailsPageProps) => {
                                 </div>
                             )}
 
-                            <motion.img
+                            <img
                                 src={getImageUrl(event.image)}
                                 alt={event.title}
                                 className={`detail-image ${imageLoaded ? 'loaded' : ''}`}
                                 onLoad={() => setImageLoaded(true)}
-                                whileHover={{ scale: 1.03 }}
-                                transition={{ duration: 0.6 }}
                             />
 
                             <div className="image-expand-hint">
@@ -348,20 +351,31 @@ const EventDetailsPage = ({ id }: EventDetailsPageProps) => {
                                     {seatLoading ? (
                                         <div className="seat-availability-loading">Loading seat availability...</div>
                                     ) : seatData && (
-                                        <div className="seat-availability-stats">
-                                            <div className="stat-item available">
-                                                <span className="stat-number">{seatData.availableCount}</span>
-                                                <span className="stat-label">Available</span>
+                                        <>
+                                            <div className="seat-availability-stats">
+                                                <div className="stat-item available">
+                                                    <span className="stat-number">{seatData.availableCount}</span>
+                                                    <span className="stat-label">Available</span>
+                                                </div>
+                                                <div className="stat-item booked">
+                                                    <span className="stat-number">{seatData.bookedCount}</span>
+                                                    <span className="stat-label">Booked</span>
+                                                </div>
+                                                <div className="stat-item total">
+                                                    <span className="stat-number">{seatData.seats?.length || 0}</span>
+                                                    <span className="stat-label">Total Seats</span>
+                                                </div>
                                             </div>
-                                            <div className="stat-item booked">
-                                                <span className="stat-number">{seatData.bookedCount}</span>
-                                                <span className="stat-label">Booked</span>
+                                            {/* SeatSelector fetches its own data, so we just need the eventId */}
+                                            <div className="theater-preview-container">
+                                                <div className="theater-seat-container">
+                                                    <SeatSelector
+                                                        eventId={event._id}
+                                                        readOnly={true}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="stat-item total">
-                                                <span className="stat-number">{seatData.seats?.length || 0}</span>
-                                                <span className="stat-label">Total Seats</span>
-                                            </div>
-                                        </div>
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -409,7 +423,6 @@ const EventDetailsPage = ({ id }: EventDetailsPageProps) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={() => setShowImageModal(false)}
                     >
                         <motion.div
                             className="modal-image-container"

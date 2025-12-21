@@ -61,11 +61,6 @@ node_modules/
 
 
 # dotenv environment variables file
-backend/.env
-backend-nest/.env
-frontend-next/.env
-frontend-next/.env.local
-.env
 
 # dataconnect generated files
 .dataconnect

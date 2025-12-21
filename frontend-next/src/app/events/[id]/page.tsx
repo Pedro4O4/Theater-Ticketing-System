@@ -8,6 +8,7 @@ import {
     FiInfo, FiArrowLeft, FiX, FiMaximize2, FiShoppingCart, FiCheck, FiGrid, FiDollarSign
 } from 'react-icons/fi';
 import '@/components/Event Components/EventDetailPage.css';
+import '@/components/Booking component/BookingTicketForm.css';
 import { getImageUrl } from '@/utils/imageHelper';
 import { useAuth } from '@/auth/AuthContext';
 import { Event } from '@/types/event';
@@ -116,113 +117,122 @@ const EventDetailsPage = () => {
     // Check if this is a theater seating event
     const hasTheater = event.hasTheaterSeating;
 
+    // For theater events, use fullpage layout like booking page
+    if (hasTheater) {
+        return (
+            <motion.div className="booking-page fullpage-theater" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <div className="booking-bg-effect"></div>
+                <div className="theater-fullpage-container">
+                    {/* Compact Header Bar - Same as booking page */}
+                    <motion.div className="theater-header-bar" initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+                        <motion.button className="back-btn-compact" onClick={() => router.push('/events')} whileHover={{ x: -3 }}>
+                            <FiArrowLeft size={18} /><span>Back</span>
+                        </motion.button>
+                        <div className="event-info-compact">
+                            <img src={getImageUrl(event.image)} alt="" className="event-thumb" />
+                            <div>
+                                <h2>{event.title}</h2>
+                                <div className="event-meta-compact">
+                                    <span><FiCalendar /> {dateInfo?.full || 'TBA'}</span>
+                                    <span><FiMapPin /> {event.location || 'TBA'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="booking-summary-compact">
+                            {seatData && (
+                                <>
+                                    <span className="seats-count">{seatData.availableCount} available</span>
+                                    <span className="seats-count" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}>{seatData.bookedCount} booked</span>
+                                </>
+                            )}
+                            {user?.role === "Standard User" && (
+                                <motion.button
+                                    className="confirm-booking-btn"
+                                    onClick={() => router.push(`/bookings/new/${event._id}`)}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    style={{ padding: '10px 20px', minWidth: 'auto', fontSize: '0.9rem' }}
+                                >
+                                    <FiGrid /> Select Seats
+                                </motion.button>
+                            )}
+                        </div>
+                    </motion.div>
+
+                    {/* Full Page Seat Selector - Same as booking page */}
+                    <div className="theater-seat-area">
+                        <SeatSelector eventId={event._id} readOnly={true} />
+                    </div>
+                </div>
+
+                {/* Image Modal */}
+                <AnimatePresence>
+                    {showImageModal && (
+                        <motion.div className="detail-image-modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowImageModal(false)}>
+                            <motion.div className="modal-image-container" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: "spring", damping: 25 }} onClick={(e) => e.stopPropagation()}>
+                                <img src={getImageUrl(event.image)} alt={event.title} />
+                                <motion.button className="modal-close" onClick={() => setShowImageModal(false)} whileHover={{ scale: 1.1, rotate: 90 }}><FiX size={24} /></motion.button>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+        );
+    }
+
+    // For non-theater events, use the original card layout
     return (
         <motion.div className="detail-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <div className="detail-bg-effect"></div>
             <div className="detail-container">
                 <motion.button className="floating-back-btn" onClick={() => router.push('/events')} initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}><FiArrowLeft size={20} /><span>Back</span></motion.button>
 
-                {/* Split layout for theater events */}
-                <div className={`detail-split-layout ${hasTheater ? 'with-theater' : ''}`}>
-                    {/* Left: Event Details */}
-                    <motion.div className="detail-card event-info-panel" initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } } }}>
-                        <motion.div className="detail-image-section" variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-                            <div className="detail-image-wrapper" onClick={() => event.image && setShowImageModal(true)}>
-                                {event.image ? (
-                                    <>
-                                        {!imageLoaded && <div className="image-skeleton-detail"><div className="skeleton-shimmer"></div></div>}
-                                        <motion.img src={getImageUrl(event.image)} alt={event.title} className={`detail-image ${imageLoaded ? 'loaded' : ''}`} onLoad={() => setImageLoaded(true)} whileHover={{ scale: 1.03 }} transition={{ duration: 0.6 }} />
-                                        <div className="image-expand-hint"><FiMaximize2 /><span>Click to expand</span></div>
-                                    </>
-                                ) : (
-                                    <div className="detail-no-photo-placeholder">
-                                        <FiX size={48} />
-                                        <span>No Photo Uploaded</span>
-                                    </div>
-                                )}
-                                {dateInfo && <div className="date-badge"><span className="date-day">{dateInfo.day}</span><span className="date-month">{dateInfo.month}</span></div>}
-                            </div>
-                        </motion.div>
-
-                        <motion.div className="detail-content" variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
-                            <div className="detail-header">
-                                <h1 className="event-title-main">{event.title}</h1>
-                                <div className={`status-badge ${ticketInfo.status}`}>{ticketInfo.status === 'available' && <FiCheck />}{ticketInfo.text}</div>
-                            </div>
-                            <div className="info-grid compact">
-                                <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiCalendar /></div><div className="info-text"><span className="info-label">Date & Time</span><span className="info-value">{dateInfo?.full || 'TBA'}</span></div></motion.div>
-                                <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiMapPin /></div><div className="info-text"><span className="info-label">Location</span><span className="info-value">{event.location || 'TBA'}</span></div></motion.div>
-                                <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiTag /></div><div className="info-text"><span className="info-label">Category</span><span className="info-value">{event.category || 'General'}</span></div></motion.div>
-                                <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiUsers /></div><div className="info-text"><span className="info-label">Available</span><span className="info-value" style={{ color: ticketInfo.color }}>{event.remainingTickets ?? 'N/A'}</span></div></motion.div>
-                            </div>
-                            <div className="description-section"><h3><FiInfo /> About This Event</h3><p>{event.description || 'No description available.'}</p></div>
-
-                            {/* Pricing Section */}
-                            {event.seatPricing && event.seatPricing.length > 0 && (
-                                <div className="pricing-section">
-                                    <h3><FiDollarSign /> Pricing</h3>
-                                    <div className="pricing-grid">
-                                        {event.seatPricing.map((p: any) => (
-                                            <div key={p.seatType} className={`pricing-item ${p.seatType}`}>
-                                                <span className="seat-type-label">{p.seatType.charAt(0).toUpperCase() + p.seatType.slice(1)}</span>
-                                                <span className="seat-price">${p.price?.toFixed(2) || '0.00'}</span>
-                                            </div>
-                                        ))}
-                                    </div>
+                <motion.div className="detail-card" initial="hidden" animate="visible" variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } } }}>
+                    <motion.div className="detail-image-section" variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <div className="detail-image-wrapper" onClick={() => event.image && setShowImageModal(true)}>
+                            {event.image ? (
+                                <>
+                                    {!imageLoaded && <div className="image-skeleton-detail"><div className="skeleton-shimmer"></div></div>}
+                                    <motion.img src={getImageUrl(event.image)} alt={event.title} className={`detail-image ${imageLoaded ? 'loaded' : ''}`} onLoad={() => setImageLoaded(true)} whileHover={{ scale: 1.03 }} transition={{ duration: 0.6 }} />
+                                    <div className="image-expand-hint"><FiMaximize2 /><span>Click to expand</span></div>
+                                </>
+                            ) : (
+                                <div className="detail-no-photo-placeholder">
+                                    <FiX size={48} />
+                                    <span>No Photo Uploaded</span>
                                 </div>
                             )}
-
-                            <div className="action-section">
-                                {!hasTheater && (
-                                    <div className="price-display">
-                                        <span className="price-label">Price per ticket</span>
-                                        <span className="price-amount">${event.ticketPrice?.toFixed(2) || '0.00'}</span>
-                                    </div>
-                                )}
-                                {user?.role === "Standard User" && (
-                                    <motion.button className={`book-now-btn-detail ${ticketInfo.status === 'sold-out' ? 'disabled' : ''}`} onClick={() => router.push(`/bookings/new/${event._id}`)} disabled={ticketInfo.status === 'sold-out'} whileHover={ticketInfo.status !== 'sold-out' ? { scale: 1.03 } : {}} whileTap={ticketInfo.status !== 'sold-out' ? { scale: 0.98 } : {}}>
-                                        {event.hasTheaterSeating ? <FiGrid /> : <FiShoppingCart />}
-                                        {ticketInfo.status === 'sold-out' ? 'Sold Out' : event.hasTheaterSeating ? 'Select Seats' : 'Book Tickets'}
-                                    </motion.button>
-                                )}
-                            </div>
-                        </motion.div>
+                            {dateInfo && <div className="date-badge"><span className="date-day">{dateInfo.day}</span><span className="date-month">{dateInfo.month}</span></div>}
+                        </div>
                     </motion.div>
 
-                    {/* Right: Theater Seat View */}
-                    {hasTheater && (
-                        <motion.div
-                            className="theater-view-panel"
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            <div className="theater-panel-header">
-                                <h2><FiGrid /> Theater Layout</h2>
-                                <div className="seat-stats">
-                                    {seatData && (
-                                        <>
-                                            <div className="stat available">
-                                                <span className="stat-number">{seatData.availableCount}</span>
-                                                <span className="stat-label">Available</span>
-                                            </div>
-                                            <div className="stat booked">
-                                                <span className="stat-number">{seatData.bookedCount}</span>
-                                                <span className="stat-label">Booked</span>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+                    <motion.div className="detail-content" variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <div className="detail-header">
+                            <h1 className="event-title-main">{event.title}</h1>
+                            <div className={`status-badge ${ticketInfo.status}`}>{ticketInfo.status === 'available' && <FiCheck />}{ticketInfo.text}</div>
+                        </div>
+                        <div className="info-grid">
+                            <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiCalendar /></div><div className="info-text"><span className="info-label">Date & Time</span><span className="info-value">{dateInfo?.full || 'TBA'}</span></div></motion.div>
+                            <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiMapPin /></div><div className="info-text"><span className="info-label">Location</span><span className="info-value">{event.location || 'TBA'}</span></div></motion.div>
+                            <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiTag /></div><div className="info-text"><span className="info-label">Category</span><span className="info-value">{event.category || 'General'}</span></div></motion.div>
+                            <motion.div className="info-card" whileHover={{ y: -3, scale: 1.02 }}><div className="info-icon"><FiUsers /></div><div className="info-text"><span className="info-label">Available</span><span className="info-value" style={{ color: ticketInfo.color }}>{event.remainingTickets ?? 'N/A'}</span></div></motion.div>
+                        </div>
+                        <div className="description-section"><h3><FiInfo /> About This Event</h3><p>{event.description || 'No description available.'}</p></div>
+
+                        <div className="action-section">
+                            <div className="price-display">
+                                <span className="price-label">Price per ticket</span>
+                                <span className="price-amount">${event.ticketPrice?.toFixed(2) || '0.00'}</span>
                             </div>
-                            <div className="theater-seat-container">
-                                <SeatSelector
-                                    eventId={event._id}
-                                    readOnly={true}
-                                />
-                            </div>
-                        </motion.div>
-                    )}
-                </div>
+                            {user?.role === "Standard User" && (
+                                <motion.button className={`book-now-btn-detail ${ticketInfo.status === 'sold-out' ? 'disabled' : ''}`} onClick={() => router.push(`/bookings/new/${event._id}`)} disabled={ticketInfo.status === 'sold-out'} whileHover={ticketInfo.status !== 'sold-out' ? { scale: 1.03 } : {}} whileTap={ticketInfo.status !== 'sold-out' ? { scale: 0.98 } : {}}>
+                                    <FiShoppingCart />
+                                    {ticketInfo.status === 'sold-out' ? 'Sold Out' : 'Book Tickets'}
+                                </motion.button>
+                            )}
+                        </div>
+                    </motion.div>
+                </motion.div>
             </div>
             <AnimatePresence>
                 {showImageModal && (
