@@ -57,26 +57,27 @@ export default function LoginForm() {
 
         try {
             const result = await login(formData) as any;
+            console.log("Login result in LoginForm:", result);
 
             if (result.success) {
                 toast.success("Login successful!");
-                console.log("Successfully logged in");
                 router.push("/events");
             } else if (result.requiresPasswordChange) {
-                // Admin-created user needs to set their own password
                 toast.info("Please set your own password");
                 router.push(`/set-password?email=${encodeURIComponent(result.email)}`);
             } else if (result.requiresVerification) {
-                // Show OTP form if verification is required
-                toast.info("Please verify your account with the code sent to your email");
+                console.log("Switching to OTP form...");
+                toast.info("Please verify your account");
                 setShowOtpForm(true);
             } else {
                 toast.error(result.error || "Login failed");
+                setError(result.error || "Login failed");
             }
         } catch (err) {
+            console.error("LoginForm handleSubmit try/catch/at:", err);
             toast.error("An unexpected error occurred");
-            console.error(err);
         } finally {
+            console.log("Setting loading to false");
             setLoading(false);
         }
     };
