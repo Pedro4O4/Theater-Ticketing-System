@@ -70,6 +70,14 @@ let EventsService = class EventsService {
         if (!event) {
             throw new common_1.NotFoundException('Event not found');
         }
+        if (event.status === 'approved' &&
+            updateDto.status &&
+            updateDto.status !== 'approved') {
+            const bookingCount = await this.bookingModel.countDocuments({ eventId: event._id });
+            if (bookingCount > 0) {
+                throw new common_1.BadRequestException(`Cannot revoke event with ${bookingCount} existing booking(s). Please cancel all bookings first.`);
+            }
+        }
         if (updateDto.hasTheaterSeating !== undefined) {
             updateDto.hasTheaterSeating =
                 updateDto.hasTheaterSeating === 'true' ||
@@ -116,6 +124,10 @@ let EventsService = class EventsService {
             event.otpExpires < new Date()) {
             throw new common_1.BadRequestException('Invalid or expired OTP');
         }
+        const bookingCount = await this.bookingModel.countDocuments({ eventId: event._id });
+        if (bookingCount > 0) {
+            throw new common_1.BadRequestException(`Cannot delete event with ${bookingCount} existing booking(s). Please cancel all bookings first.`);
+        }
         await this.bookingModel.deleteMany({ eventId: event._id }).exec();
         await this.eventModel.deleteOne({ _id: event._id }).exec();
     }
@@ -126,6 +138,10 @@ let EventsService = class EventsService {
         }
         if (event.status === 'approved') {
             throw new common_1.BadRequestException('Approved events require OTP verification. Please use the OTP verification endpoint.');
+        }
+        const bookingCount = await this.bookingModel.countDocuments({ eventId: event._id });
+        if (bookingCount > 0) {
+            throw new common_1.BadRequestException(`Cannot delete event with ${bookingCount} existing booking(s). Please cancel all bookings first.`);
         }
         await this.bookingModel.deleteMany({ eventId: event._id }).exec();
         await this.eventModel.deleteOne({ _id: event._id }).exec();

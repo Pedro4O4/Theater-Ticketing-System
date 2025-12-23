@@ -81,6 +81,20 @@ export class EventsService {
             throw new NotFoundException('Event not found');
         }
 
+        // Prevent revoking an approved event if it has bookings
+        if (
+            event.status === 'approved' &&
+            updateDto.status &&
+            updateDto.status !== 'approved'
+        ) {
+            const bookingCount = await this.bookingModel.countDocuments({ eventId: event._id } as any);
+            if (bookingCount > 0) {
+                throw new BadRequestException(
+                    `Cannot revoke event with ${bookingCount} existing booking(s). Please cancel all bookings first.`
+                );
+            }
+        }
+
         if (updateDto.hasTheaterSeating !== undefined) {
             updateDto.hasTheaterSeating =
                 updateDto.hasTheaterSeating === 'true' ||
@@ -140,6 +154,14 @@ export class EventsService {
             throw new BadRequestException('Invalid or expired OTP');
         }
 
+        // Check for existing bookings before deletion
+        const bookingCount = await this.bookingModel.countDocuments({ eventId: event._id } as any);
+        if (bookingCount > 0) {
+            throw new BadRequestException(
+                `Cannot delete event with ${bookingCount} existing booking(s). Please cancel all bookings first.`
+            );
+        }
+
         await this.bookingModel.deleteMany({ eventId: event._id } as any).exec();
         await this.eventModel.deleteOne({ _id: event._id }).exec();
     }
@@ -153,6 +175,14 @@ export class EventsService {
         if (event.status === 'approved') {
             throw new BadRequestException(
                 'Approved events require OTP verification. Please use the OTP verification endpoint.',
+            );
+        }
+
+        // Check for existing bookings before deletion
+        const bookingCount = await this.bookingModel.countDocuments({ eventId: event._id } as any);
+        if (bookingCount > 0) {
+            throw new BadRequestException(
+                `Cannot delete event with ${bookingCount} existing booking(s). Please cancel all bookings first.`
             );
         }
 

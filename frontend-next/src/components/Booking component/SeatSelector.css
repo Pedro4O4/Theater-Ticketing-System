@@ -210,10 +210,10 @@
 }
 
 .row-label {
-    width: 32px;
-    min-width: 32px;
-    font-size: 0.75rem;
-    font-weight: 700;
+    width: 45px;
+    min-width: 45px;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: #94A3B8;
     text-align: center;
     flex-shrink: 0;
@@ -229,8 +229,8 @@
 }
 
 .seat-slot {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -334,8 +334,8 @@
 
 /* ===== Seat Button - Matching TheaterDesigner styling ===== */
 .seat-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -424,8 +424,8 @@
 
 /* Empty and Removed Seat Slots */
 .seat-slot {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -655,14 +655,15 @@
     }
 
     .seat-btn {
-        width: 24px;
-        height: 24px;
-        font-size: 0.5rem;
+        width: 26px;
+        height: 26px;
+        font-size: 0.55rem;
     }
 
     .row-label {
-        width: 25px;
-        font-size: 0.65rem;
+        width: 30px;
+        min-width: 30px;
+        font-size: 0.7rem;
     }
 
     .selection-summary {

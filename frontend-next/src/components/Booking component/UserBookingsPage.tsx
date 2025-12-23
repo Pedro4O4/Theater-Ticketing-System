@@ -112,10 +112,8 @@ const UserBookingsPage = () => {
             setCancellationLoading(true);
             await api.delete(`/booking/${deleteBookingId}`);
 
-            // Update local state
-            setBookings(prev => prev.map(b =>
-                b._id === deleteBookingId ? { ...b, status: 'cancelled' as const } : b
-            ));
+            // Remove from local state so it disappears from the list
+            setBookings(prev => prev.filter(b => b._id !== deleteBookingId));
 
             toast.success("Booking cancelled successfully");
             setShowDeleteConfirm(false);

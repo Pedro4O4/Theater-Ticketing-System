@@ -384,6 +384,9 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                         {/* Labels Overlay */}
                         <div className="labels-overlay">
                             {theaterData?.layout.labels?.filter((label: any) => (label.section || 'main') === activeSection).map((label: any) => {
+                                const isEntry = label.text?.toUpperCase().includes('ENTRY');
+                                const isExit = label.text?.toUpperCase().includes('EXIT');
+
                                 const style: React.CSSProperties = {
                                     width: label.width || 'auto',
                                     height: label.height || 'auto'
@@ -402,7 +405,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                                 return (
                                     <motion.div
                                         key={label.id}
-                                        className="theater-label"
+                                        className={`theater-label ${isEntry ? 'label-entry' : ''} ${isExit ? 'label-exit' : ''}`}
                                         style={{
                                             ...style,
                                             minWidth: label.width ? undefined : 'auto'
