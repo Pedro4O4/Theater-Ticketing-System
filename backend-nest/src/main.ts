@@ -14,10 +14,11 @@ async function bootstrap() {
   app.use(urlencoded({ limit: '50mb', extended: true }));
 
   // Configure CORS - allow multiple origins
-  const isDevelopment = process.env.NODE_ENV !== 'production';
-  const allowedOrigins = process.env.CLIENT_ORIGINS
-    ? process.env.CLIENT_ORIGINS.split(',')
-    : ['http://localhost:3000', 'http://localhost:5173'];
+  const isProd = process.env.NODE_ENV === 'production';
+  const rawOrigins = process.env.CLIENT_ORIGINS || process.env.CLIENT_ORIGIN;
+  const allowedOrigins = rawOrigins
+    ? rawOrigins.split(',').map(o => o.trim())
+    : ['http://localhost:3000', 'http://localhost:3002', 'http://localhost:5173'];
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
@@ -27,17 +28,17 @@ async function bootstrap() {
         return;
       }
 
-      // In development, allow all origins for easier testing across devices
-      if (isDevelopment) {
-        callback(null, true);
-        return;
-      }
-
       // In production, check against allowed origins
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
+      if (isProd) {
+        if (allowedOrigins.some(ao => origin.includes(ao) || ao === '*')) {
+          callback(null, true);
+        } else {
+          console.log(`CORS blocked for origin: ${origin}`);
+          callback(null, false);
+        }
       } else {
-        callback(null, false);
+        // In development, allow all origins for easier testing across devices
+        callback(null, true);
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -45,8 +46,9 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization',
   });
 
-  // Listen on 0.0.0.0 to accept connections from any network interface
-  await app.listen(3001, '0.0.0.0');
-  console.log('🚀 Backend running on http://localhost:3001');
+  // Listen on PORT env var (provided by Render) or default to 3001
+  const port = process.env.PORT || 3001;
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 Backend running on port ${port}`);
 }
 bootstrap();
