@@ -4,6 +4,7 @@ import { API_BASE_URL } from "../config";
 const api = axios.create({
     baseURL: API_BASE_URL,
     withCredentials: true,
+    timeout: 15000, // 15 seconds timeout
 });
 
 // Add interceptor for token if not using cookies only
