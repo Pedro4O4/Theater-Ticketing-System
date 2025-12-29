@@ -740,30 +740,104 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .booking-page {
+        padding: 0 !important;
+        background: #0d0d12 !important;
+    }
+
+    .booking-page.fullpage-theater {
+        padding: 0 !important;
+        background: #0d0d12 !important;
+    }
+
+    .booking-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .booking-card {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .theater-fullpage-container {
+        padding: 0 !important;
+        background: transparent !important;
+    }
+
     .theater-header-bar {
-        padding: 10px 16px;
+        padding: 10px 12px;
     }
 
     .event-info-compact {
-        margin: 0 12px;
+        margin: 0 8px;
     }
 
     .event-info-compact h2 {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .event-meta-compact {
         display: none;
     }
 
+    .theater-seat-area {
+        padding: 0 !important;
+        width: 100% !important;
+        justify-content: flex-start;
+        align-items: flex-start;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        flex: 1;
+    }
+
+    .theater-seat-area .seat-selector {
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
     .theater-action-bar {
-        padding: 12px 16px;
+        padding: 10px 12px;
     }
 
     .confirm-booking-btn {
-        padding: 12px 24px;
+        padding: 12px 20px;
         min-width: auto;
         flex: 1;
-        font-size: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .booking-summary-compact {
+        gap: 8px;
+    }
+
+    .seats-count {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+
+    .total-amount {
+        font-size: 1.2rem;
+    }
+
+    .back-btn-compact {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .event-thumb {
+        width: 50px;
+        height: 50px;
     }
 }

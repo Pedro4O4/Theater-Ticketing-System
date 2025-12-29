@@ -227,6 +227,12 @@
 @media (max-width: 768px) {
     .navbar {
         padding: 0.8rem 1rem;
+        box-shadow: none !important;
+        background: rgba(13, 13, 18, 0.95) !important;
+    }
+
+    .navbar-scrolled {
+        box-shadow: none !important;
     }
 
     .navbar-container {

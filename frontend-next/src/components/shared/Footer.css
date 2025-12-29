@@ -111,6 +111,11 @@
 }
 
 @media (max-width: 768px) {
+  .footer {
+    box-shadow: none !important;
+    border-top: none !important;
+  }
+
   .footer-container {
     flex-direction: column;
   }

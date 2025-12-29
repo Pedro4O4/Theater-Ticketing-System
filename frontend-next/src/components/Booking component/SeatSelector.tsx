@@ -147,49 +147,80 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
     const clearSelection = () => setSelectedSeats([]);
 
-    // Auto-scale logic
+    // Auto-scale logic - Calculate scale to fit theater on screen
+    const [baseWidth, setBaseWidth] = useState(1100);
+
     useEffect(() => {
         if (!theaterData) return;
 
         const calculateScale = () => {
-            if (containerRef.current && theaterData?.layout) {
-                // Account for the padding in .theater-canvas-container
-                const containerWidth = containerRef.current.offsetWidth - 80;
+            const screenWidth = window.innerWidth;
+            const isMobile = screenWidth < 768;
 
-                // Estimate theater width based on layout
-                const mainFloor = theaterData.layout.mainFloor;
-                const seatsPerRow = mainFloor?.seatsPerRow || 12;
-                const seatSize = 28; // compact size
-                const seatGap = 2;   // tight gap
+            // Calculate actual content dimensions to determine base width
+            let maxSeatsInAnyRow = 0;
+            const sections = [theaterData.layout.mainFloor, theaterData.layout.balcony];
 
-                // Count vertical corridors
-                const vCorridors = theaterData.layout.vCorridors || {};
-                let totalCorridorWidth = 0;
-                Object.values(vCorridors).forEach((count: any) => {
-                    totalCorridorWidth += count * 20; // 20px per corridor segment
-                });
+            sections.forEach(section => {
+                if (section?.rows) {
+                    maxSeatsInAnyRow = Math.max(maxSeatsInAnyRow, section.seatsPerRow || 0);
+                }
+            });
 
-                const gridWidth = (seatsPerRow * seatSize) + ((seatsPerRow - 1) * seatGap) + totalCorridorWidth + 100; // row labels + buffer
+            // Seat grid width: seats * (32px + 4px gap) + row labels (2 * 35px) + safety padding
+            const seatGridWidth = (maxSeatsInAnyRow * 36) + 70 + 20;
 
-                // Account for labels that might be outside the grid
-                const labels = theaterData.layout.labels || [];
-                let maxLabelExtentX = gridWidth / 2;
+            // Check max reach of absolute labels
+            let maxLabelX = 0;
+            if (theaterData.layout.labels && Array.isArray(theaterData.layout.labels)) {
+                theaterData.layout.labels.forEach((label: any) => {
+                    // Labels can be pixel-based (offset from center) or legacy percentage-based
+                    if (label.isPixelBased || (label.position?.x && !label.position.x.toString().includes('%'))) {
+                        const xVal = typeof label.position.x === 'number'
+                            ? label.position.x
+                            : parseFloat(label.position.x);
 
-                labels.forEach((label: any) => {
-                    if (label.isPixelBased) {
-                        // x is offset from center
-                        const labelWidth = typeof label.width === 'number' ? label.width : 100;
-                        const extent = Math.abs(label.position?.x || 0) + (labelWidth / 2);
-                        maxLabelExtentX = Math.max(maxLabelExtentX, extent);
+                        if (!isNaN(xVal)) {
+                            // If pixel based, it's offset from center. 
+                            // To fit this label, we need at least (abs(x) + width) * 2 to keep theater centered
+                            const reach = label.isPixelBased
+                                ? (Math.abs(xVal) + 80) * 2
+                                : xVal + 80;
+                            maxLabelX = Math.max(maxLabelX, reach);
+                        }
                     }
                 });
-
-                // The theater is centered, so maxLabelExtentX defines the minimum half-width needed
-                const totalWidthRequired = (maxLabelExtentX * 2) + 120; // Add some side buffer
-
-                const newScale = Math.min(1.2, containerWidth / totalWidthRequired);
-                setScale(newScale);
             }
+
+            // The true width of the theater content
+            const theaterContentWidth = Math.max(seatGridWidth, maxLabelX);
+
+            // Tighter base width that matches the content exactly
+            // 40px accounts for the .section internal padding (20px each side)
+            const calculatedBaseWidth = Math.max(500, theaterContentWidth + 40);
+            setBaseWidth(calculatedBaseWidth);
+
+            // Available width with minimal screen padding
+            const padding = isMobile ? 8 : 40;
+            const availableWidth = screenWidth - padding;
+
+            // Final scale
+            let calculatedScale = availableWidth / calculatedBaseWidth;
+
+            // ENHANCED MOBILE VISIBILITY:
+            // Don't let the scale drop too low on mobile. If it's too small, 
+            // we prefer a larger size with horizontal scrolling.
+            if (isMobile) {
+                // FORCE EXPANDED VIEW: Minimum scale for "Giant Chairs" visibility: 0.85
+                // This ensures "all chairs" are expanded and big as requested.
+                // We prioritize visibility over fitting the whole map horizontally.
+                calculatedScale = Math.max(0.85, calculatedScale);
+            }
+
+            // Max scale for desktop/large screens
+            calculatedScale = Math.min(0.85, calculatedScale);
+
+            setScale(calculatedScale);
         };
 
         calculateScale();
@@ -348,9 +379,32 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                 </div>
             )}
 
+            {/* Legend - between buttons and theater */}
+            <div className="seat-legend">
+                {Object.entries(SEAT_TYPE_COLORS).map(([type, colors]) => {
+                    const pricing = seatPricing.find(p => p.seatType === type);
+                    return (
+                        <div key={type} className="legend-item">
+                            <div className="legend-color" style={{ background: colors.bg }} />
+                            <span>{colors.label}</span>
+                            {pricing && <span className="legend-price">${pricing.price}</span>}
+                        </div>
+                    );
+                })}
+                <div className="legend-item"><div className="legend-color booked" /><span>Booked</span></div>
+                <div className="legend-item">
+                    <div className={`legend-color ${readOnly ? 'highlighted' : 'selected-legend'}`} />
+                    <span>{readOnly ? 'Your Seats' : 'Selected'}</span>
+                </div>
+            </div>
+
             <div className="theater-frame">
                 <div className="theater-canvas-container" ref={containerRef}>
-                    <div className="theater-canvas" style={{ transform: `scale(${scale})` }}>
+                    <div className="theater-canvas" style={{
+                        transform: `scale(${scale})`,
+                        width: `${baseWidth}px`,
+                        transformOrigin: 'top center'
+                    }}>
                         {/* Stage at top */}
                         {(theaterData?.layout.stage?.position || 'top') === 'top' && (
                             <motion.div
@@ -420,24 +474,6 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                             })}
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div className="seat-legend">
-                {Object.entries(SEAT_TYPE_COLORS).map(([type, colors]) => {
-                    const pricing = seatPricing.find(p => p.seatType === type);
-                    return (
-                        <div key={type} className="legend-item">
-                            <div className="legend-color" style={{ background: colors.bg }} />
-                            <span>{colors.label}</span>
-                            {pricing && <span className="legend-price">${pricing.price}</span>}
-                        </div>
-                    );
-                })}
-                <div className="legend-item"><div className="legend-color booked" /><span>Booked</span></div>
-                <div className="legend-item">
-                    <div className={`legend-color ${readOnly ? 'highlighted' : 'selected-legend'}`} />
-                    <span>{readOnly ? 'Your Seats' : 'Selected'}</span>
                 </div>
             </div>
 

@@ -1044,6 +1044,29 @@
 }
 
 @media (max-width: 768px) {
+    .detail-page {
+        padding: 0 !important;
+        background: #0d0d12 !important;
+    }
+
+    .detail-container {
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .detail-card {
+        border-radius: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
     .theater-panel-header {
         flex-direction: column;
         text-align: center;
@@ -1054,7 +1077,32 @@
     }
 
     .theater-view-panel {
-        height: 450px;
+        height: auto;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .theater-seat-container {
+        padding: 0;
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .theater-seat-container .seat-selector {
+        width: 100%;
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    .theater-seat-container .theater-frame {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        width: 100%;
     }
 
     .info-grid.compact {

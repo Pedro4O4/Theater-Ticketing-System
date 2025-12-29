@@ -358,3 +358,151 @@
     border-radius: 12px;
     text-decoration: none;
 }
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 768px) {
+    .booking-details-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .booking-details-wrapper {
+        gap: 1rem;
+    }
+
+    .booking-details-card {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    .booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-title h2 {
+        font-size: 1.1rem;
+    }
+
+    .booking-status {
+        align-self: flex-start;
+    }
+
+    .event-info-section {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .event-image-sm {
+        width: 100%;
+        height: 120px;
+    }
+
+    .event-info-content h3 {
+        font-size: 1rem;
+    }
+
+    .booking-financial-info {
+        padding: 0.75rem;
+    }
+
+    .financial-row {
+        font-size: 0.8rem;
+    }
+
+    .financial-row strong {
+        font-size: 0.85rem;
+    }
+
+    .price-text {
+        font-size: 1rem !important;
+    }
+
+    .seat-chip {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .booking-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .cancel-booking-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .back-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .theater-view-section {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+
+    .theater-view-section .section-header h3 {
+        font-size: 1rem;
+    }
+
+    .theater-details-container {
+        min-height: 300px;
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-details-container {
+        padding: 0.5rem;
+    }
+
+    .booking-details-card {
+        border-radius: 12px;
+        padding: 0.75rem;
+    }
+
+    .booking-header {
+        gap: 0.3rem;
+    }
+
+    .header-title h2 {
+        font-size: 1rem;
+    }
+
+    .booking-id-tag {
+        font-size: 0.6rem;
+    }
+
+    .booking-status {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.6rem;
+    }
+
+    .event-info-content h3 {
+        font-size: 0.9rem;
+    }
+
+    .detail-meta p {
+        font-size: 0.7rem;
+    }
+
+    .seats-display-section h4 {
+        font-size: 0.85rem;
+    }
+
+    .seat-chips-list {
+        gap: 0.3rem;
+    }
+
+    .seat-chip {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.7rem;
+    }
+
+    .back-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}

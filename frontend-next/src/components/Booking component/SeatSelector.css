@@ -122,13 +122,17 @@
 
 .theater-canvas-container {
     position: relative;
-    overflow: auto;
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    overflow-y: visible;
     width: 100%;
     min-height: 400px;
-    padding: 40px;
-    display: flex;
-    justify-content: center;
+    padding: 20px 10px;
+    display: block;
+    /* Changed from flex for better scroll behavior */
     background: rgba(0, 0, 0, 0.2);
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
 }
 
 .theater-rows {
@@ -142,12 +146,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    width: fit-content;
+    padding: 10px;
+    width: max-content;
+    /* Allow content to expand beyond container */
     min-width: 100%;
     transform-origin: top center;
     transition: transform 0.3s ease;
     position: relative;
+    margin: 0 auto;
 }
 
 .section {
@@ -191,28 +197,31 @@
     position: relative;
 }
 
-/* Left row label - sticky when scrolling - matching TheaterDesigner colors */
+/* Left row label - sticky when scrolling */
 .seat-row>.row-label:first-child {
     position: sticky;
     left: 0;
-    z-index: 20;
+    z-index: 2;
+    /* Lower z-index to stay behind floating elements */
     background: linear-gradient(90deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
-    padding-right: 8px;
+    padding-right: 4px;
 }
 
-/* Right row label - sticky when scrolling - matching TheaterDesigner colors */
+/* Right row label - sticky when scrolling */
 .seat-row>.row-label:last-child {
     position: sticky;
     right: 0;
-    z-index: 20;
+    z-index: 2;
+    /* Lower z-index to stay behind floating elements */
     background: linear-gradient(270deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
-    padding-left: 8px;
+    padding-left: 4px;
 }
 
 .row-label {
-    width: 45px;
-    min-width: 45px;
-    font-size: 0.8rem;
+    width: 35px;
+    min-width: 35px;
+    font-size: clamp(0.55rem, 1.5vw, 0.8rem);
+    /* Flexible font size */
     font-weight: 600;
     color: #94A3B8;
     text-align: center;
@@ -220,6 +229,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .row-seats {
@@ -472,18 +484,19 @@
     opacity: 0.5;
 }
 
-/* ===== Legend ===== */
+/* ===== Legend - Between buttons and theater ===== */
 .seat-legend {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 15px;
-    margin-top: 25px;
-    padding: 15px;
-    background: #1a1a2e;
+    margin-bottom: 20px;
+    padding: 12px 20px;
+    background: rgba(26, 26, 46, 0.8);
+    border: 1px solid rgba(139, 92, 246, 0.2);
     border-radius: 10px;
     position: relative;
-    z-index: 50;
+    z-index: 5;
 }
 
 .legend-item {
@@ -644,40 +657,126 @@
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .seat-selector {
-        padding: 20px 10px;
+        padding: 0;
+        width: 100%;
+        border-radius: 0;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none;
+    }
+
+    .section {
+        padding: 0 !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .theater-frame {
+        border-radius: 0;
+        margin: 0;
+        overflow: visible;
+        width: 100%;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .theater-canvas-container {
+        padding: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        overflow-x: auto !important;
+        display: flex !important;
+        justify-content: flex-start !important;
+        background: transparent !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .theater-canvas {
+        transform-origin: top center;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        /* margin: 0 auto allows centering when width < container, 
+           while flex-start ensures we start at 0 when width > container */
+        margin: 0 auto !important;
+        width: max-content;
     }
 
     .stage {
-        width: 85%;
-        padding: 12px 30px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
     }
 
-    .seat-btn {
-        width: 26px;
-        height: 26px;
-        font-size: 0.55rem;
-    }
-
-    .row-label {
-        width: 30px;
-        min-width: 30px;
-        font-size: 0.7rem;
+    .h-corridor-space {
+        /* Slightly smaller corridor text on mobile */
+        font-size: 0.65rem;
     }
 
     .selection-summary {
         width: 95%;
-        padding: 15px;
-        bottom: 80px;
+        padding: 12px;
+        bottom: 70px;
+    }
+
+    .section-switcher {
+        margin-bottom: 20px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        gap: 8px !important;
     }
 
     .seat-legend {
-        gap: 10px;
+        margin-bottom: 20px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 8px !important;
     }
 
     .legend-item {
-        font-size: 0.7rem;
+        background: rgba(255, 255, 255, 0.05) !important;
+        padding: 4px 8px !important;
+        border-radius: 6px !important;
+        border: 1px solid rgba(139, 92, 246, 0.1) !important;
+        font-size: 0.65rem;
+    }
+
+    .legend-color {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* JS handles scaling - keep laptop proportions */
+
+    .theater-canvas-container {
+        min-height: 200px;
+    }
+
+    /* REMOVED: seat-btn, row-label, stage size overrides to match laptop proportions */
+
+    .legend-item {
+        font-size: 0.55rem;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
     }
 }
 
