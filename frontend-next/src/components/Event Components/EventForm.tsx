@@ -143,21 +143,52 @@ const EventForm: React.FC<EventFormProps> = ({ initialData, isEdit, eventId }) =
         }));
     };
 
+    // Helper function to compress image before converting to base64
+    const compressImage = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Resize if image is too large (max 1200px width)
+                    const maxWidth = 1200;
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx?.drawImage(img, 0, 0, width, height);
+
+                    // Convert to base64 with compression (0.8 quality for JPEG)
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    resolve(compressedBase64);
+                };
+                img.onerror = reject;
+                img.src = e.target?.result as string;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setLoading(true);
 
-            // Convert image file to base64 if needed
+            // Convert image file to base64 with compression if needed
             let imageData = formData.image;
             if (formData.useImageUrl && formData.imageUrl) {
                 imageData = formData.imageUrl;
             } else if (formData.imageFile) {
-                imageData = await new Promise<string>((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result as string);
-                    reader.readAsDataURL(formData.imageFile!);
-                });
+                imageData = await compressImage(formData.imageFile);
             }
 
             const requestData: any = {

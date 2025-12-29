@@ -10,8 +10,8 @@ const express_1 = require("express");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use((0, cookie_parser_1.default)());
-    app.use((0, express_1.json)({ limit: '50mb' }));
-    app.use((0, express_1.urlencoded)({ limit: '50mb', extended: true }));
+    app.use((0, express_1.json)({ limit: '100mb' }));
+    app.use((0, express_1.urlencoded)({ limit: '100mb', extended: true }));
     const isProd = process.env.NODE_ENV === 'production';
     const rawOrigins = process.env.CLIENT_ORIGINS || process.env.CLIENT_ORIGIN;
     const allowedOrigins = rawOrigins

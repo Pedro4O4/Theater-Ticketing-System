@@ -14,20 +14,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventsController = void 0;
 const common_1 = require("@nestjs/common");
-const platform_express_1 = require("@nestjs/platform-express");
 const events_service_1 = require("./events.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const multer_1 = require("multer");
-const path_1 = require("path");
 let EventsController = class EventsController {
     eventsService;
     constructor(eventsService) {
         this.eventsService = eventsService;
     }
-    async create(createDto, req, file) {
-        if (file) {
-            createDto.image = file.path;
-        }
+    async create(createDto, req) {
         const data = await this.eventsService.create(createDto, req.user._id, req.user.role);
         return { success: true, data };
     }
@@ -46,10 +40,7 @@ let EventsController = class EventsController {
         const data = await this.eventsService.findOne(id);
         return { success: true, data };
     }
-    async update(id, updateDto, file) {
-        if (file) {
-            updateDto.image = file.path;
-        }
+    async update(id, updateDto) {
         const data = await this.eventsService.update(id, updateDto);
         return { success: true, data };
     }
@@ -78,23 +69,10 @@ exports.EventsController = EventsController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/events',
-            filename: (req, file, cb) => {
-                const randomName = Array(32)
-                    .fill(null)
-                    .map(() => Math.round(Math.random() * 16).toString(16))
-                    .join('');
-                return cb(null, `${randomName}${(0, path_1.extname)(file.originalname)}`);
-            },
-        }),
-    })),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Req)()),
-    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "create", null);
 __decorate([
@@ -121,23 +99,10 @@ __decorate([
 __decorate([
     (0, common_1.Put)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/events',
-            filename: (req, file, cb) => {
-                const randomName = Array(32)
-                    .fill(null)
-                    .map(() => Math.round(Math.random() * 16).toString(16))
-                    .join('');
-                return cb(null, `${randomName}${(0, path_1.extname)(file.originalname)}`);
-            },
-        }),
-    })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
-    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "update", null);
 __decorate([

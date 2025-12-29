@@ -2,7 +2,7 @@ import { EventsService } from './events.service';
 export declare class EventsController {
     private readonly eventsService;
     constructor(eventsService: EventsService);
-    create(createDto: any, req: any, file: Express.Multer.File): Promise<{
+    create(createDto: any, req: any): Promise<{
         success: boolean;
         data: import("./schemas/event.schema").EventDocument;
     }>;
@@ -18,7 +18,7 @@ export declare class EventsController {
         success: boolean;
         data: import("./schemas/event.schema").EventDocument;
     }>;
-    update(id: string, updateDto: any, file: Express.Multer.File): Promise<{
+    update(id: string, updateDto: any): Promise<{
         success: boolean;
         data: import("./schemas/event.schema").EventDocument;
     }>;

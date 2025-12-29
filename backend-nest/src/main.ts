@@ -9,9 +9,9 @@ async function bootstrap() {
   // Enable cookie parser
   app.use(cookieParser());
 
-  // Increase payload size limits
-  app.use(json({ limit: '50mb' }));
-  app.use(urlencoded({ limit: '50mb', extended: true }));
+  // Increase payload size limits for base64 encoded images
+  app.use(json({ limit: '100mb' }));
+  app.use(urlencoded({ limit: '100mb', extended: true }));
 
   // Configure CORS - allow multiple origins
   const isProd = process.env.NODE_ENV === 'production';

@@ -1,146 +1,109 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const nodemailer = __importStar(require("nodemailer"));
+const mailgun_js_1 = __importDefault(require("mailgun.js"));
+const form_data_1 = __importDefault(require("form-data"));
 let MailService = class MailService {
     configService;
-    transporter;
+    mailgun;
+    domain;
     fromEmail;
     constructor(configService) {
         this.configService = configService;
-        const emailUser = this.configService.get('EMAIL_USER');
-        const emailPass = this.configService.get('EMAIL_APP_PASSWORD');
-        this.fromEmail = `EventTix <${emailUser}>`;
-        console.log('📧 Mail Service Initializing...');
-        if (emailUser && emailPass) {
-            this.transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                auth: {
-                    user: emailUser,
-                    pass: emailPass,
-                },
+        const apiKey = this.configService.get('MAILGUN_API_KEY');
+        this.domain = this.configService.get('MAILGUN_DOMAIN');
+        const fromName = this.configService.get('EMAIL_FROM_NAME') || 'EventTix';
+        const fromEmail = this.configService.get('EMAIL_FROM') || 'noreply@' + this.domain;
+        if (apiKey && this.domain) {
+            const mailgunClient = new mailgun_js_1.default(form_data_1.default);
+            this.mailgun = mailgunClient.client({
+                username: 'api',
+                key: apiKey,
             });
-            console.log(`   SMTP Service: ✅ Configured for ${emailUser}`);
+            this.fromEmail = `${fromName} <${fromEmail}>`;
+            console.log(`✅ Mailgun Service: Configured for ${this.domain}`);
         }
         else {
-            console.log('   SMTP Service: ❌ Missing EMAIL_USER or EMAIL_APP_PASSWORD');
+            console.warn('⚠️  Mailgun not configured. Set MAILGUN_API_KEY and MAILGUN_DOMAIN in .env');
         }
     }
-    async sendVerificationOTP(email, otp) {
-        this.logOTPTerminal(email, otp, 'VERIFICATION CODE');
+    async sendVerificationOTP(to, otp) {
+        const subject = 'Verify Your Account - EventTix';
         const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #8B5CF6;">Account Verification</h2>
-        <p>Hello,</p>
-        <p>Thank you for registering with EventTix. Please verify your account to continue.</p>
-        <p>Your verification code is:</p>
-        <div style="background-color: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
-          <h1 style="font-size: 32px; color: #8B5CF6; margin: 0; letter-spacing: 5px;">${otp}</h1>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px;">
+        <div style="background: white; padding: 30px; border-radius: 8px;">
+          <h1 style="color: #667eea; text-align: center; margin-bottom: 30px;">🎟️ EventTix</h1>
+          <h2 style="color: #333; text-align: center;">Account Verification</h2>
+          <p style="color: #666; font-size: 16px; line-height: 1.6;">
+            Thank you for registering! Please use the following OTP to verify your account:
+          </p>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px;">${otp}</span>
+          </div>
+          <p style="color: #999; font-size: 14px; text-align: center;">
+            This code expires in 10 minutes.
+          </p>
         </div>
-        <p>This code will expire in 10 minutes.</p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-        <p style="font-size: 12px; color: #6b7280;">
-          This is an automated email from EventTix. Please do not reply to this email.
-        </p>
       </div>
     `;
-        return this.sendMail(email, 'Account Verification - EventTix', html);
+        await this.sendMail(to, subject, html);
     }
-    async sendPasswordResetOTP(email, otp) {
-        this.logOTPTerminal(email, otp, 'PASSWORD RESET CODE');
+    async sendPasswordResetOTP(to, otp) {
+        const subject = 'Password Reset Code - EventTix';
         const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #8B5CF6;">Password Reset Request</h2>
-        <p>Hello,</p>
-        <p>You have requested to reset your password for your EventTix account.</p>
-        <p>Your verification code is:</p>
-        <div style="background-color: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
-          <h1 style="font-size: 32px; color: #8B5CF6; margin: 0; letter-spacing: 5px;">${otp}</h1>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 10px;">
+        <div style="background: white; padding: 30px; border-radius: 8px;">
+          <h1 style="color: #f5576c; text-align: center; margin-bottom: 30px;">🎟️ EventTix</h1>
+          <h2 style="color: #333; text-align: center;">Password Reset</h2>
+          <p style="color: #666; font-size: 16px; line-height: 1.6;">
+            We received a request to reset your password. Use the following code:
+          </p>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; color: #f5576c; letter-spacing: 8px;">${otp}</span>
+          </div>
+          <p style="color: #999; font-size: 14px; text-align: center;">
+            This code expires in 10 minutes.
+          </p>
+          <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
+            If you didn't request this, please ignore this email.
+          </p>
         </div>
-        <p>This code will expire in 10 minutes.</p>
-        <p>If you didn't request this password reset, please ignore this email.</p>
-        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-        <p style="font-size: 12px; color: #6b7280;">
-          This is an automated email from EventTix. Please do not reply to this email.
-        </p>
       </div>
     `;
-        return this.sendMail(email, 'Password Reset OTP - EventTix', html);
+        await this.sendMail(to, subject, html);
     }
     async sendMail(to, subject, html) {
-        if (!this.transporter) {
-            console.warn('⚠️ SMTP not configured - email not sent (check EMAIL_USER/EMAIL_APP_PASSWORD)');
-            return { success: false, error: 'Email service not configured' };
+        if (!this.mailgun) {
+            throw new common_1.InternalServerErrorException('Email service not configured. Please contact support.');
         }
+        console.log(`📧 Sending email to ${to}: ${subject}`);
         try {
-            const info = await this.transporter.sendMail({
+            const response = await this.mailgun.messages.create(this.domain, {
                 from: this.fromEmail,
-                to,
+                to: [to],
                 subject,
                 html,
             });
-            console.log('✅ Email sent via SMTP:', info.messageId);
-            return { success: true, messageId: info.messageId };
+            console.log(`✅ Email sent successfully: ${response.id}`);
         }
         catch (error) {
             console.error('❌ Email sending failed:', error.message);
-            throw new common_1.InternalServerErrorException('Failed to send email. Please try again later or contact support.');
+            throw new common_1.InternalServerErrorException(`Failed to send email: ${error.message}`);
         }
-    }
-    logOTPTerminal(email, otp, type) {
-        console.log('\n========================================');
-        console.log(`📧 ${type}`);
-        console.log('========================================');
-        console.log(`Email: ${email}`);
-        console.log(`OTP Code: ${otp}`);
-        console.log(`Expires: 10 minutes`);
-        console.log('========================================\n');
     }
 };
 exports.MailService = MailService;
