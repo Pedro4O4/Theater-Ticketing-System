@@ -1,22 +1,28 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
-
-@Injectable()
+import * as nodemailer from 'nodemailer';
 export class MailService {
-  private resend: Resend | null = null;
+  private transporter: any;
   private fromEmail: string;
 
   constructor(private configService: ConfigService) {
-    const resendApiKey = this.configService.get<string>('RESEND_API_KEY');
-    this.fromEmail = this.configService.get<string>('EMAIL_FROM') || 'EventTix <onboarding@resend.dev>';
+    const emailUser = this.configService.get<string>('EMAIL_USER');
+    const emailPass = this.configService.get<string>('EMAIL_APP_PASSWORD'); // Google App Password
+    this.fromEmail = `EventTix <${emailUser}>`;
 
     console.log('📧 Mail Service Initializing...');
-    console.log(`   RESEND_API_KEY: ${resendApiKey ? '✅ SET (' + resendApiKey.length + ' chars)' : '❌ NOT SET'}`);
-    console.log(`   EMAIL_FROM: ${this.fromEmail}`);
 
-    if (resendApiKey) {
-      this.resend = new Resend(resendApiKey);
+    if (emailUser && emailPass) {
+      this.transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: emailUser,
+          pass: emailPass,
+        },
+      });
+      console.log(`   SMTP Service: ✅ Configured for ${emailUser}`);
+    } else {
+      console.log('   SMTP Service: ❌ Missing EMAIL_USER or EMAIL_APP_PASSWORD');
     }
   }
 
@@ -68,26 +74,21 @@ export class MailService {
   }
 
   private async sendMail(to: string, subject: string, html: string) {
-    if (!this.resend) {
-      console.warn('⚠️ Resend not configured - email not sent (check RESEND_API_KEY)');
+    if (!this.transporter) {
+      console.warn('⚠️ SMTP not configured - email not sent (check EMAIL_USER/EMAIL_APP_PASSWORD)');
       return { success: false, error: 'Email service not configured' };
     }
 
     try {
-      const { data, error } = await this.resend.emails.send({
+      const info = await this.transporter.sendMail({
         from: this.fromEmail,
-        to: [to],
+        to,
         subject,
         html,
       });
 
-      if (error) {
-        console.error('❌ Email sending failed:', error.message);
-        throw new InternalServerErrorException('Failed to send email: ' + error.message);
-      }
-
-      console.log('✅ Email sent via Resend:', data?.id);
-      return { success: true, messageId: data?.id };
+      console.log('✅ Email sent via SMTP:', info.messageId);
+      return { success: true, messageId: info.messageId };
     } catch (error: any) {
       console.error('❌ Email sending failed:', error.message);
       throw new InternalServerErrorException(
