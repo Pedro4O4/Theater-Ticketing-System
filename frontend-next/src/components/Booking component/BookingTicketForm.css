@@ -19,6 +19,25 @@
     z-index: 0;
 }
 
+.booking-bg-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+    background: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 40%);
+}
+
+@media (max-width: 768px) {
+    .booking-bg-effect {
+        display: none !important;
+    }
+}
+
 .booking-container {
     position: relative;
     z-index: 1;

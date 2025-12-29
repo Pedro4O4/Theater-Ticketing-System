@@ -668,7 +668,9 @@
         backdrop-filter: none;
     }
 
-    .section {
+    .section,
+    .main-section,
+    .balcony-section {
         padding: 0 !important;
         max-width: 100% !important;
         margin: 0 !important;
@@ -676,6 +678,7 @@
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
+        width: 100% !important;
     }
 
     .theater-frame {
@@ -700,15 +703,14 @@
     }
 
     .theater-canvas {
-        transform-origin: top center;
+        transform-origin: top left !important;
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
-        /* margin: 0 auto allows centering when width < container, 
-           while flex-start ensures we start at 0 when width > container */
-        margin: 0 auto !important;
+        margin: 0 !important;
         width: max-content;
+        align-items: flex-start !important;
     }
 
     .stage {
@@ -809,10 +811,21 @@
 }
 
 /* Fix for Booking page redundant scrollbars */
-.theater-seat-area .theater-canvas-container {
-    overflow: visible !important;
+.theater-seat-area .theater-canvas-container,
+.theater-seat-container .theater-canvas-container {
+    overflow: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    background: transparent !important;
+    -webkit-overflow-scrolling: touch;
 }
 
-.theater-seat-area .theater-frame {
+.theater-seat-area .theater-frame,
+.theater-seat-container .theater-frame {
     overflow: visible !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }

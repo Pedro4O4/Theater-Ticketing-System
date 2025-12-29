@@ -14,4 +14,4 @@ const getBaseUrl = () => {
 };
 
 export const BASE_URL = getBaseUrl();
-export const API_BASE_URL = `${BASE_URL}/api/v1`;
+export const API_BASE_URL = BASE_URL.endsWith('/api/v1') ? BASE_URL : `${BASE_URL}/api/v1`;
