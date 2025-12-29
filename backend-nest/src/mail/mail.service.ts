@@ -15,9 +15,7 @@ export class MailService {
 
     if (emailUser && emailPass) {
       this.transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // use STARTTLS
+        service: 'gmail',
         auth: {
           user: emailUser,
           pass: emailPass,
