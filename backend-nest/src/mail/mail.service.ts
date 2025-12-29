@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 @Injectable()
+// Service for sending emails via Nodemailer
 export class MailService {
   private transporter: any;
   private fromEmail: string;
