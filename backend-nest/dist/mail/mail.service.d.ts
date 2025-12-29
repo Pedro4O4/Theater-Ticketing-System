@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 export declare class MailService {
     private configService;
-    private resend;
+    private transporter;
     private fromEmail;
     constructor(configService: ConfigService);
     sendVerificationOTP(email: string, otp: string): Promise<{
@@ -10,7 +10,7 @@ export declare class MailService {
         messageId?: undefined;
     } | {
         success: boolean;
-        messageId: string;
+        messageId: any;
         error?: undefined;
     }>;
     sendPasswordResetOTP(email: string, otp: string): Promise<{
@@ -19,7 +19,7 @@ export declare class MailService {
         messageId?: undefined;
     } | {
         success: boolean;
-        messageId: string;
+        messageId: any;
         error?: undefined;
     }>;
     private sendMail;

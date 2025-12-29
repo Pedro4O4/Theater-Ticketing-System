@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 @Injectable()
-// Service for sending emails via Nodemailer
 export class MailService {
   private transporter: any;
   private fromEmail: string;
@@ -16,7 +15,9 @@ export class MailService {
 
     if (emailUser && emailPass) {
       this.transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // use SSL
         auth: {
           user: emailUser,
           pass: emailPass,
