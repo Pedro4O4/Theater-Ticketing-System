@@ -95,7 +95,7 @@ export class MailService {
     } catch (error: any) {
       console.error('❌ Email sending failed:', error.message);
       throw new InternalServerErrorException(
-        'Failed to send email. Please try again later or contact support.',
+        `Failed to send email: ${error.message}`,
       );
     }
   }
