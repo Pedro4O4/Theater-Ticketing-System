@@ -8,17 +8,12 @@ import {
     Param,
     UseGuards,
     Req,
-    UseInterceptors,
-    UploadedFile,
     HttpCode,
     HttpStatus,
     ForbiddenException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 @Controller('api/v1/event')
 export class EventsController {
@@ -26,28 +21,11 @@ export class EventsController {
 
     @Post()
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(
-        FileInterceptor('image', {
-            storage: diskStorage({
-                destination: './uploads/events',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32)
-                        .fill(null)
-                        .map(() => Math.round(Math.random() * 16).toString(16))
-                        .join('');
-                    return cb(null, `${randomName}${extname(file.originalname)}`);
-                },
-            }),
-        }),
-    )
     async create(
         @Body() createDto: any,
         @Req() req: any,
-        @UploadedFile() file: Express.Multer.File,
     ) {
-        if (file) {
-            createDto.image = file.path;
-        }
+        // Image is expected to be sent as base64 string in createDto.image
         const data = await this.eventsService.create(createDto, req.user._id, req.user.role);
         return { success: true, data };
     }
@@ -76,28 +54,11 @@ export class EventsController {
 
     @Put(':id')
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(
-        FileInterceptor('image', {
-            storage: diskStorage({
-                destination: './uploads/events',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32)
-                        .fill(null)
-                        .map(() => Math.round(Math.random() * 16).toString(16))
-                        .join('');
-                    return cb(null, `${randomName}${extname(file.originalname)}`);
-                },
-            }),
-        }),
-    )
     async update(
         @Param('id') id: string,
         @Body() updateDto: any,
-        @UploadedFile() file: Express.Multer.File,
     ) {
-        if (file) {
-            updateDto.image = file.path;
-        }
+        // Image is expected to be sent as base64 string in updateDto.image
         const data = await this.eventsService.update(id, updateDto);
         return { success: true, data };
     }

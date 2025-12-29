@@ -147,43 +147,47 @@ const EventForm: React.FC<EventFormProps> = ({ initialData, isEdit, eventId }) =
         e.preventDefault();
         try {
             setLoading(true);
-            const eventFormData = new FormData();
-            eventFormData.append('title', formData.title);
-            eventFormData.append('description', formData.description);
-            eventFormData.append('date', formData.date);
-            eventFormData.append('location', formData.location);
-            eventFormData.append('category', formData.category);
 
-            const finalTicketPrice = formData.hasTheaterSeating ? 0 : formData.ticketPrice;
-            eventFormData.append('ticketPrice', finalTicketPrice.toString());
-            eventFormData.append('totalTickets', formData.totalTickets.toString());
-            eventFormData.append('hasTheaterSeating', formData.hasTheaterSeating.toString());
+            // Convert image file to base64 if needed
+            let imageData = formData.image;
+            if (formData.useImageUrl && formData.imageUrl) {
+                imageData = formData.imageUrl;
+            } else if (formData.imageFile) {
+                imageData = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.readAsDataURL(formData.imageFile!);
+                });
+            }
+
+            const requestData: any = {
+                title: formData.title,
+                description: formData.description,
+                date: formData.date,
+                location: formData.location,
+                category: formData.category,
+                ticketPrice: formData.hasTheaterSeating ? 0 : formData.ticketPrice,
+                totalTickets: formData.totalTickets,
+                hasTheaterSeating: formData.hasTheaterSeating,
+                image: imageData
+            };
 
             if (formData.hasTheaterSeating && formData.theaterId) {
-                eventFormData.append('theater', formData.theaterId);
-                const seatPricingArray = Object.entries(formData.seatPricing).map(([type, price]) => ({
+                requestData.theater = formData.theaterId;
+                requestData.seatPricing = Object.entries(formData.seatPricing).map(([type, price]) => ({
                     seatType: type,
                     price: price
                 }));
-                eventFormData.append('seatPricing', JSON.stringify(seatPricingArray));
                 if (eventSeatConfig && eventSeatConfig.length > 0) {
-                    eventFormData.append('seatConfig', JSON.stringify(eventSeatConfig));
+                    requestData.seatConfig = eventSeatConfig;
                 }
-            }
-
-            if (formData.useImageUrl && formData.imageUrl) {
-                eventFormData.append('imageUrl', formData.imageUrl);
-            } else if (formData.imageFile) {
-                eventFormData.append('image', formData.imageFile);
-            } else if (formData.image) {
-                eventFormData.append('imageUrl', formData.image);
             }
 
             let response;
             if (isEdit && eventId) {
-                response = await api.put(`/event/${eventId}`, eventFormData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                response = await api.put(`/event/${eventId}`, requestData);
             } else {
-                response = await api.post('/event', eventFormData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                response = await api.post('/event', requestData);
             }
 
             if (response.data.success) {
