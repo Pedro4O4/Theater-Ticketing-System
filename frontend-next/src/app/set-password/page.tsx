@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { FiLock, FiCheck, FiAlertCircle, FiMail, FiShield } from 'react-icons/fi';
+import { FiAlertCircle } from 'react-icons/fi';
 import api from '@/services/api';
 import { toast } from 'react-toastify';
+import PasswordStrengthIndicator from '@/components/shared/PasswordStrengthIndicator';
+import '@/components/RegisterForm.css';
 
 type Step = 'password' | 'otp';
 
@@ -16,7 +17,7 @@ const SetPasswordContent = () => {
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [otp, setOtp] = useState('');
+    const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +29,25 @@ const SetPasswordContent = () => {
             router.push('/login');
         }
     }, [searchParams, router]);
+
+    const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const value = e.target.value;
+        if (value && !/^\d*$/.test(value)) return;
+        const newOtp = [...otp];
+        newOtp[index] = value.substring(0, 1);
+        setOtp(newOtp);
+        if (value && index < 5) {
+            const nextInput = document.getElementById(`set-otp-${index + 1}`);
+            if (nextInput) nextInput.focus();
+        }
+    };
+
+    const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+        if (e.key === 'Backspace' && !otp[index] && index > 0) {
+            const prevInput = document.getElementById(`set-otp-${index - 1}`);
+            if (prevInput) prevInput.focus();
+        }
+    };
 
     const handleSubmitPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,7 +89,8 @@ const SetPasswordContent = () => {
         e.preventDefault();
         setError(null);
 
-        if (!otp || otp.length !== 6) {
+        const otpString = otp.join('');
+        if (!otpString || otpString.length !== 6) {
             setError('Please enter a valid 6-digit OTP');
             return;
         }
@@ -78,16 +99,14 @@ const SetPasswordContent = () => {
             setLoading(true);
             const response = await api.post('/auth/verify-activate', {
                 email,
-                otp
+                otp: otpString
             });
 
             if (response.data.success) {
                 toast.success('Account activated! Redirecting...');
 
-                // Backend already sets the cookie, we just need to redirect
                 const userRole = response.data.data.user.role;
 
-                // Give time for cookie to be set, then reload to fresh state
                 setTimeout(() => {
                     if (userRole === 'System Admin') {
                         window.location.href = '/admin/users';
@@ -106,212 +125,152 @@ const SetPasswordContent = () => {
         }
     };
 
-    const inputStyle = {
-        width: '100%',
-        padding: '0.875rem 1rem',
-        borderRadius: '10px',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        background: 'rgba(255, 255, 255, 0.05)',
-        color: 'white',
-        fontSize: '1rem',
-        outline: 'none',
-    };
-
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-            padding: '2rem'
-        }}>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{
-                    maxWidth: '450px',
-                    width: '100%',
-                    padding: '2.5rem',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    backdropFilter: 'blur(10px)'
-                }}
-            >
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1rem'
-                    }}>
-                        {step === 'password' ? <FiLock size={28} color="white" /> : <FiShield size={28} color="white" />}
-                    </div>
-                    <h1 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
-                        {step === 'password' ? 'Set Your Password' : 'Verify Your Email'}
-                    </h1>
-                    <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem' }}>
-                        {step === 'password'
-                            ? 'Create a secure password for your account'
-                            : 'Enter the verification code sent to your email'
-                        }
-                    </p>
-                </div>
+        <div className="login-container">
+            <div className="background-shapes">
+                <div className="shape shape-1"></div>
+                <div className="shape shape-2"></div>
+                <div className="shape shape-3"></div>
+            </div>
+            <div className="login-card">
+                <div className="card-decoration"></div>
+                <h1 className="login-title">
+                    {step === 'password' ? 'Set Your Password' : 'Verify Your Email'}
+                </h1>
 
-                {/* Error Banner */}
-                {error && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        style={{
-                            background: 'rgba(239, 68, 68, 0.15)',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
-                            borderRadius: '10px',
-                            padding: '0.75rem 1rem',
-                            marginBottom: '1.5rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            color: '#ef4444'
-                        }}
-                    >
-                        <FiAlertCircle />
-                        <span>{error}</span>
-                    </motion.div>
-                )}
+                {error && <div className="error-message">{error}</div>}
 
-                {/* Email Display */}
+                {/* Email badge */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(102, 126, 234, 0.1)',
-                    borderRadius: '10px',
-                    marginBottom: '1.5rem'
+                    padding: '0.6rem 1rem',
+                    background: 'rgba(139, 92, 246, 0.12)',
+                    borderRadius: 'var(--radius-md)',
+                    marginBottom: '1.2rem',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
                 }}>
-                    <FiMail style={{ color: '#667eea' }} />
-                    <span style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{email}</span>
+                    <i className="input-icon fas fa-envelope" style={{ color: 'var(--primary)', fontSize: '0.85rem' }}></i>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{email}</span>
                 </div>
 
                 {step === 'password' ? (
                     <form onSubmit={handleSubmitPassword} autoComplete="on">
-                        {/* Hidden email field for browser password manager */}
                         <input type="hidden" name="email" value={email} autoComplete="username" />
 
-                        <div style={{ marginBottom: '1.25rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem' }}>
-                                New Password
+                        <div className="form-group">
+                            <label className="form-label">
+                                <span className="label-text">New Password</span>
                             </label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                                placeholder="Enter your new password"
-                                autoComplete="new-password"
-                                style={inputStyle}
-                            />
+                            <div className="input-container">
+                                <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Create a secure password"
+                                    className="form-input"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    autoComplete="new-password"
+                                    required
+                                />
+                                <i className="input-icon fas fa-lock"></i>
+                            </div>
+                            <PasswordStrengthIndicator password={newPassword} />
                         </div>
 
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem' }}>
-                                Confirm Password
+                        <div className="form-group">
+                            <label className="form-label">
+                                <span className="label-text">Confirm Password</span>
                             </label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                placeholder="Confirm your new password"
-                                autoComplete="new-password"
-                                style={inputStyle}
-                            />
+                            <div className="input-container">
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    placeholder="Confirm your new password"
+                                    className="form-input"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    autoComplete="new-password"
+                                    required
+                                />
+                                <i className="input-icon fas fa-shield-alt"></i>
+                            </div>
+                            {confirmPassword && newPassword !== confirmPassword && (
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.35rem',
+                                    marginTop: '0.4rem',
+                                    fontSize: '0.75rem',
+                                    color: 'var(--danger)',
+                                }}>
+                                    <FiAlertCircle size={12} />
+                                    Passwords do not match
+                                </div>
+                            )}
+                            {confirmPassword && newPassword === confirmPassword && confirmPassword.length > 0 && (
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.35rem',
+                                    marginTop: '0.4rem',
+                                    fontSize: '0.75rem',
+                                    color: 'var(--success)',
+                                }}>
+                                    ✓ Passwords match
+                                </div>
+                            )}
                         </div>
 
-                        <motion.button
+                        <button
                             type="submit"
+                            className="btn-primary"
                             disabled={loading}
-                            whileHover={{ scale: loading ? 1 : 1.02 }}
-                            whileTap={{ scale: loading ? 1 : 0.98 }}
-                            style={{
-                                width: '100%',
-                                padding: '1rem',
-                                borderRadius: '12px',
-                                border: 'none',
-                                background: loading ? 'rgba(102, 126, 234, 0.5)' : 'linear-gradient(135deg, #667eea, #764ba2)',
-                                color: 'white',
-                                fontSize: '1rem',
-                                fontWeight: 600,
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem'
-                            }}
                         >
-                            {loading ? 'Saving...' : 'Continue'}
-                        </motion.button>
+                            {loading ? (
+                                <>
+                                    <span className="form-loader"></span>
+                                    Saving...
+                                </>
+                            ) : (
+                                <>Continue</>
+                            )}
+                        </button>
                     </form>
                 ) : (
-                    <form onSubmit={handleVerifyOtp} autoComplete="off">
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem' }}>
-                                Verification Code
-                            </label>
-                            <input
-                                type="text"
-                                name="otp"
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                placeholder="Enter 6-digit code"
-                                maxLength={6}
-                                autoComplete="one-time-code"
-                                inputMode="numeric"
-                                style={{
-                                    ...inputStyle,
-                                    textAlign: 'center',
-                                    fontSize: '1.5rem',
-                                    letterSpacing: '0.5rem'
-                                }}
-                            />
-                        </div>
-
-                        <motion.button
-                            type="submit"
-                            disabled={loading}
-                            whileHover={{ scale: loading ? 1 : 1.02 }}
-                            whileTap={{ scale: loading ? 1 : 0.98 }}
-                            style={{
-                                width: '100%',
-                                padding: '1rem',
-                                borderRadius: '12px',
-                                border: 'none',
-                                background: loading ? 'rgba(102, 126, 234, 0.5)' : 'linear-gradient(135deg, #667eea, #764ba2)',
-                                color: 'white',
-                                fontSize: '1rem',
-                                fontWeight: 600,
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem'
-                            }}
-                        >
-                            {loading ? 'Verifying...' : (
-                                <>
-                                    <FiCheck />
-                                    Activate Account
-                                </>
-                            )}
-                        </motion.button>
-                    </form>
+                    <div className="otp-form-container">
+                        <form className="otp-form" onSubmit={handleVerifyOtp}>
+                            <div className="content">
+                                <p style={{ textAlign: "center" }}>Enter verification code</p>
+                                <div className="inp">
+                                    {otp.map((digit, index) => (
+                                        <input
+                                            key={index}
+                                            id={`set-otp-${index}`}
+                                            type="text"
+                                            className="input"
+                                            maxLength={1}
+                                            value={digit}
+                                            onChange={(e) => handleOtpChange(e, index)}
+                                            onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                                            autoFocus={index === 0}
+                                        />
+                                    ))}
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="verify-btn"
+                                    disabled={loading || otp.some(digit => !digit)}
+                                >
+                                    {loading ? 'Verifying...' : 'Activate Account'}
+                                </button>
+                            </div>
+                            <svg className="svg" xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
+                                <path className="path" d="M58 29.2C61.3 28.8 63.3 32.5 61.8 35.4C60.4 38.2 56.6 38.4 54.7 35.9C52.8 33.3 54.7 29.6 58 29.2Z" fill="var(--primary)"></path>
+                            </svg>
+                        </form>
+                    </div>
                 )}
 
                 {/* Step Indicator */}
@@ -319,22 +278,28 @@ const SetPasswordContent = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    marginTop: '2rem'
+                    marginTop: '1.5rem',
                 }}>
                     <div style={{
                         width: '40px',
                         height: '4px',
                         borderRadius: '2px',
-                        background: step === 'password' ? '#667eea' : 'rgba(102, 126, 234, 0.3)'
+                        background: step === 'password'
+                            ? 'var(--primary)'
+                            : 'rgba(139, 92, 246, 0.25)',
+                        transition: 'all 0.3s ease',
                     }} />
                     <div style={{
                         width: '40px',
                         height: '4px',
                         borderRadius: '2px',
-                        background: step === 'otp' ? '#667eea' : 'rgba(102, 126, 234, 0.3)'
+                        background: step === 'otp'
+                            ? 'var(--primary)'
+                            : 'rgba(139, 92, 246, 0.25)',
+                        transition: 'all 0.3s ease',
                     }} />
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };
@@ -342,15 +307,11 @@ const SetPasswordContent = () => {
 const SetPasswordPage = () => {
     return (
         <Suspense fallback={
-            <div style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-                color: 'white'
-            }}>
-                Loading...
+            <div className="login-container">
+                <div className="login-card" style={{ textAlign: 'center' }}>
+                    <span className="form-loader" style={{ display: 'inline-block' }}></span>
+                    <p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>Loading...</p>
+                </div>
             </div>
         }>
             <SetPasswordContent />

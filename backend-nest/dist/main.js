@@ -23,6 +23,10 @@ async function bootstrap() {
                 callback(null, true);
                 return;
             }
+            if (origin.match(/^https:\/\/theater-ticketing-system-nq1d[\w-]*\.vercel\.app$/)) {
+                callback(null, true);
+                return;
+            }
             if (isProd) {
                 if (allowedOrigins.some(ao => origin.includes(ao) || ao === '*')) {
                     callback(null, true);

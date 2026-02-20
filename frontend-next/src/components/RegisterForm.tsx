@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/services/api";
 import { toast } from "react-toastify";
+import PasswordStrengthIndicator from '@/components/shared/PasswordStrengthIndicator';
 import "./RegisterForm.css";
 
 interface FormData {
@@ -161,6 +162,7 @@ export default function RegisterForm() {
                                 />
                                 <i className="input-icon fas fa-lock"></i>
                             </div>
+                            <PasswordStrengthIndicator password={form.password} />
                         </div>
 
 

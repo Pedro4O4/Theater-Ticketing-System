@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/services/api';
 import { toast } from 'react-toastify';
+import PasswordStrengthIndicator from '@/components/shared/PasswordStrengthIndicator';
 import '@/components/ForgotPasswordForm.css';
 
 const ForgotPasswordForm = () => {
@@ -84,15 +85,32 @@ const ForgotPasswordForm = () => {
                 ) : (
                     <div>
                         <div className="otp-form-container">
-                            <div className="inp" style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                            <div className="inp">
                                 {[0, 1, 2, 3, 4, 5].map((i) => (
-                                    <input key={i} type="text" className="input" maxLength={1} value={otpDigits[i]} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleKeyDown(i, e)} ref={(el) => { inputRefs.current[i] = el; }} style={{ width: '30px', textAlign: 'center' }} />
+                                    <input key={i} type="text" className="input" maxLength={1} value={otpDigits[i]} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleKeyDown(i, e)} ref={(el) => { inputRefs.current[i] = el; }} />
                                 ))}
                             </div>
                         </div>
                         <form onSubmit={handleResetPassword}>
-                            <div className="form-group"><label>New Password</label><input type="password" name="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} /></div>
-                            <div className="form-group"><label>Confirm Password</label><input type="password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} /></div>
+                            <div className="form-group">
+                                <label>New Password</label>
+                                <input type="password" name="newPassword" className="form-input" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} placeholder="Create a secure password" />
+                                <PasswordStrengthIndicator password={newPassword} />
+                            </div>
+                            <div className="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" name="confirmPassword" className="form-input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} placeholder="Confirm your password" />
+                                {confirmPassword && newPassword !== confirmPassword && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', color: 'var(--danger)' }}>
+                                        ○ Passwords do not match
+                                    </div>
+                                )}
+                                {confirmPassword && newPassword === confirmPassword && confirmPassword.length > 0 && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.4rem', fontSize: '0.75rem', color: 'var(--success)' }}>
+                                        ✓ Passwords match
+                                    </div>
+                                )}
+                            </div>
                             <button type="submit" className="verify-btn" disabled={loading}>{loading ? 'Resetting...' : 'Update Password'}</button>
                         </form>
                     </div>
