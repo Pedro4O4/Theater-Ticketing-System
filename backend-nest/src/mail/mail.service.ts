@@ -1,32 +1,29 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Mailgun from 'mailgun.js';
-import FormData from 'form-data';
+import { google } from 'googleapis';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
-// Service for sending emails via Mailgun
 export class MailService {
-  private mailgun: any;
-  private domain: string | undefined;
-  private fromEmail: string;
+  private oauth2Client: InstanceType<typeof google.auth.OAuth2>;
+  private emailUser: string;
+  private isConfigured: boolean = false;
 
   constructor(private configService: ConfigService) {
-    const apiKey = this.configService.get<string>('MAILGUN_API_KEY');
-    this.domain = this.configService.get<string>('MAILGUN_DOMAIN');
-    const fromName = this.configService.get<string>('EMAIL_FROM_NAME') || 'EventTix';
-    const fromEmail = this.configService.get<string>('EMAIL_FROM') || 'noreply@' + this.domain;
+    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = this.configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const redirectUri = this.configService.get<string>('GOOGLE_REDIRECT_URI');
+    const refreshToken = this.configService.get<string>('GOOGLE_REFRESH_TOKEN');
+    this.emailUser = this.configService.get<string>('EMAIL_USER') || '';
 
-    if (apiKey && this.domain) {
-      const mailgunClient = new Mailgun(FormData);
-      this.mailgun = mailgunClient.client({
-        username: 'api',
-        key: apiKey,
-      });
-      this.fromEmail = `${fromName} <${fromEmail}>`;
-      console.log(`✅ Mailgun Service: Configured for ${this.domain}`);
+    if (clientId && clientSecret && redirectUri && refreshToken && this.emailUser) {
+      this.oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+      this.oauth2Client.setCredentials({ refresh_token: refreshToken });
+      this.isConfigured = true;
+      console.log(`✅ Gmail OAuth2 Service: Configured for ${this.emailUser}`);
     } else {
       console.warn(
-        '⚠️  Mailgun not configured. Set MAILGUN_API_KEY and MAILGUN_DOMAIN in .env',
+        '⚠️  Gmail API not configured. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_REFRESH_TOKEN, and EMAIL_USER in .env',
       );
     }
   }
@@ -80,12 +77,8 @@ export class MailService {
     await this.sendMail(to, subject, html);
   }
 
-  private async sendMail(
-    to: string,
-    subject: string,
-    html: string,
-  ): Promise<void> {
-    if (!this.mailgun) {
+  private async sendMail(to: string, subject: string, html: string): Promise<void> {
+    if (!this.isConfigured) {
       throw new InternalServerErrorException(
         'Email service not configured. Please contact support.',
       );
@@ -94,14 +87,29 @@ export class MailService {
     console.log(`📧 Sending email to ${to}: ${subject}`);
 
     try {
-      const response = await this.mailgun.messages.create(this.domain, {
-        from: this.fromEmail,
-        to: [to],
+      // Get a fresh access token using the refresh token
+      const { token: accessToken } = await this.oauth2Client.getAccessToken();
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: this.emailUser,
+          clientId: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+          clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+          refreshToken: this.configService.get<string>('GOOGLE_REFRESH_TOKEN'),
+          accessToken: accessToken as string,
+        },
+      });
+
+      const info = await transporter.sendMail({
+        from: `EventTix <${this.emailUser}>`,
+        to,
         subject,
         html,
       });
 
-      console.log(`✅ Email sent successfully: ${response.id}`);
+      console.log(`✅ Email sent successfully: ${info.messageId}`);
     } catch (error: any) {
       console.error('❌ Email sending failed:', error.message);
       throw new InternalServerErrorException(

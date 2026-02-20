@@ -1,44 +1,72 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const mailgun_js_1 = __importDefault(require("mailgun.js"));
-const form_data_1 = __importDefault(require("form-data"));
+const googleapis_1 = require("googleapis");
+const nodemailer = __importStar(require("nodemailer"));
 let MailService = class MailService {
     configService;
-    mailgun;
-    domain;
-    fromEmail;
+    oauth2Client;
+    emailUser;
+    isConfigured = false;
     constructor(configService) {
         this.configService = configService;
-        const apiKey = this.configService.get('MAILGUN_API_KEY');
-        this.domain = this.configService.get('MAILGUN_DOMAIN');
-        const fromName = this.configService.get('EMAIL_FROM_NAME') || 'EventTix';
-        const fromEmail = this.configService.get('EMAIL_FROM') || 'noreply@' + this.domain;
-        if (apiKey && this.domain) {
-            const mailgunClient = new mailgun_js_1.default(form_data_1.default);
-            this.mailgun = mailgunClient.client({
-                username: 'api',
-                key: apiKey,
-            });
-            this.fromEmail = `${fromName} <${fromEmail}>`;
-            console.log(`✅ Mailgun Service: Configured for ${this.domain}`);
+        const clientId = this.configService.get('GOOGLE_CLIENT_ID');
+        const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET');
+        const redirectUri = this.configService.get('GOOGLE_REDIRECT_URI');
+        const refreshToken = this.configService.get('GOOGLE_REFRESH_TOKEN');
+        this.emailUser = this.configService.get('EMAIL_USER') || '';
+        if (clientId && clientSecret && redirectUri && refreshToken && this.emailUser) {
+            this.oauth2Client = new googleapis_1.google.auth.OAuth2(clientId, clientSecret, redirectUri);
+            this.oauth2Client.setCredentials({ refresh_token: refreshToken });
+            this.isConfigured = true;
+            console.log(`✅ Gmail OAuth2 Service: Configured for ${this.emailUser}`);
         }
         else {
-            console.warn('⚠️  Mailgun not configured. Set MAILGUN_API_KEY and MAILGUN_DOMAIN in .env');
+            console.warn('⚠️  Gmail API not configured. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_REFRESH_TOKEN, and EMAIL_USER in .env');
         }
     }
     async sendVerificationOTP(to, otp) {
@@ -87,18 +115,30 @@ let MailService = class MailService {
         await this.sendMail(to, subject, html);
     }
     async sendMail(to, subject, html) {
-        if (!this.mailgun) {
+        if (!this.isConfigured) {
             throw new common_1.InternalServerErrorException('Email service not configured. Please contact support.');
         }
         console.log(`📧 Sending email to ${to}: ${subject}`);
         try {
-            const response = await this.mailgun.messages.create(this.domain, {
-                from: this.fromEmail,
-                to: [to],
+            const { token: accessToken } = await this.oauth2Client.getAccessToken();
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    type: 'OAuth2',
+                    user: this.emailUser,
+                    clientId: this.configService.get('GOOGLE_CLIENT_ID'),
+                    clientSecret: this.configService.get('GOOGLE_CLIENT_SECRET'),
+                    refreshToken: this.configService.get('GOOGLE_REFRESH_TOKEN'),
+                    accessToken: accessToken,
+                },
+            });
+            const info = await transporter.sendMail({
+                from: `EventTix <${this.emailUser}>`,
+                to,
                 subject,
                 html,
             });
-            console.log(`✅ Email sent successfully: ${response.id}`);
+            console.log(`✅ Email sent successfully: ${info.messageId}`);
         }
         catch (error) {
             console.error('❌ Email sending failed:', error.message);

@@ -27,3 +27,6 @@ coverage/
 
 # TypeScript cache
 *.tsbuildinfo
+
+# OAuth token generation script (contains credentials)
+generate-token.js
