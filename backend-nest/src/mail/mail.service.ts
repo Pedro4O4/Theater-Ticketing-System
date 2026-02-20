@@ -1,19 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { google } from 'googleapis';
-import * as nodemailer from 'nodemailer';
+import { google, gmail_v1 } from 'googleapis';
 
 @Injectable()
 export class MailService {
-  private config: {
-    clientId: string;
-    clientSecret: string;
-    redirectUri: string;
-    refreshToken: string;
-  } | null = null;
   private emailUser: string;
   private isConfigured: boolean = false;
-  private oauth2Client: any;
+  private gmail: gmail_v1.Gmail;
 
   constructor(private configService: ConfigService) {
     const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID')?.trim();
@@ -23,11 +16,11 @@ export class MailService {
     this.emailUser = this.configService.get<string>('EMAIL_USER')?.trim() || '';
 
     if (clientId && clientSecret && redirectUri && refreshToken && this.emailUser) {
-      this.config = { clientId, clientSecret, redirectUri, refreshToken };
-      this.oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-      this.oauth2Client.setCredentials({ refresh_token: refreshToken });
+      const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+      oauth2Client.setCredentials({ refresh_token: refreshToken });
+      this.gmail = google.gmail({ version: 'v1', auth: oauth2Client });
       this.isConfigured = true;
-      console.log(`✅ Gmail OAuth2 Service: Configured for ${this.emailUser}`);
+      console.log(`✅ Gmail API Service: Configured for ${this.emailUser}`);
     } else {
       const missing = [];
       if (!clientId) missing.push('GOOGLE_CLIENT_ID');
@@ -92,7 +85,7 @@ export class MailService {
   }
 
   private async sendMail(to: string, subject: string, html: string): Promise<void> {
-    if (!this.isConfigured || !this.config) {
+    if (!this.isConfigured || !this.gmail) {
       const errorMsg = 'Email service not configured (check GOOGLE_* and EMAIL_USER env vars).';
       console.error(`❌ ${errorMsg}`);
       throw new InternalServerErrorException(errorMsg);
@@ -101,40 +94,36 @@ export class MailService {
     console.log(`📧 Attempting to send email to ${to}: ${subject}`);
 
     try {
-      console.log('🔑 Requesting Gmail access token...');
-      const { token: accessToken } = await this.oauth2Client.getAccessToken();
+      // Build RFC 2822 email message
+      const messageParts = [
+        `From: EventTix <${this.emailUser}>`,
+        `To: ${to}`,
+        `Subject: ${subject}`,
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=utf-8',
+        '',
+        html,
+      ];
+      const message = messageParts.join('\r\n');
 
-      if (!accessToken) {
-        throw new Error('Google OAuth2: Failed to retrieve access token. Check your refresh token.');
-      }
-      console.log('✅ Access token retrieved.');
+      // Base64url encode the message
+      const encodedMessage = Buffer.from(message)
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
 
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-          type: 'OAuth2',
-          user: this.emailUser,
-          clientId: this.config.clientId,
-          clientSecret: this.config.clientSecret,
-          refreshToken: this.config.refreshToken,
-          accessToken: accessToken as string,
+      console.log('✉️ Sending via Gmail API...');
+      const result = await this.gmail.users.messages.send({
+        userId: 'me',
+        requestBody: {
+          raw: encodedMessage,
         },
       });
 
-      console.log('✉️ Sending via Nodemailer/SMTP...');
-      const info = await transporter.sendMail({
-        from: `EventTix <${this.emailUser}>`,
-        to,
-        subject,
-        html,
-      });
-
-      console.log(`✅ Email sent successfully: ${info.messageId}`);
+      console.log(`✅ Email sent successfully: ${result.data.id}`);
     } catch (error: any) {
       console.error('❌ Email sending failed:', error);
-      // Detailed error logging for OAuth issues
       if (error.response?.data) {
         console.error('API Error details:', JSON.stringify(error.response.data));
       }
