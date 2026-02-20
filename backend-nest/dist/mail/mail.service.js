@@ -54,11 +54,11 @@ let MailService = class MailService {
     isConfigured = false;
     constructor(configService) {
         this.configService = configService;
-        const clientId = this.configService.get('GOOGLE_CLIENT_ID');
-        const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET');
-        const redirectUri = this.configService.get('GOOGLE_REDIRECT_URI');
-        const refreshToken = this.configService.get('GOOGLE_REFRESH_TOKEN');
-        this.emailUser = this.configService.get('EMAIL_USER') || '';
+        const clientId = this.configService.get('GOOGLE_CLIENT_ID')?.trim();
+        const clientSecret = this.configService.get('GOOGLE_CLIENT_SECRET')?.trim();
+        const redirectUri = this.configService.get('GOOGLE_REDIRECT_URI')?.trim();
+        const refreshToken = this.configService.get('GOOGLE_REFRESH_TOKEN')?.trim();
+        this.emailUser = this.configService.get('EMAIL_USER')?.trim() || '';
         if (clientId && clientSecret && redirectUri && refreshToken && this.emailUser) {
             this.oauth2Client = new googleapis_1.google.auth.OAuth2(clientId, clientSecret, redirectUri);
             this.oauth2Client.setCredentials({ refresh_token: refreshToken });
@@ -66,7 +66,18 @@ let MailService = class MailService {
             console.log(`✅ Gmail OAuth2 Service: Configured for ${this.emailUser}`);
         }
         else {
-            console.warn('⚠️  Gmail API not configured. Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI, GOOGLE_REFRESH_TOKEN, and EMAIL_USER in .env');
+            const missing = [];
+            if (!clientId)
+                missing.push('GOOGLE_CLIENT_ID');
+            if (!clientSecret)
+                missing.push('GOOGLE_CLIENT_SECRET');
+            if (!redirectUri)
+                missing.push('GOOGLE_REDIRECT_URI');
+            if (!refreshToken)
+                missing.push('GOOGLE_REFRESH_TOKEN');
+            if (!this.emailUser)
+                missing.push('EMAIL_USER');
+            console.error(`❌ Gmail API not configured properly. Missing: ${missing.join(', ')}`);
         }
     }
     async sendVerificationOTP(to, otp) {
@@ -116,11 +127,18 @@ let MailService = class MailService {
     }
     async sendMail(to, subject, html) {
         if (!this.isConfigured) {
-            throw new common_1.InternalServerErrorException('Email service not configured. Please contact support.');
+            const errorMsg = 'Email service not configured (check GOOGLE_* environment variables).';
+            console.error(`❌ ${errorMsg}`);
+            throw new common_1.InternalServerErrorException(errorMsg);
         }
-        console.log(`📧 Sending email to ${to}: ${subject}`);
+        console.log(`📧 Attempting to send email to ${to}: ${subject}`);
         try {
+            console.log('🔑 Requesting Gmail access token...');
             const { token: accessToken } = await this.oauth2Client.getAccessToken();
+            if (!accessToken) {
+                throw new Error('Failed to retrieve access token from Google.');
+            }
+            console.log('✅ Access token retrieved.');
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -132,6 +150,7 @@ let MailService = class MailService {
                     accessToken: accessToken,
                 },
             });
+            console.log('✉️ Sending via Nodemailer...');
             const info = await transporter.sendMail({
                 from: `EventTix <${this.emailUser}>`,
                 to,
@@ -141,8 +160,8 @@ let MailService = class MailService {
             console.log(`✅ Email sent successfully: ${info.messageId}`);
         }
         catch (error) {
-            console.error('❌ Email sending failed:', error.message);
-            throw new common_1.InternalServerErrorException(`Failed to send email: ${error.message}`);
+            console.error('❌ Email sending failed:', error);
+            throw new common_1.InternalServerErrorException(`Failed to send email: ${error.message || 'Unknown error'}`);
         }
     }
 };
