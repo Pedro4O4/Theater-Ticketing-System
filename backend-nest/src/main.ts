@@ -28,6 +28,12 @@ async function bootstrap() {
         return;
       }
 
+      // Always allow any Vercel preview/production URL for this project
+      if (origin.match(/^https:\/\/theater-ticketing-system-nq1d[\w-]*\.vercel\.app$/)) {
+        callback(null, true);
+        return;
+      }
+
       // In production, check against allowed origins
       if (isProd) {
         if (allowedOrigins.some(ao => origin.includes(ao) || ao === '*')) {
