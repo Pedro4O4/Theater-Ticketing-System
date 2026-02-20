@@ -5,9 +5,15 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
-  private oauth2Client: InstanceType<typeof google.auth.OAuth2>;
+  private config: {
+    clientId: string;
+    clientSecret: string;
+    redirectUri: string;
+    refreshToken: string;
+  } | null = null;
   private emailUser: string;
   private isConfigured: boolean = false;
+  private oauth2Client: any;
 
   constructor(private configService: ConfigService) {
     const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID')?.trim();
@@ -17,6 +23,7 @@ export class MailService {
     this.emailUser = this.configService.get<string>('EMAIL_USER')?.trim() || '';
 
     if (clientId && clientSecret && redirectUri && refreshToken && this.emailUser) {
+      this.config = { clientId, clientSecret, redirectUri, refreshToken };
       this.oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
       this.oauth2Client.setCredentials({ refresh_token: refreshToken });
       this.isConfigured = true;
@@ -30,7 +37,7 @@ export class MailService {
       if (!this.emailUser) missing.push('EMAIL_USER');
 
       console.error(
-        `❌ Gmail API not configured properly. Missing: ${missing.join(', ')}`,
+        `❌ Gmail API not configured properly. Missing variables: ${missing.join(', ')}`,
       );
     }
   }
@@ -85,8 +92,8 @@ export class MailService {
   }
 
   private async sendMail(to: string, subject: string, html: string): Promise<void> {
-    if (!this.isConfigured) {
-      const errorMsg = 'Email service not configured (check GOOGLE_* environment variables).';
+    if (!this.isConfigured || !this.config) {
+      const errorMsg = 'Email service not configured (check GOOGLE_* and EMAIL_USER env vars).';
       console.error(`❌ ${errorMsg}`);
       throw new InternalServerErrorException(errorMsg);
     }
@@ -98,23 +105,25 @@ export class MailService {
       const { token: accessToken } = await this.oauth2Client.getAccessToken();
 
       if (!accessToken) {
-        throw new Error('Failed to retrieve access token from Google.');
+        throw new Error('Google OAuth2: Failed to retrieve access token. Check your refresh token.');
       }
       console.log('✅ Access token retrieved.');
 
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
           type: 'OAuth2',
           user: this.emailUser,
-          clientId: this.configService.get<string>('GOOGLE_CLIENT_ID'),
-          clientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
-          refreshToken: this.configService.get<string>('GOOGLE_REFRESH_TOKEN'),
+          clientId: this.config.clientId,
+          clientSecret: this.config.clientSecret,
+          refreshToken: this.config.refreshToken,
           accessToken: accessToken as string,
         },
       });
 
-      console.log('✉️ Sending via Nodemailer...');
+      console.log('✉️ Sending via Nodemailer/SMTP...');
       const info = await transporter.sendMail({
         from: `EventTix <${this.emailUser}>`,
         to,
@@ -125,10 +134,15 @@ export class MailService {
       console.log(`✅ Email sent successfully: ${info.messageId}`);
     } catch (error: any) {
       console.error('❌ Email sending failed:', error);
+      // Detailed error logging for OAuth issues
+      if (error.response?.data) {
+        console.error('API Error details:', JSON.stringify(error.response.data));
+      }
       throw new InternalServerErrorException(
         `Failed to send email: ${error.message || 'Unknown error'}`,
       );
     }
   }
+
 
 }
