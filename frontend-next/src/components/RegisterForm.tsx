@@ -11,7 +11,9 @@ import "./RegisterForm.css";
 interface FormData {
     name: string;
     email: string;
+    phone: string;
     password: string;
+    confirmPassword: string;
     role: string;
 }
 
@@ -19,7 +21,9 @@ export default function RegisterForm() {
     const [form, setForm] = useState<FormData>({
         name: "",
         email: "",
+        phone: "",
         password: "",
+        confirmPassword: "",
         role: "Standard User",
     });
     const [error, setError] = useState<string>("");
@@ -40,8 +44,21 @@ export default function RegisterForm() {
         setLoading(true);
         setError("");
 
+        // Validate confirm password
+        if (form.password !== form.confirmPassword) {
+            setError("Passwords do not match");
+            toast.error("Passwords do not match");
+            setLoading(false);
+            return;
+        }
+
         try {
-            await api.post("/auth/register", form);
+            await api.post("/auth/register", {
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                password: form.password,
+            });
             toast.success("Verification code sent to your email");
             setShowOtpForm(true);
         } catch (err: any) {
@@ -148,6 +165,24 @@ export default function RegisterForm() {
 
                         <div className="form-group">
                             <label className="form-label">
+                                <span className="label-text">Phone Number</span>
+                            </label>
+                            <div className="input-container">
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="Enter your phone number"
+                                    className="form-input"
+                                    value={form.phone}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <i className="input-icon fas fa-phone"></i>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">
                                 <span className="label-text">Password</span>
                             </label>
                             <div className="input-container">
@@ -165,6 +200,26 @@ export default function RegisterForm() {
                             <PasswordStrengthIndicator password={form.password} />
                         </div>
 
+                        <div className="form-group">
+                            <label className="form-label">
+                                <span className="label-text">Confirm Password</span>
+                            </label>
+                            <div className="input-container">
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    placeholder="Repeat your password"
+                                    className="form-input"
+                                    value={form.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <i className="input-icon fas fa-lock"></i>
+                            </div>
+                            {form.confirmPassword && form.password !== form.confirmPassword && (
+                                <div className="password-mismatch">Passwords do not match</div>
+                            )}
+                        </div>
 
                         <button
                             type="submit"

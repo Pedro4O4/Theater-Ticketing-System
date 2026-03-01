@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiCalendar, FiMapPin, FiTag, FiMinus, FiPlus,
     FiShoppingCart, FiArrowLeft, FiCheckCircle, FiAlertCircle,
-    FiCreditCard, FiUsers, FiGrid
+    FiCreditCard, FiUsers, FiGrid, FiUser, FiPhone, FiArrowRight, FiClock
 } from 'react-icons/fi';
 import { getImageUrl } from '@/utils/imageHelper';
 import SeatSelector from '@/components/Booking component/SeatSelector';
@@ -15,6 +15,11 @@ import { Event } from '@/types/event';
 import { Seat } from '@/types/booking';
 import { toast } from 'react-toastify';
 import '@/components/Booking component/BookingTicketForm.css';
+
+interface AttendeeInfo {
+    attendeeName: string;
+    attendeePhone: string;
+}
 
 const BookTicketPage = () => {
     const params = useParams();
@@ -31,6 +36,14 @@ const BookTicketPage = () => {
     const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
     const [seatTotalPrice, setSeatTotalPrice] = useState(0);
 
+    // Attendee form state
+    const [showAttendeeForm, setShowAttendeeForm] = useState(false);
+    const [attendeeInfo, setAttendeeInfo] = useState<AttendeeInfo[]>([]);
+
+    // Organizer InstaPay
+    const [organizerInstapay, setOrganizerInstapay] = useState<string>('');
+    const [hasCopied, setHasCopied] = useState(false);
+
     useEffect(() => {
         if (!eventId) return;
         const fetchEvent = async () => {
@@ -39,6 +52,10 @@ const BookTicketPage = () => {
                 const response = await api.get<any>(`/event/${eventId}`);
                 const data = response.data.success ? response.data.data : response.data;
                 setEvent(data);
+                // Read organizer InstaPay number from populated event data
+                if (data.organizerId && typeof data.organizerId === 'object') {
+                    setOrganizerInstapay(data.organizerId.instapayNumber || '');
+                }
             } catch (err: any) {
                 console.error("Error fetching event details:", err);
                 setError(err.response?.data?.message || "Failed to load event details");
@@ -63,6 +80,35 @@ const BookTicketPage = () => {
         setSeatTotalPrice(totalPrice);
     }, []);
 
+    // Step 1 → Step 2: Click "Next" to go to attendee form
+    const handleNext = () => {
+        if (selectedSeats.length === 0) {
+            toast.error("Please select at least one seat");
+            return;
+        }
+        setError(null);
+
+        // Initialize attendee info for each seat (preserve existing data)
+        const newAttendeeInfo = selectedSeats.map((_seat, index) => {
+            const existing = attendeeInfo[index];
+            return existing || { attendeeName: '', attendeePhone: '' };
+        });
+        setAttendeeInfo(newAttendeeInfo);
+        setShowAttendeeForm(true);
+    };
+
+    const handleBackToSeats = () => {
+        setShowAttendeeForm(false);
+    };
+
+    const handleAttendeeChange = (index: number, field: keyof AttendeeInfo, value: string) => {
+        setAttendeeInfo(prev => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [field]: value };
+            return updated;
+        });
+    };
+
     const handleSubmit = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
@@ -77,35 +123,46 @@ const BookTicketPage = () => {
             return;
         }
 
+        // Validate attendee info for theater events
+        if (event.hasTheaterSeating) {
+            for (let i = 0; i < attendeeInfo.length; i++) {
+                if (!attendeeInfo[i]?.attendeeName?.trim()) {
+                    toast.error(`Please enter name for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    return;
+                }
+                if (!attendeeInfo[i]?.attendeePhone?.trim()) {
+                    toast.error(`Please enter phone for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    return;
+                }
+            }
+        }
+
         setIsLoading(true);
         setError(null);
 
         try {
-            // Build request payload based on booking type
             const payload: any = {
                 eventId: event._id,
                 status: 'confirmed'
             };
 
             if (event.hasTheaterSeating) {
-                // Seat-based booking
-                payload.selectedSeats = selectedSeats.map(seat => ({
+                payload.selectedSeats = selectedSeats.map((seat, index) => ({
                     row: seat.row,
                     seatNumber: seat.seatNumber,
-                    section: seat.section
+                    section: seat.section,
+                    attendeeName: attendeeInfo[index]?.attendeeName || '',
+                    attendeePhone: attendeeInfo[index]?.attendeePhone || '',
                 }));
             } else {
-                // Regular ticket booking
                 payload.numberOfTickets = numberOfTickets;
             }
 
             const response = await api.post('/booking', payload);
 
+
             if (response.data.success) {
                 setSuccess(true);
-                setTimeout(() => {
-                    router.push('/bookings');
-                }, 2000);
             }
         } catch (err: any) {
             console.error("Booking error:", err);
@@ -146,7 +203,7 @@ const BookTicketPage = () => {
                 <div className="booking-error-state">
                     <FiAlertCircle size={60} />
                     <h2>Event Not Found</h2>
-                    <p>The event you're looking for doesn't exist or has been removed.</p>
+                    <p>The event you&apos;re looking for doesn&apos;t exist or has been removed.</p>
                     <motion.button onClick={() => router.push('/events')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                         <FiArrowLeft /> Browse Events
                     </motion.button>
@@ -157,18 +214,60 @@ const BookTicketPage = () => {
 
     if (success) {
         const ticketCount = event.hasTheaterSeating ? selectedSeats.length : numberOfTickets;
-        const totalPaid = event.hasTheaterSeating ? seatTotalPrice : numberOfTickets * (event.ticketPrice || 0);
+        const totalToPay = event.hasTheaterSeating ? seatTotalPrice : numberOfTickets * (event.ticketPrice || 0);
 
         return (
             <motion.div className="booking-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <motion.div className="booking-success-state" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", damping: 20 }}>
-                    <motion.div className="success-icon" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }}>
-                        <FiCheckCircle size={80} />
+                    <motion.div className="success-icon pending-icon" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring" }}>
+                        <FiClock size={80} />
                     </motion.div>
-                    <h2>Booking Confirmed!</h2>
-                    <p>You have successfully booked {ticketCount} {event.hasTheaterSeating ? 'seat' : 'ticket'}{ticketCount > 1 ? 's' : ''} for {event.title}</p>
-                    <div className="success-details"><span>Total Paid: ${totalPaid.toFixed(2)}</span></div>
-                    <p className="redirect-text">Redirecting to your bookings...</p>
+                    <h2>Payment Pending</h2>
+                    <p>Your booking for {ticketCount} {event.hasTheaterSeating ? 'seat' : 'ticket'}{ticketCount > 1 ? 's' : ''} is reserved!</p>
+
+                    {event.hasTheaterSeating && selectedSeats.length > 0 && (
+                        <div className="success-seats">
+                            {selectedSeats.map(seat => (
+                                <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="seat-chip">
+                                    {seat.row}{seat.seatNumber}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="instapay-section">
+                        <h3>Pay via InstaPay</h3>
+                        <p className="instapay-instruction">Send <strong>${totalToPay.toFixed(2)}</strong> to the organizer&apos;s InstaPay number below:</p>
+                        {organizerInstapay ? (
+                            <div className="instapay-number-box">
+                                <span className="instapay-number">{organizerInstapay}</span>
+                                <button
+                                    type="button"
+                                    className="copy-btn"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(organizerInstapay);
+                                        setHasCopied(true);
+                                        toast.success('InstaPay number copied!');
+                                    }}
+                                >
+                                    {hasCopied ? '✓ Copied' : 'Copy'}
+                                </button>
+                            </div>
+                        ) : (
+                            <p className="instapay-fallback">Contact the event organizer for payment details.</p>
+                        )}
+                        <p className="instapay-note">The organizer will confirm your booking once payment is verified.</p>
+                    </div>
+
+                    <motion.button
+                        className={`view-bookings-btn ${!hasCopied ? 'btn-disabled' : ''}`}
+                        onClick={() => hasCopied && router.push('/bookings')}
+                        disabled={!hasCopied}
+                        whileHover={hasCopied ? { scale: 1.02 } : {}}
+                        whileTap={hasCopied ? { scale: 0.98 } : {}}
+                    >
+                        Done
+                    </motion.button>
                 </motion.div>
             </motion.div>
         );
@@ -187,9 +286,15 @@ const BookTicketPage = () => {
                     <div className="theater-fullpage-container">
                         {/* Compact Header Bar */}
                         <motion.div className="theater-header-bar" initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-                            <motion.button className="back-btn-compact" onClick={() => router.back()} whileHover={{ x: -3 }}>
-                                <FiArrowLeft size={18} /><span>Back</span>
+                            <motion.button
+                                className="back-btn-compact"
+                                onClick={() => showAttendeeForm ? handleBackToSeats() : router.back()}
+                                whileHover={{ x: -3 }}
+                            >
+                                <FiArrowLeft size={18} />
+                                <span>{showAttendeeForm ? 'Back to Seats' : 'Back'}</span>
                             </motion.button>
+
                             <div className="event-info-compact">
                                 <img src={getImageUrl(event.image)} alt="" className="event-thumb" />
                                 <div>
@@ -200,9 +305,18 @@ const BookTicketPage = () => {
                                     </div>
                                 </div>
                             </div>
+
                             <div className="booking-summary-compact">
                                 {selectedSeats.length > 0 && (
                                     <>
+                                        <div className="header-seats-chips">
+                                            {selectedSeats.map(seat => (
+                                                <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="header-seat-chip">
+                                                    {seat.row}{seat.seatNumber}
+                                                    <span className="header-chip-price">${seat.price}</span>
+                                                </span>
+                                            ))}
+                                        </div>
                                         <span className="seats-count">{selectedSeats.length} seat{selectedSeats.length !== 1 ? 's' : ''}</span>
                                         <span className="total-amount">${seatTotalPrice.toFixed(2)}</span>
                                     </>
@@ -210,19 +324,115 @@ const BookTicketPage = () => {
                             </div>
                         </motion.div>
 
-                        {/* Full Page Seat Selector */}
-                        <div className="theater-seat-area">
-                            <SeatSelector eventId={event._id} onSeatsSelected={handleSeatsSelected} maxSeats={10} />
-                        </div>
+                        {/* Main Content: Seat selector OR Attendee form */}
+                        <AnimatePresence mode="wait">
+                            {!showAttendeeForm ? (
+                                <motion.div
+                                    key="seat-selection"
+                                    className="theater-seat-area"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                >
+                                    <SeatSelector eventId={event._id} onSeatsSelected={handleSeatsSelected} maxSeats={10} />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="attendee-form"
+                                    className="attendee-form-area"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                >
+                                    <div className="attendee-form-container">
+                                        <div className="attendee-form-header">
+                                            <FiUsers size={24} />
+                                            <div>
+                                                <h3>Attendee Information</h3>
+                                                <p>Enter name and phone for each seat</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="attendee-cards-list">
+                                            {selectedSeats.map((seat, index) => (
+                                                <motion.div
+                                                    key={`${seat.section}-${seat.row}-${seat.seatNumber}`}
+                                                    className="attendee-card"
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: index * 0.08 }}
+                                                >
+                                                    <div className="attendee-card-header">
+                                                        <span className="attendee-seat-badge">
+                                                            Seat {seat.row}{seat.seatNumber}
+                                                        </span>
+                                                        <span className="attendee-seat-price">${seat.price}</span>
+                                                    </div>
+                                                    <div className="attendee-fields">
+                                                        <div className="attendee-field">
+                                                            <FiUser className="field-icon" />
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Full Name"
+                                                                value={attendeeInfo[index]?.attendeeName || ''}
+                                                                onChange={(e) => handleAttendeeChange(index, 'attendeeName', e.target.value)}
+                                                                className="attendee-input"
+                                                            />
+                                                        </div>
+                                                        <div className="attendee-field">
+                                                            <FiPhone className="field-icon" />
+                                                            <input
+                                                                type="tel"
+                                                                placeholder="Phone Number"
+                                                                value={attendeeInfo[index]?.attendeePhone || ''}
+                                                                onChange={(e) => handleAttendeeChange(index, 'attendeePhone', e.target.value)}
+                                                                className="attendee-input"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Fixed Bottom Action Bar */}
                         <motion.div className="theater-action-bar" initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                             {error && <div className="error-inline"><FiAlertCircle /> {error}</div>}
-                            <motion.button type="button" className="confirm-booking-btn" onClick={() => handleSubmit()} disabled={isLoading || selectedSeats.length === 0} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                {isLoading ? <><span className="btn-spinner"></span>Processing...</> : (
-                                    <>{selectedSeats.length > 0 ? `Confirm ${selectedSeats.length} Seat${selectedSeats.length !== 1 ? 's' : ''} - $${seatTotalPrice.toFixed(2)}` : 'Select Seats to Continue'}</>
-                                )}
-                            </motion.button>
+
+                            {!showAttendeeForm ? (
+                                <motion.button
+                                    type="button"
+                                    className="confirm-booking-btn"
+                                    onClick={handleNext}
+                                    disabled={selectedSeats.length === 0}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    <FiArrowRight />
+                                    {selectedSeats.length > 0
+                                        ? `Next — ${selectedSeats.length} Seat${selectedSeats.length !== 1 ? 's' : ''} — $${seatTotalPrice.toFixed(2)}`
+                                        : 'Select Seats to Continue'
+                                    }
+                                </motion.button>
+                            ) : (
+                                <motion.button
+                                    type="button"
+                                    className="confirm-booking-btn"
+                                    onClick={() => handleSubmit()}
+                                    disabled={isLoading || selectedSeats.length === 0}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    {isLoading ? (
+                                        <><span className="btn-spinner"></span>Processing...</>
+                                    ) : (
+                                        <><FiCreditCard /> Confirm Booking — ${seatTotalPrice.toFixed(2)}</>
+                                    )}
+                                </motion.button>
+                            )}
                         </motion.div>
                     </div>
                 ) : (
@@ -272,4 +482,3 @@ const BookTicketPage = () => {
 };
 
 export default BookTicketPage;
-

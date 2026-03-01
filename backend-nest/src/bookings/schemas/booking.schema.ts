@@ -24,6 +24,12 @@ class SelectedSeat {
 
     @Prop({ min: 0, required: true })
     price: number;
+
+    @Prop()
+    attendeeName: string;
+
+    @Prop()
+    attendeePhone: string;
 }
 
 @Schema({ timestamps: true })
@@ -41,7 +47,7 @@ export class Booking {
     totalPrice: number;
 
     @Prop({
-        enum: ['pending', 'confirmed', 'canceled'],
+        enum: ['pending', 'confirmed', 'canceled', 'rejected'],
         default: 'pending',
     })
     status: string;
@@ -49,8 +55,14 @@ export class Booking {
     @Prop({ default: false })
     hasTheaterSeating: boolean;
 
+    @Prop({ type: Date, default: null })
+    pendingExpiresAt: Date;
+
     @Prop({ type: [SelectedSeat] })
     selectedSeats: SelectedSeat[];
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
+
+// TTL index: auto-delete pending bookings after pendingExpiresAt
+BookingSchema.index({ pendingExpiresAt: 1 }, { expireAfterSeconds: 0 });

@@ -10,6 +10,7 @@ export interface Seat extends SelectedSeat {
     seatType: 'standard' | 'vip' | 'premium' | 'wheelchair';
     price: number;
     isBooked: boolean;
+    isPending?: boolean;
     isActive: boolean;
 }
 

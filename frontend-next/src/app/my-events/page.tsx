@@ -9,6 +9,7 @@ import { Event } from '@/types/event';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { toast } from 'react-toastify';
 import '@/components/Event Components/MyEventPage.css';
+import '@/components/Event Components/EventBookings.css';
 
 const MyEventsPage = () => {
     const [showOtpModal, setShowOtpModal] = useState(false);
@@ -138,6 +139,9 @@ const MyEventsPage = () => {
                                         <span className={`status-dot ${event.status}`}></span>
                                         <span className="status-text">{event.status}</span>
                                     </div>
+                                    <Link href={`/my-events/${event._id}/bookings`} className="view-bookings-btn-card">
+                                        View Bookings
+                                    </Link>
                                 </div>
                             </div>
                         ))}

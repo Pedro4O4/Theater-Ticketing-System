@@ -468,6 +468,14 @@
     opacity: 0.5;
 }
 
+.password-mismatch {
+    color: #f87171;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    padding-left: 4px;
+    animation: messageSlide 0.3s ease;
+}
+
 .svg {
     display: none;
 }

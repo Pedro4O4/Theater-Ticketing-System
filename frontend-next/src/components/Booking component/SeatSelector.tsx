@@ -113,7 +113,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
     // Handle seat click
     const handleSeatClick = useCallback((seat: Seat) => {
-        if (readOnly || seat.isBooked || !seat.isActive) return;
+        if (readOnly || seat.isBooked || seat.isPending || !seat.isActive) return;
 
         setSelectedSeats(prev => {
             const isSelected = prev.some(
@@ -263,6 +263,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
         );
 
         const typeColors = SEAT_TYPE_COLORS[seat.seatType] || SEAT_TYPE_COLORS.standard;
+        const isPending = seat.isPending && !seat.isBooked && !isHighlighted;
 
         // Force inline styles for booked seats to ensure visibility
         const bookedStyles = (seat.isBooked && !isHighlighted) ? {
@@ -271,12 +272,20 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             opacity: 0.7,
             cursor: 'not-allowed',
             pointerEvents: 'none' as const,
+        } : isPending ? {
+            background: '#3d3520',
+            borderColor: '#fbbf24',
+            opacity: 0.8,
+            cursor: 'not-allowed',
+            pointerEvents: 'none' as const,
         } : {};
+
+        const isSeatDisabled = (seat.isBooked && !isHighlighted) || isPending || !seat.isActive || readOnly;
 
         return (
             <React.Fragment key={seatKey}>
                 <motion.button
-                    className={`seat-btn ${seat.seatType} ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${seat.isBooked && !isHighlighted ? 'booked' : ''} ${!seat.isActive ? 'disabled' : ''}`}
+                    className={`seat-btn ${seat.seatType} ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${seat.isBooked && !isHighlighted ? 'booked' : ''} ${isPending ? 'pending' : ''} ${!seat.isActive ? 'disabled' : ''}`}
                     style={{
                         '--seat-bg': typeColors.bg,
                         '--seat-border': typeColors.border,
@@ -285,14 +294,16 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                     onClick={() => handleSeatClick(seat)}
                     onMouseEnter={() => !readOnly && setHoveredSeat(seat)}
                     onMouseLeave={() => setHoveredSeat(null)}
-                    disabled={(seat.isBooked && !isHighlighted) || !seat.isActive || readOnly}
-                    whileHover={!seat.isBooked && seat.isActive && !readOnly ? { scale: 1.15 } : {}}
-                    whileTap={!seat.isBooked && seat.isActive && !readOnly ? { scale: 0.95 } : {}}
+                    disabled={isSeatDisabled}
+                    whileHover={!seat.isBooked && !isPending && seat.isActive && !readOnly ? { scale: 1.15 } : {}}
+                    whileTap={!seat.isBooked && !isPending && seat.isActive && !readOnly ? { scale: 0.95 } : {}}
                 >
                     {(isSelected || isHighlighted) ? (
                         <FiCheck className="check-icon" />
                     ) : seat.isBooked && !isHighlighted ? (
                         <FiX style={{ color: '#ef4444', fontSize: '1rem' }} />
+                    ) : isPending ? (
+                        <FiLoader style={{ color: '#fbbf24', fontSize: '0.85rem' }} />
                     ) : (
                         <span className="seat-num">{seat.seatNumber}</span>
                     )}
@@ -487,26 +498,6 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                 )}
             </AnimatePresence>
 
-            <AnimatePresence>
-                {!readOnly && selectedSeats.length > 0 && (
-                    <motion.div className="selection-summary" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}>
-                        <div className="summary-header">
-                            <div className="summary-count"><FiUsers /><span>{selectedSeats.length} seat{selectedSeats.length > 1 ? 's' : ''} selected</span></div>
-                            <button className="clear-btn" onClick={clearSelection}>Clear All</button>
-                        </div>
-                        <div className="selected-seats-list">
-                            {selectedSeats.map(seat => (
-                                <motion.div key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="selected-seat-chip" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                                    <span>{seat.row}{seat.seatNumber}</span>
-                                    <span className="chip-price">${seat.price}</span>
-                                    <button onClick={() => handleSeatClick(seat)} className="remove-seat"><FiX /></button>
-                                </motion.div>
-                            ))}
-                        </div>
-                        <div className="summary-total"><FiDollarSign /><span>Total:</span><strong>${totalPrice.toFixed(2)}</strong></div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 };

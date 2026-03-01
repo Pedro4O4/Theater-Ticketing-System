@@ -45,6 +45,14 @@ let BookingsController = class BookingsController {
         const data = await this.bookingsService.getAvailableSeats(eventId);
         return { success: true, data };
     }
+    async getEventBookings(eventId) {
+        const data = await this.bookingsService.findAllForEvent(eventId);
+        return { success: true, count: data.length, data };
+    }
+    async updateBookingStatus(id, status) {
+        const data = await this.bookingsService.updateBookingStatus(id, status);
+        return { success: true, data };
+    }
 };
 exports.BookingsController = BookingsController;
 __decorate([
@@ -94,6 +102,23 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], BookingsController.prototype, "getEventSeats", null);
+__decorate([
+    (0, common_1.Get)('event/:eventId/bookings'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('eventId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], BookingsController.prototype, "getEventBookings", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], BookingsController.prototype, "updateBookingStatus", null);
 exports.BookingsController = BookingsController = __decorate([
     (0, common_1.Controller)('api/v1/booking'),
     __metadata("design:paramtypes", [bookings_service_1.BookingsService])

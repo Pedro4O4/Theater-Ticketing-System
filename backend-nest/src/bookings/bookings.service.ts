@@ -2,6 +2,8 @@ import {
     Injectable,
     NotFoundException,
     BadRequestException,
+    OnModuleInit,
+    Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -10,12 +12,49 @@ import { Event, EventDocument } from '../events/schemas/event.schema';
 import { Theater, TheaterDocument } from '../theaters/schemas/theater.schema';
 
 @Injectable()
-export class BookingsService {
+export class BookingsService implements OnModuleInit {
+    private readonly logger = new Logger(BookingsService.name);
+
     constructor(
         @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
         @InjectModel(Event.name) private eventModel: Model<EventDocument>,
         @InjectModel(Theater.name) private theaterModel: Model<TheaterDocument>,
     ) { }
+
+    onModuleInit() {
+        // Check for expired pending bookings every 60 seconds
+        setInterval(() => this.cleanupExpiredBookings(), 60 * 1000);
+        // Also run immediately on startup
+        this.cleanupExpiredBookings();
+    }
+
+    private async cleanupExpiredBookings() {
+        try {
+            const expiredBookings = await this.bookingModel.find({
+                status: 'pending',
+                pendingExpiresAt: { $lte: new Date() },
+            } as any).exec();
+
+            for (const booking of expiredBookings) {
+                // Release seats from the event
+                if (booking.hasTheaterSeating && booking.selectedSeats?.length > 0) {
+                    await this.eventModel.findByIdAndUpdate(booking.eventId, {
+                        $pull: { bookedSeats: { bookingId: booking._id } },
+                        $inc: { remainingTickets: booking.numberOfTickets },
+                    });
+                } else {
+                    await this.eventModel.findByIdAndUpdate(booking.eventId, {
+                        $inc: { remainingTickets: booking.numberOfTickets },
+                    });
+                }
+                await this.bookingModel.findByIdAndDelete(booking._id).exec();
+                this.logger.log(`Expired pending booking ${booking._id} cleaned up`);
+            }
+        } catch (err) {
+            this.logger.error('Error cleaning up expired bookings', err);
+        }
+    }
+
 
     async create(createDto: any, userId: string): Promise<BookingDocument> {
         const { eventId, numberOfTickets, status, selectedSeats } = createDto;
@@ -29,7 +68,8 @@ export class BookingsService {
         const bookingData: any = {
             StandardId: userId,
             eventId,
-            status: status || 'confirmed',
+            status: 'pending',
+            pendingExpiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
         };
 
         if (event.hasTheaterSeating && selectedSeats && selectedSeats.length > 0) {
@@ -97,6 +137,8 @@ export class BookingsService {
                     section: seat.section || 'main',
                     seatType,
                     price,
+                    attendeeName: seat.attendeeName || '',
+                    attendeePhone: seat.attendeePhone || '',
                 };
             });
 
@@ -194,6 +236,41 @@ export class BookingsService {
         await this.bookingModel.findByIdAndDelete(id).exec();
     }
 
+    async findAllForEvent(eventId: string): Promise<BookingDocument[]> {
+        return this.bookingModel
+            .find({ eventId } as any)
+            .populate('StandardId', 'name email phone')
+            .sort({ createdAt: -1 })
+            .exec();
+    }
+
+    async updateBookingStatus(bookingId: string, status: string): Promise<BookingDocument> {
+        const booking = await this.bookingModel.findById(bookingId).exec();
+        if (!booking) {
+            throw new NotFoundException('Booking not found');
+        }
+
+        if (!['confirmed', 'rejected'].includes(status)) {
+            throw new BadRequestException('Status must be confirmed or rejected');
+        }
+
+        // If rejecting a previously pending booking that had seats, release the seats
+        if (status === 'rejected' && booking.hasTheaterSeating && booking.selectedSeats?.length > 0) {
+            await this.eventModel.findByIdAndUpdate(booking.eventId, {
+                $pull: { bookedSeats: { bookingId: booking._id } },
+                $inc: { remainingTickets: booking.numberOfTickets },
+            });
+        }
+
+        // If confirming, clear the TTL so it doesn't auto-delete
+        if (status === 'confirmed') {
+            booking.pendingExpiresAt = null as any;
+        }
+
+        booking.status = status;
+        return booking.save();
+    }
+
     async getAvailableSeats(eventId: string): Promise<any> {
         const event = await this.eventModel
             .findById(eventId)
@@ -211,6 +288,20 @@ export class BookingsService {
         const bookedSeatsSet = new Set(
             event.bookedSeats.map((s: any) => `${s.section}-${s.row}-${s.seatNumber}`),
         );
+
+        // Find pending bookings to mark seats as pending (yellow)
+        const pendingBookings = await this.bookingModel.find({
+            eventId,
+            status: 'pending',
+        } as any).exec();
+        const pendingSeatsSet = new Set<string>();
+        for (const pb of pendingBookings) {
+            if (pb.selectedSeats) {
+                for (const s of pb.selectedSeats as any[]) {
+                    pendingSeatsSet.add(`${s.section}-${s.row}-${s.seatNumber}`);
+                }
+            }
+        }
 
         const mergedSeatConfig = [...(theater.seatConfig || [])];
         if (event.seatConfig && event.seatConfig.length > 0) {
@@ -263,6 +354,7 @@ export class BookingsService {
                     seatType,
                     isActive,
                     isBooked: bookedSeatsSet.has(seatKey),
+                    isPending: pendingSeatsSet.has(seatKey),
                     price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                 });
             }
@@ -299,6 +391,7 @@ export class BookingsService {
                         seatType,
                         isActive,
                         isBooked: bookedSeatsSet.has(seatKey),
+                        isPending: pendingSeatsSet.has(seatKey),
                         price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                     });
                 }

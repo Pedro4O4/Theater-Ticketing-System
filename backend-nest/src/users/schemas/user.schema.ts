@@ -17,6 +17,12 @@ export class User {
     @Prop({ required: true, unique: true })
     email: string;
 
+    @Prop()
+    phone: string;
+
+    @Prop()
+    instapayNumber: string;
+
     @Prop({ required: false })
     profilePicture?: string;
 

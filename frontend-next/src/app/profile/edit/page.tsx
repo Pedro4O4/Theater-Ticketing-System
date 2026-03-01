@@ -6,7 +6,7 @@ import api from '@/services/api';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiUser, FiMail, FiCamera, FiCheck, FiX, FiArrowLeft } from 'react-icons/fi';
+import { FiUser, FiMail, FiCamera, FiCheck, FiX, FiArrowLeft, FiDollarSign, FiPhone } from 'react-icons/fi';
 import '@/components/UserComponent/UpdateProfilePage.css';
 
 const UpdateProfilePageContent = () => {
@@ -16,7 +16,9 @@ const UpdateProfilePageContent = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        profilePicture: ''
+        phone: '',
+        profilePicture: '',
+        instapayNumber: ''
     });
 
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -29,7 +31,9 @@ const UpdateProfilePageContent = () => {
             setFormData({
                 name: user.name || '',
                 email: user.email || '',
-                profilePicture: user.profilePicture || ''
+                phone: (user as any).phone || '',
+                profilePicture: user.profilePicture || '',
+                instapayNumber: (user as any).instapayNumber || ''
             });
 
             if (user.profilePicture) {
@@ -217,6 +221,52 @@ const UpdateProfilePageContent = () => {
                                 <div className="focus-border"></div>
                             </div>
                         </motion.div>
+
+                        <motion.div
+                            className="form-group"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.35 }}
+                        >
+                            <label>
+                                <FiPhone className="label-icon" />
+                                Phone Number
+                            </label>
+                            <div className="input-wrapper">
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    placeholder="e.g. 01012345678"
+                                />
+                                <div className="focus-border"></div>
+                            </div>
+                        </motion.div>
+
+                        {user?.role === 'Organizer' && (
+                            <motion.div
+                                className="form-group"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.4 }}
+                            >
+                                <label>
+                                    <FiDollarSign className="label-icon" />
+                                    InstaPay Number
+                                </label>
+                                <div className="input-wrapper">
+                                    <input
+                                        type="text"
+                                        name="instapayNumber"
+                                        value={formData.instapayNumber}
+                                        onChange={handleChange}
+                                        placeholder="e.g. 01221627432"
+                                    />
+                                    <div className="focus-border"></div>
+                                </div>
+                            </motion.div>
+                        )}
                     </div>
 
                     <motion.div

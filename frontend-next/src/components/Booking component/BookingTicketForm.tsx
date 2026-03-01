@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiCalendar, FiMapPin, FiTag, FiMinus, FiPlus,
     FiShoppingCart, FiArrowLeft, FiCheckCircle, FiAlertCircle,
-    FiCreditCard, FiUsers, FiGrid
+    FiCreditCard, FiUsers, FiGrid, FiUser, FiPhone, FiArrowRight
 } from 'react-icons/fi';
 import api from '@/services/api';
 import { getImageUrl } from '@/utils/imageHelper';
@@ -17,6 +17,12 @@ interface Seat {
     row: string;
     seatNumber: number;
     section?: string;
+    price?: number;
+}
+
+interface AttendeeInfo {
+    attendeeName: string;
+    attendeePhone: string;
 }
 
 interface Event {
@@ -49,6 +55,10 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
 
     const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
     const [seatTotalPrice, setSeatTotalPrice] = useState<number>(0);
+
+    // Attendee form state
+    const [showAttendeeForm, setShowAttendeeForm] = useState<boolean>(false);
+    const [attendeeInfo, setAttendeeInfo] = useState<AttendeeInfo[]>([]);
 
     useEffect(() => {
         if (preSelectedEvent) {
@@ -93,6 +103,35 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
         setSeatTotalPrice(totalPrice);
     }, []);
 
+    // Open attendee form
+    const handleContinueToAttendee = () => {
+        if (selectedSeats.length === 0) {
+            setError("Please select at least one seat");
+            return;
+        }
+        setError(null);
+
+        // Initialize attendee info for each seat (preserve existing data)
+        const newAttendeeInfo = selectedSeats.map((seat, index) => {
+            const existing = attendeeInfo[index];
+            return existing || { attendeeName: '', attendeePhone: '' };
+        });
+        setAttendeeInfo(newAttendeeInfo);
+        setShowAttendeeForm(true);
+    };
+
+    const handleAttendeeChange = (index: number, field: keyof AttendeeInfo, value: string) => {
+        setAttendeeInfo(prev => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [field]: value };
+            return updated;
+        });
+    };
+
+    const handleBackToSeats = () => {
+        setShowAttendeeForm(false);
+    };
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -106,6 +145,20 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
             return;
         }
 
+        // Validate attendee info
+        if (selectedEvent.hasTheaterSeating) {
+            for (let i = 0; i < attendeeInfo.length; i++) {
+                if (!attendeeInfo[i].attendeeName.trim()) {
+                    setError(`Please enter name for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    return;
+                }
+                if (!attendeeInfo[i].attendeePhone.trim()) {
+                    setError(`Please enter phone for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    return;
+                }
+            }
+        }
+
         setIsLoading(true);
         setError(null);
 
@@ -116,10 +169,12 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
             };
 
             if (selectedEvent.hasTheaterSeating) {
-                payload.selectedSeats = selectedSeats.map(seat => ({
+                payload.selectedSeats = selectedSeats.map((seat, index) => ({
                     row: seat.row,
                     seatNumber: seat.seatNumber,
-                    section: seat.section
+                    section: seat.section,
+                    attendeeName: attendeeInfo[index]?.attendeeName || '',
+                    attendeePhone: attendeeInfo[index]?.attendeePhone || '',
                 }));
             } else {
                 payload.numberOfTickets = numberOfTickets;
@@ -256,11 +311,11 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                     >
                         <motion.button
                             className="back-btn-compact"
-                            onClick={() => router.back()}
+                            onClick={() => showAttendeeForm ? handleBackToSeats() : router.back()}
                             whileHover={{ x: -3 }}
                         >
                             <FiArrowLeft size={18} />
-                            <span>Back</span>
+                            <span>{showAttendeeForm ? 'Back to Seats' : 'Back'}</span>
                         </motion.button>
 
                         <div className="event-info-compact">
@@ -277,6 +332,14 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                         <div className="booking-summary-compact">
                             {selectedSeats.length > 0 && (
                                 <>
+                                    <div className="header-seats-chips">
+                                        {selectedSeats.map(seat => (
+                                            <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="header-seat-chip">
+                                                {seat.row}{seat.seatNumber}
+                                                <span className="header-chip-price">${seat.price}</span>
+                                            </span>
+                                        ))}
+                                    </div>
                                     <span className="seats-count">{selectedSeats.length} seat{selectedSeats.length !== 1 ? 's' : ''}</span>
                                     <span className="total-amount">${seatTotalPrice.toFixed(2)}</span>
                                 </>
@@ -284,13 +347,82 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                         </div>
                     </motion.div>
 
-                    <div className="theater-seat-area">
-                        <SeatSelector
-                            eventId={selectedEvent._id}
-                            onSeatsSelected={handleSeatsSelected}
-                            maxSeats={10}
-                        />
-                    </div>
+                    <AnimatePresence mode="wait">
+                        {!showAttendeeForm ? (
+                            <motion.div
+                                key="seat-selection"
+                                className="theater-seat-area"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                            >
+                                <SeatSelector
+                                    eventId={selectedEvent._id}
+                                    onSeatsSelected={handleSeatsSelected}
+                                    maxSeats={10}
+                                />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="attendee-form"
+                                className="attendee-form-area"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                            >
+                                <div className="attendee-form-container">
+                                    <div className="attendee-form-header">
+                                        <FiUsers size={24} />
+                                        <div>
+                                            <h3>Attendee Information</h3>
+                                            <p>Enter name and phone for each seat</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="attendee-cards-list">
+                                        {selectedSeats.map((seat, index) => (
+                                            <motion.div
+                                                key={`${seat.section}-${seat.row}-${seat.seatNumber}`}
+                                                className="attendee-card"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.08 }}
+                                            >
+                                                <div className="attendee-card-header">
+                                                    <span className="attendee-seat-badge">
+                                                        Seat {seat.row}{seat.seatNumber}
+                                                    </span>
+                                                    <span className="attendee-seat-price">${seat.price}</span>
+                                                </div>
+                                                <div className="attendee-fields">
+                                                    <div className="attendee-field">
+                                                        <FiUser className="field-icon" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Full Name"
+                                                            value={attendeeInfo[index]?.attendeeName || ''}
+                                                            onChange={(e) => handleAttendeeChange(index, 'attendeeName', e.target.value)}
+                                                            className="attendee-input"
+                                                        />
+                                                    </div>
+                                                    <div className="attendee-field">
+                                                        <FiPhone className="field-icon" />
+                                                        <input
+                                                            type="tel"
+                                                            placeholder="Phone Number"
+                                                            value={attendeeInfo[index]?.attendeePhone || ''}
+                                                            onChange={(e) => handleAttendeeChange(index, 'attendeePhone', e.target.value)}
+                                                            className="attendee-input"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     <motion.div
                         className="theater-action-bar"
@@ -303,29 +435,43 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                             </div>
                         )}
 
-                        <motion.button
-                            type="button"
-                            className="confirm-booking-btn"
-                            onClick={handleSubmit}
-                            disabled={isLoading || selectedSeats.length === 0}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <span className="btn-spinner"></span>
-                                    Processing...
-                                </>
-                            ) : (
-                                <>
-                                    <FiCreditCard />
-                                    {selectedSeats.length > 0
-                                        ? `Confirm ${selectedSeats.length} Seat${selectedSeats.length !== 1 ? 's' : ''} - $${seatTotalPrice.toFixed(2)}`
-                                        : 'Select Seats to Continue'
-                                    }
-                                </>
-                            )}
-                        </motion.button>
+                        {!showAttendeeForm ? (
+                            <motion.button
+                                type="button"
+                                className="confirm-booking-btn"
+                                onClick={handleContinueToAttendee}
+                                disabled={selectedSeats.length === 0}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <FiArrowRight />
+                                {selectedSeats.length > 0
+                                    ? `Continue — ${selectedSeats.length} Seat${selectedSeats.length !== 1 ? 's' : ''} — $${seatTotalPrice.toFixed(2)}`
+                                    : 'Select Seats to Continue'
+                                }
+                            </motion.button>
+                        ) : (
+                            <motion.button
+                                type="button"
+                                className="confirm-booking-btn"
+                                onClick={handleSubmit}
+                                disabled={isLoading || selectedSeats.length === 0}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <span className="btn-spinner"></span>
+                                        Processing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiCreditCard />
+                                        Confirm Booking — ${seatTotalPrice.toFixed(2)}
+                                    </>
+                                )}
+                            </motion.button>
+                        )}
                     </motion.div>
                 </div>
             ) : (

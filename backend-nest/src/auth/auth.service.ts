@@ -6,9 +6,12 @@ import {
     NotFoundException,
     ForbiddenException,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { MailService } from '../mail/mail.service';
+import { PendingRegistration, PendingRegistrationDocument } from './schemas/pending-registration.schema';
 import * as bcrypt from 'bcryptjs';
 import { UserRole } from '../users/schemas/user.schema';
 
@@ -18,13 +21,14 @@ export class AuthService {
         private usersService: UsersService,
         private jwtService: JwtService,
         private mailService: MailService,
+        @InjectModel(PendingRegistration.name)
+        private pendingModel: Model<PendingRegistrationDocument>,
     ) { }
 
     async register(registerDto: any) {
-        const { email, password, name } = registerDto;
-        // Public registration always creates Standard Users only
-        const role = UserRole.STANDARD;
+        const { email, password, name, phone } = registerDto;
 
+        // Check if email already exists as a verified user
         const existingUser = await this.usersService.findOneByEmail(email);
         if (existingUser) {
             throw new ConflictException('User already exists');
@@ -32,20 +36,24 @@ export class AuthService {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await this.usersService.create({
-            name,
-            email,
-            password: hashedPassword,
-            role,
-            otp,
-            otpExpires,
-            isVerified: false,
-        });
+        // Upsert into pending_registrations (so re-registrations update the OTP)
+        await this.pendingModel.findOneAndUpdate(
+            { email },
+            {
+                name,
+                email,
+                phone: phone || '',
+                password: hashedPassword,
+                otp,
+                otpExpires,
+                createdAt: new Date(),
+            },
+            { upsert: true, new: true },
+        );
 
-        // Send email and await result to ensure success
+        // Send verification email
         await this.mailService.sendVerificationOTP(email, otp);
 
         return {
@@ -55,24 +63,55 @@ export class AuthService {
     }
 
     async verifyRegistration(email: string, otp: string) {
-        const user = await this.usersService.findOneByEmail(email);
-        if (!user) {
-            throw new NotFoundException('User not found');
+        // First check pending registrations
+        const pending = await this.pendingModel.findOne({ email }).exec();
+        if (!pending) {
+            // Fallback: check if user already exists (for admin-created users or legacy flow)
+            const user = await this.usersService.findOneByEmail(email);
+            if (!user) {
+                throw new NotFoundException('No pending registration found for this email');
+            }
+
+            // Legacy flow for existing unverified users
+            if (
+                !user.otp ||
+                user.otp !== otp ||
+                !user.otpExpires ||
+                user.otpExpires < new Date()
+            ) {
+                throw new BadRequestException('Invalid or expired OTP');
+            }
+
+            user.isVerified = true;
+            user.otp = undefined;
+            user.otpExpires = undefined;
+            await user.save();
+
+            return { message: 'Registration completed successfully' };
         }
 
+        // Verify OTP from pending registration
         if (
-            !user.otp ||
-            user.otp !== otp ||
-            !user.otpExpires ||
-            user.otpExpires < new Date()
+            !pending.otp ||
+            pending.otp !== otp ||
+            !pending.otpExpires ||
+            pending.otpExpires < new Date()
         ) {
             throw new BadRequestException('Invalid or expired OTP');
         }
 
-        user.isVerified = true;
-        user.otp = undefined;
-        user.otpExpires = undefined;
-        await user.save();
+        // Create the real user in the users collection
+        await this.usersService.create({
+            name: pending.name,
+            email: pending.email,
+            phone: pending.phone,
+            password: pending.password, // already hashed
+            role: UserRole.STANDARD,
+            isVerified: true,
+        });
+
+        // Remove from pending
+        await this.pendingModel.deleteOne({ email });
 
         return { message: 'Registration completed successfully' };
     }
@@ -91,7 +130,6 @@ export class AuthService {
         }
 
         // Admin-created users must change password on first login
-        // DON'T send OTP yet - just redirect to password change page
         if (user.requiresPasswordChange) {
             throw new ForbiddenException({
                 message: 'Please set your own password.',
@@ -108,7 +146,6 @@ export class AuthService {
             user.otpExpires = otpExpires;
             await user.save();
 
-            // Send email and await result
             await this.mailService.sendVerificationOTP(email, otp);
 
             throw new ForbiddenException({
@@ -147,7 +184,6 @@ export class AuthService {
         user.otpExpires = otpExpires;
         await user.save();
 
-        // Send email and await result
         await this.mailService.sendPasswordResetOTP(email, otp);
 
         return { message: 'OTP sent to your email.' };
@@ -191,10 +227,8 @@ export class AuthService {
             throw new BadRequestException('User does not require password change');
         }
 
-        // Save the new password
         user.password = await bcrypt.hash(newPassword, 10);
 
-        // Generate and send OTP for verification
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -202,7 +236,6 @@ export class AuthService {
         user.otpExpires = otpExpires;
         await user.save();
 
-        // Send email in background - don't await
         this.mailService.sendVerificationOTP(email, otp).catch(err =>
             console.error(`Failed to send verification email to ${email}:`, err.message)
         );
@@ -241,7 +274,6 @@ export class AuthService {
         user.requiresPasswordChange = false;
         await user.save();
 
-        // Generate token for auto-login
         const payload = { sub: user._id, role: user.role };
         const token = this.jwtService.sign(payload);
 

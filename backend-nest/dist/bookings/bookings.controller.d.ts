@@ -27,4 +27,13 @@ export declare class BookingsController {
         success: boolean;
         data: any;
     }>;
+    getEventBookings(eventId: string): Promise<{
+        success: boolean;
+        count: number;
+        data: import("./schemas/booking.schema").BookingDocument[];
+    }>;
+    updateBookingStatus(id: string, status: string): Promise<{
+        success: boolean;
+        data: import("./schemas/booking.schema").BookingDocument;
+    }>;
 }

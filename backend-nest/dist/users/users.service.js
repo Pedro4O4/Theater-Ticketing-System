@@ -90,7 +90,7 @@ let UsersService = class UsersService {
         }
     }
     async updateProfile(id, updateDto) {
-        const { name, email, profilePicture } = updateDto;
+        const { name, email, phone, profilePicture, instapayNumber } = updateDto;
         const user = await this.userModel.findById(id).exec();
         if (!user) {
             throw new common_1.NotFoundException('User not found');
@@ -105,8 +105,12 @@ let UsersService = class UsersService {
             user.name = name;
         if (email)
             user.email = email;
+        if (phone !== undefined)
+            user.phone = phone;
         if (profilePicture !== undefined)
             user.profilePicture = profilePicture;
+        if (instapayNumber !== undefined)
+            user.instapayNumber = instapayNumber;
         return await user.save();
     }
     async createUserByAdmin(createDto) {

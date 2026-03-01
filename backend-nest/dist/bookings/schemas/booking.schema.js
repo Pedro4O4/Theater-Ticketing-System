@@ -18,6 +18,8 @@ let SelectedSeat = class SelectedSeat {
     section;
     seatType;
     price;
+    attendeeName;
+    attendeePhone;
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -42,6 +44,14 @@ __decorate([
     (0, mongoose_1.Prop)({ min: 0, required: true }),
     __metadata("design:type", Number)
 ], SelectedSeat.prototype, "price", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], SelectedSeat.prototype, "attendeeName", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], SelectedSeat.prototype, "attendeePhone", void 0);
 SelectedSeat = __decorate([
     (0, mongoose_1.Schema)()
 ], SelectedSeat);
@@ -52,6 +62,7 @@ let Booking = class Booking {
     totalPrice;
     status;
     hasTheaterSeating;
+    pendingExpiresAt;
     selectedSeats;
 };
 exports.Booking = Booking;
@@ -73,7 +84,7 @@ __decorate([
 ], Booking.prototype, "totalPrice", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        enum: ['pending', 'confirmed', 'canceled'],
+        enum: ['pending', 'confirmed', 'canceled', 'rejected'],
         default: 'pending',
     }),
     __metadata("design:type", String)
@@ -83,6 +94,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Booking.prototype, "hasTheaterSeating", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ type: Date, default: null }),
+    __metadata("design:type", Date)
+], Booking.prototype, "pendingExpiresAt", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ type: [SelectedSeat] }),
     __metadata("design:type", Array)
 ], Booking.prototype, "selectedSeats", void 0);
@@ -90,4 +105,5 @@ exports.Booking = Booking = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Booking);
 exports.BookingSchema = mongoose_1.SchemaFactory.createForClass(Booking);
+exports.BookingSchema.index({ pendingExpiresAt: 1 }, { expireAfterSeconds: 0 });
 //# sourceMappingURL=booking.schema.js.map

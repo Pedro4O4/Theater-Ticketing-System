@@ -41,26 +41,33 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 const jwt_1 = require("@nestjs/jwt");
 const users_service_1 = require("../users/users.service");
 const mail_service_1 = require("../mail/mail.service");
+const pending_registration_schema_1 = require("./schemas/pending-registration.schema");
 const bcrypt = __importStar(require("bcryptjs"));
 const user_schema_1 = require("../users/schemas/user.schema");
 let AuthService = class AuthService {
     usersService;
     jwtService;
     mailService;
-    constructor(usersService, jwtService, mailService) {
+    pendingModel;
+    constructor(usersService, jwtService, mailService, pendingModel) {
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.mailService = mailService;
+        this.pendingModel = pendingModel;
     }
     async register(registerDto) {
-        const { email, password, name } = registerDto;
-        const role = user_schema_1.UserRole.STANDARD;
+        const { email, password, name, phone } = registerDto;
         const existingUser = await this.usersService.findOneByEmail(email);
         if (existingUser) {
             throw new common_1.ConflictException('User already exists');
@@ -68,35 +75,54 @@ let AuthService = class AuthService {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await this.usersService.create({
+        await this.pendingModel.findOneAndUpdate({ email }, {
             name,
             email,
+            phone: phone || '',
             password: hashedPassword,
-            role,
             otp,
             otpExpires,
-            isVerified: false,
-        });
+            createdAt: new Date(),
+        }, { upsert: true, new: true });
         await this.mailService.sendVerificationOTP(email, otp);
         return {
             message: 'Registration initiated. Please verify your email with the OTP sent.',
         };
     }
     async verifyRegistration(email, otp) {
-        const user = await this.usersService.findOneByEmail(email);
-        if (!user) {
-            throw new common_1.NotFoundException('User not found');
+        const pending = await this.pendingModel.findOne({ email }).exec();
+        if (!pending) {
+            const user = await this.usersService.findOneByEmail(email);
+            if (!user) {
+                throw new common_1.NotFoundException('No pending registration found for this email');
+            }
+            if (!user.otp ||
+                user.otp !== otp ||
+                !user.otpExpires ||
+                user.otpExpires < new Date()) {
+                throw new common_1.BadRequestException('Invalid or expired OTP');
+            }
+            user.isVerified = true;
+            user.otp = undefined;
+            user.otpExpires = undefined;
+            await user.save();
+            return { message: 'Registration completed successfully' };
         }
-        if (!user.otp ||
-            user.otp !== otp ||
-            !user.otpExpires ||
-            user.otpExpires < new Date()) {
+        if (!pending.otp ||
+            pending.otp !== otp ||
+            !pending.otpExpires ||
+            pending.otpExpires < new Date()) {
             throw new common_1.BadRequestException('Invalid or expired OTP');
         }
-        user.isVerified = true;
-        user.otp = undefined;
-        user.otpExpires = undefined;
-        await user.save();
+        await this.usersService.create({
+            name: pending.name,
+            email: pending.email,
+            phone: pending.phone,
+            password: pending.password,
+            role: user_schema_1.UserRole.STANDARD,
+            isVerified: true,
+        });
+        await this.pendingModel.deleteOne({ email });
         return { message: 'Registration completed successfully' };
     }
     async login(loginDto) {
@@ -232,8 +258,10 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(3, (0, mongoose_1.InjectModel)(pending_registration_schema_1.PendingRegistration.name)),
     __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService,
-        mail_service_1.MailService])
+        mail_service_1.MailService,
+        mongoose_2.Model])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

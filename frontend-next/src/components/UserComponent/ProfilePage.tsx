@@ -9,7 +9,7 @@ import {
     FiUser, FiMail, FiCalendar, FiEdit, FiArrowLeft,
     FiActivity, FiAward, FiTrendingUp, FiDollarSign,
     FiUsers, FiCheckCircle, FiClock, FiBarChart2,
-    FiGrid, FiPlus, FiPieChart, FiSettings
+    FiGrid, FiPlus, FiPieChart, FiSettings, FiPhone
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import api from '@/services/api';
@@ -18,6 +18,8 @@ import './ProfilePage.css';
 interface UserData {
     name?: string;
     email?: string;
+    phone?: string;
+    instapayNumber?: string;
     role?: string;
     createdAt?: string;
     profilePicture?: string;
@@ -222,6 +224,18 @@ const ProfilePage = () => {
                             <FiMail className="detail-icon" />
                             <span>{displayUser?.email || "No email"}</span>
                         </div>
+                        {(displayUser as any)?.phone && (
+                            <div className="detail-item">
+                                <FiPhone className="detail-icon" />
+                                <span>{(displayUser as any).phone}</span>
+                            </div>
+                        )}
+                        {displayUser?.role === 'Organizer' && (displayUser as any)?.instapayNumber && (
+                            <div className="detail-item">
+                                <FiDollarSign className="detail-icon" />
+                                <span>InstaPay: {(displayUser as any).instapayNumber}</span>
+                            </div>
+                        )}
                         <div className="detail-item">
                             <FiCalendar className="detail-icon" />
                             <span>Joined {displayUser?.createdAt ? new Date(displayUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Unknown"}</span>

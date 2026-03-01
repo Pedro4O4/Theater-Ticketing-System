@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var BookingsService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingsService = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,14 +20,45 @@ const mongoose_2 = require("mongoose");
 const booking_schema_1 = require("./schemas/booking.schema");
 const event_schema_1 = require("../events/schemas/event.schema");
 const theater_schema_1 = require("../theaters/schemas/theater.schema");
-let BookingsService = class BookingsService {
+let BookingsService = BookingsService_1 = class BookingsService {
     bookingModel;
     eventModel;
     theaterModel;
+    logger = new common_1.Logger(BookingsService_1.name);
     constructor(bookingModel, eventModel, theaterModel) {
         this.bookingModel = bookingModel;
         this.eventModel = eventModel;
         this.theaterModel = theaterModel;
+    }
+    onModuleInit() {
+        setInterval(() => this.cleanupExpiredBookings(), 60 * 1000);
+        this.cleanupExpiredBookings();
+    }
+    async cleanupExpiredBookings() {
+        try {
+            const expiredBookings = await this.bookingModel.find({
+                status: 'pending',
+                pendingExpiresAt: { $lte: new Date() },
+            }).exec();
+            for (const booking of expiredBookings) {
+                if (booking.hasTheaterSeating && booking.selectedSeats?.length > 0) {
+                    await this.eventModel.findByIdAndUpdate(booking.eventId, {
+                        $pull: { bookedSeats: { bookingId: booking._id } },
+                        $inc: { remainingTickets: booking.numberOfTickets },
+                    });
+                }
+                else {
+                    await this.eventModel.findByIdAndUpdate(booking.eventId, {
+                        $inc: { remainingTickets: booking.numberOfTickets },
+                    });
+                }
+                await this.bookingModel.findByIdAndDelete(booking._id).exec();
+                this.logger.log(`Expired pending booking ${booking._id} cleaned up`);
+            }
+        }
+        catch (err) {
+            this.logger.error('Error cleaning up expired bookings', err);
+        }
     }
     async create(createDto, userId) {
         const { eventId, numberOfTickets, status, selectedSeats } = createDto;
@@ -38,7 +70,8 @@ let BookingsService = class BookingsService {
         const bookingData = {
             StandardId: userId,
             eventId,
-            status: status || 'confirmed',
+            status: 'pending',
+            pendingExpiresAt: new Date(Date.now() + 30 * 60 * 1000),
         };
         if (event.hasTheaterSeating && selectedSeats && selectedSeats.length > 0) {
             const unavailableSeats = [];
@@ -84,6 +117,8 @@ let BookingsService = class BookingsService {
                     section: seat.section || 'main',
                     seatType,
                     price,
+                    attendeeName: seat.attendeeName || '',
+                    attendeePhone: seat.attendeePhone || '',
                 };
             });
             totalPrice = seatsWithPrices.reduce((sum, seat) => sum + seat.price, 0);
@@ -162,6 +197,33 @@ let BookingsService = class BookingsService {
         }
         await this.bookingModel.findByIdAndDelete(id).exec();
     }
+    async findAllForEvent(eventId) {
+        return this.bookingModel
+            .find({ eventId })
+            .populate('StandardId', 'name email phone')
+            .sort({ createdAt: -1 })
+            .exec();
+    }
+    async updateBookingStatus(bookingId, status) {
+        const booking = await this.bookingModel.findById(bookingId).exec();
+        if (!booking) {
+            throw new common_1.NotFoundException('Booking not found');
+        }
+        if (!['confirmed', 'rejected'].includes(status)) {
+            throw new common_1.BadRequestException('Status must be confirmed or rejected');
+        }
+        if (status === 'rejected' && booking.hasTheaterSeating && booking.selectedSeats?.length > 0) {
+            await this.eventModel.findByIdAndUpdate(booking.eventId, {
+                $pull: { bookedSeats: { bookingId: booking._id } },
+                $inc: { remainingTickets: booking.numberOfTickets },
+            });
+        }
+        if (status === 'confirmed') {
+            booking.pendingExpiresAt = null;
+        }
+        booking.status = status;
+        return booking.save();
+    }
     async getAvailableSeats(eventId) {
         const event = await this.eventModel
             .findById(eventId)
@@ -175,6 +237,18 @@ let BookingsService = class BookingsService {
         }
         const theater = event.theater;
         const bookedSeatsSet = new Set(event.bookedSeats.map((s) => `${s.section}-${s.row}-${s.seatNumber}`));
+        const pendingBookings = await this.bookingModel.find({
+            eventId,
+            status: 'pending',
+        }).exec();
+        const pendingSeatsSet = new Set();
+        for (const pb of pendingBookings) {
+            if (pb.selectedSeats) {
+                for (const s of pb.selectedSeats) {
+                    pendingSeatsSet.add(`${s.section}-${s.row}-${s.seatNumber}`);
+                }
+            }
+        }
         const mergedSeatConfig = [...(theater.seatConfig || [])];
         if (event.seatConfig && event.seatConfig.length > 0) {
             event.seatConfig.forEach((eventSeat) => {
@@ -214,6 +288,7 @@ let BookingsService = class BookingsService {
                     seatType,
                     isActive,
                     isBooked: bookedSeatsSet.has(seatKey),
+                    isPending: pendingSeatsSet.has(seatKey),
                     price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                 });
             }
@@ -241,6 +316,7 @@ let BookingsService = class BookingsService {
                         seatType,
                         isActive,
                         isBooked: bookedSeatsSet.has(seatKey),
+                        isPending: pendingSeatsSet.has(seatKey),
                         price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                     });
                 }
@@ -262,7 +338,7 @@ let BookingsService = class BookingsService {
     }
 };
 exports.BookingsService = BookingsService;
-exports.BookingsService = BookingsService = __decorate([
+exports.BookingsService = BookingsService = BookingsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(booking_schema_1.Booking.name)),
     __param(1, (0, mongoose_1.InjectModel)(event_schema_1.Event.name)),

@@ -1,11 +1,14 @@
+import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { MailService } from '../mail/mail.service';
+import { PendingRegistrationDocument } from './schemas/pending-registration.schema';
 export declare class AuthService {
     private usersService;
     private jwtService;
     private mailService;
-    constructor(usersService: UsersService, jwtService: JwtService, mailService: MailService);
+    private pendingModel;
+    constructor(usersService: UsersService, jwtService: JwtService, mailService: MailService, pendingModel: Model<PendingRegistrationDocument>);
     register(registerDto: any): Promise<{
         message: string;
     }>;

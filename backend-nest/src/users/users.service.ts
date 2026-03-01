@@ -53,7 +53,7 @@ export class UsersService {
     }
 
     async updateProfile(id: string, updateDto: any): Promise<UserDocument> {
-        const { name, email, profilePicture } = updateDto;
+        const { name, email, phone, profilePicture, instapayNumber } = updateDto;
 
         const user = await this.userModel.findById(id).exec();
         if (!user) {
@@ -69,7 +69,9 @@ export class UsersService {
 
         if (name) user.name = name;
         if (email) user.email = email;
+        if (phone !== undefined) (user as any).phone = phone;
         if (profilePicture !== undefined) user.profilePicture = profilePicture;
+        if (instapayNumber !== undefined) (user as any).instapayNumber = instapayNumber;
 
         return await user.save();
     }

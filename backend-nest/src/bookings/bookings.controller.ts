@@ -3,6 +3,7 @@ import {
     Get,
     Post,
     Delete,
+    Patch,
     Body,
     Param,
     UseGuards,
@@ -55,6 +56,25 @@ export class BookingsController {
     @Get('event/:eventId/seats')
     async getEventSeats(@Param('eventId') eventId: string) {
         const data = await this.bookingsService.getAvailableSeats(eventId);
+        return { success: true, data };
+    }
+
+    // Organizer: get all bookings for their event
+    @Get('event/:eventId/bookings')
+    @UseGuards(JwtAuthGuard)
+    async getEventBookings(@Param('eventId') eventId: string) {
+        const data = await this.bookingsService.findAllForEvent(eventId);
+        return { success: true, count: data.length, data };
+    }
+
+    // Organizer: approve or reject a booking
+    @Patch(':id/status')
+    @UseGuards(JwtAuthGuard)
+    async updateBookingStatus(
+        @Param('id') id: string,
+        @Body('status') status: string,
+    ) {
+        const data = await this.bookingsService.updateBookingStatus(id, status);
         return { success: true, data };
     }
 }

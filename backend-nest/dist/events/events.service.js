@@ -59,7 +59,7 @@ let EventsService = class EventsService {
         return this.eventModel.find().exec();
     }
     async findOne(id) {
-        const event = await this.eventModel.findById(id).exec();
+        const event = await this.eventModel.findById(id).populate('organizerId', 'name instapayNumber').exec();
         if (!event) {
             throw new common_1.NotFoundException('Event not found');
         }
