@@ -20,15 +20,18 @@ const mongoose_2 = require("mongoose");
 const booking_schema_1 = require("./schemas/booking.schema");
 const event_schema_1 = require("../events/schemas/event.schema");
 const theater_schema_1 = require("../theaters/schemas/theater.schema");
+const tickets_service_1 = require("../tickets/tickets.service");
 let BookingsService = BookingsService_1 = class BookingsService {
     bookingModel;
     eventModel;
     theaterModel;
+    ticketsService;
     logger = new common_1.Logger(BookingsService_1.name);
-    constructor(bookingModel, eventModel, theaterModel) {
+    constructor(bookingModel, eventModel, theaterModel, ticketsService) {
         this.bookingModel = bookingModel;
         this.eventModel = eventModel;
         this.theaterModel = theaterModel;
+        this.ticketsService = ticketsService;
     }
     onModuleInit() {
         setInterval(() => this.cleanupExpiredBookings(), 60 * 1000);
@@ -229,7 +232,25 @@ let BookingsService = BookingsService_1 = class BookingsService {
             booking.pendingExpiresAt = null;
         }
         booking.status = status;
-        return booking.save();
+        const savedBooking = await booking.save();
+        if (status === 'confirmed' && booking.hasTheaterSeating && booking.selectedSeats?.length > 0) {
+            try {
+                await this.ticketsService.generateTicketsForBooking(bookingId, booking.eventId.toString(), booking.StandardId.toString(), booking.selectedSeats.map((s) => ({
+                    row: s.row,
+                    seatNumber: s.seatNumber,
+                    section: s.section || 'main',
+                    seatType: s.seatType || 'standard',
+                    price: s.price || 0,
+                    attendeeName: s.attendeeName || '',
+                    attendeePhone: s.attendeePhone || '',
+                })));
+                this.logger.log(`Generated ${booking.selectedSeats.length} QR tickets for booking ${bookingId}`);
+            }
+            catch (error) {
+                this.logger.error(`Failed to generate QR tickets for booking ${bookingId}:`, error);
+            }
+        }
+        return savedBooking;
     }
     async uploadReceipt(bookingId, userId, receiptBase64) {
         const booking = await this.bookingModel.findById(bookingId).exec();
@@ -368,6 +389,7 @@ exports.BookingsService = BookingsService = BookingsService_1 = __decorate([
     __param(2, (0, mongoose_1.InjectModel)(theater_schema_1.Theater.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
-        mongoose_2.Model])
+        mongoose_2.Model,
+        tickets_service_1.TicketsService])
 ], BookingsService);
 //# sourceMappingURL=bookings.service.js.map

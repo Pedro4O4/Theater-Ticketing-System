@@ -5,7 +5,7 @@ import api from '@/services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiArrowLeft, FiCheckCircle, FiXCircle, FiClock,
-    FiUser, FiPhone, FiMail, FiAlertCircle, FiGrid, FiEye, FiX
+    FiUser, FiPhone, FiMail, FiAlertCircle, FiGrid, FiEye, FiX, FiCamera
 } from 'react-icons/fi';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { toast } from 'react-toastify';
@@ -146,7 +146,23 @@ const EventBookingsPage = () => {
                         >
                             <FiArrowLeft size={18} /> Back to My Events
                         </motion.button>
-                        <h1>Bookings for &quot;{eventTitle}&quot;</h1>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                            <h1 style={{ margin: 0 }}>Bookings for &quot;{eventTitle}&quot;</h1>
+                            <motion.button
+                                onClick={() => router.push(`/my-events/${eventId}/scan`)}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                    background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white', border: 'none',
+                                    padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: 600,
+                                    fontSize: '0.9rem', boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                <FiCamera size={16} /> Scan QR Codes
+                            </motion.button>
+                        </div>
 
                         {/* Stats */}
                         <div className="eb-stats">

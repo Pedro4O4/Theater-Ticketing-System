@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/services/api';
 import ConfirmationDialog from '../AdminComponent/ConfirmationDialog';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCalendar, FiMapPin, FiClock, FiTrash2, FiEye, FiAlertCircle, FiCheckCircle, FiUploadCloud } from 'react-icons/fi';
+import { FiCalendar, FiMapPin, FiClock, FiTrash2, FiEye, FiAlertCircle, FiCheckCircle, FiUploadCloud, FiGrid } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import './UserBookingPage.css';
 
@@ -21,6 +21,7 @@ interface Booking {
     pendingExpiresAt?: string;
     isReceiptUploaded?: boolean;
     instapayReceipt?: string;
+    hasTheaterSeating?: boolean;
 }
 
 interface EventData {
@@ -310,6 +311,22 @@ const UserBookingsPage = () => {
                                             >
                                                 <FiUploadCloud /> Upload Receipt
                                             </button>
+                                        )}
+                                        {booking.status === 'confirmed' && booking.hasTheaterSeating && (
+                                            <Link
+                                                href={`/bookings/${booking._id}/tickets`}
+                                                className="view-tickets-btn"
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                                    padding: '0.5rem 1rem', borderRadius: '8px',
+                                                    background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white',
+                                                    border: 'none', cursor: 'pointer', textDecoration: 'none',
+                                                    fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s',
+                                                    boxShadow: '0 2px 10px rgba(139, 92, 246, 0.3)'
+                                                }}
+                                            >
+                                                <FiGrid /> QR Tickets
+                                            </Link>
                                         )}
                                     </div>
                                 </motion.div>

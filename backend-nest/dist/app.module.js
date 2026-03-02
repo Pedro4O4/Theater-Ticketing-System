@@ -20,6 +20,7 @@ const events_module_1 = require("./events/events.module");
 const bookings_module_1 = require("./bookings/bookings.module");
 const auth_module_1 = require("./auth/auth.module");
 const mail_module_1 = require("./mail/mail.module");
+const tickets_module_1 = require("./tickets/tickets.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -42,6 +43,7 @@ exports.AppModule = AppModule = __decorate([
             bookings_module_1.BookingsModule,
             auth_module_1.AuthModule,
             mail_module_1.MailModule,
+            tickets_module_1.TicketsModule,
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(__dirname, '..', 'uploads'),
                 serveRoot: '/uploads',

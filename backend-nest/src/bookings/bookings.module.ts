@@ -5,6 +5,7 @@ import { BookingsController } from './bookings.controller';
 import { Booking, BookingSchema } from './schemas/booking.schema';
 import { Event, EventSchema } from '../events/schemas/event.schema';
 import { Theater, TheaterSchema } from '../theaters/schemas/theater.schema';
+import { TicketsModule } from '../tickets/tickets.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Theater, TheaterSchema } from '../theaters/schemas/theater.schema';
       { name: Event.name, schema: EventSchema },
       { name: Theater.name, schema: TheaterSchema },
     ]),
+    TicketsModule,
   ],
   providers: [BookingsService],
   controllers: [BookingsController],

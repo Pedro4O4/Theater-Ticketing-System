@@ -14,6 +14,7 @@ const bookings_controller_1 = require("./bookings.controller");
 const booking_schema_1 = require("./schemas/booking.schema");
 const event_schema_1 = require("../events/schemas/event.schema");
 const theater_schema_1 = require("../theaters/schemas/theater.schema");
+const tickets_module_1 = require("../tickets/tickets.module");
 let BookingsModule = class BookingsModule {
 };
 exports.BookingsModule = BookingsModule;
@@ -25,6 +26,7 @@ exports.BookingsModule = BookingsModule = __decorate([
                 { name: event_schema_1.Event.name, schema: event_schema_1.EventSchema },
                 { name: theater_schema_1.Theater.name, schema: theater_schema_1.TheaterSchema },
             ]),
+            tickets_module_1.TicketsModule,
         ],
         providers: [bookings_service_1.BookingsService],
         controllers: [bookings_controller_1.BookingsController],

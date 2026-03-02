@@ -7,7 +7,7 @@ import ConfirmationDialog from '@/components/AdminComponent/ConfirmationDialog';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { Booking, Event } from '@/types/event';
 import { motion } from 'framer-motion';
-import { FiAlertCircle, FiArrowRight, FiTrash2, FiClock } from 'react-icons/fi';
+import { FiAlertCircle, FiArrowRight, FiTrash2, FiClock, FiGrid } from 'react-icons/fi';
 import '@/components/Booking component/BookingDetails.css';
 import { getImageUrl } from '@/utils/imageHelper';
 import SeatSelector from '@/components/Booking component/SeatSelector';
@@ -208,6 +208,21 @@ const BookingDetailsPage = () => {
                                         </button>
                                     </div>
                                 )}
+                                {booking.status === 'confirmed' && (
+                                    <motion.button
+                                        onClick={() => router.push(`/bookings/${id}/tickets`)}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        style={{
+                                            padding: '8px 16px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px',
+                                            background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white', border: 'none',
+                                            borderRadius: '10px', cursor: 'pointer', fontWeight: 600,
+                                            boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
+                                        }}
+                                    >
+                                        <FiGrid size={14} /> View QR Tickets
+                                    </motion.button>
+                                )}
                                 {!isCancelled && !isPending && (
                                     <motion.button
                                         className="cancel-booking-btn"
@@ -341,6 +356,19 @@ const BookingDetailsPage = () => {
                             <Link href="/bookings" className="back-button">
                                 <FiArrowRight style={{ transform: 'rotate(180deg)' }} /> Back to My Bookings
                             </Link>
+                            {booking.status === 'confirmed' && (
+                                <button
+                                    onClick={() => router.push(`/bookings/${id}/tickets`)}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '8px',
+                                        background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white', border: 'none',
+                                        padding: '10px 20px', borderRadius: '10px', cursor: 'pointer', fontWeight: 600,
+                                        fontSize: '0.9rem', boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
+                                    }}
+                                >
+                                    <FiGrid /> View QR Tickets
+                                </button>
+                            )}
                             {!isCancelled && !isPending && (
                                 <button onClick={() => setShowCancelConfirm(true)} className="cancel-booking-btn">
                                     <FiTrash2 /> Cancel Booking

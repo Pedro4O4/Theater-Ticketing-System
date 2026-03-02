@@ -10,6 +10,7 @@ import { Model, Types } from 'mongoose';
 import { Booking, BookingDocument } from './schemas/booking.schema';
 import { Event, EventDocument } from '../events/schemas/event.schema';
 import { Theater, TheaterDocument } from '../theaters/schemas/theater.schema';
+import { TicketsService } from '../tickets/tickets.service';
 
 @Injectable()
 export class BookingsService implements OnModuleInit {
@@ -19,6 +20,7 @@ export class BookingsService implements OnModuleInit {
         @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
         @InjectModel(Event.name) private eventModel: Model<EventDocument>,
         @InjectModel(Theater.name) private theaterModel: Model<TheaterDocument>,
+        private readonly ticketsService: TicketsService,
     ) { }
 
     onModuleInit() {
@@ -275,7 +277,32 @@ export class BookingsService implements OnModuleInit {
         }
 
         booking.status = status;
-        return booking.save();
+        const savedBooking = await booking.save();
+
+        // Generate QR code tickets when booking is confirmed
+        if (status === 'confirmed' && booking.hasTheaterSeating && booking.selectedSeats?.length > 0) {
+            try {
+                await this.ticketsService.generateTicketsForBooking(
+                    bookingId,
+                    booking.eventId.toString(),
+                    booking.StandardId.toString(),
+                    booking.selectedSeats.map((s: any) => ({
+                        row: s.row,
+                        seatNumber: s.seatNumber,
+                        section: s.section || 'main',
+                        seatType: s.seatType || 'standard',
+                        price: s.price || 0,
+                        attendeeName: s.attendeeName || '',
+                        attendeePhone: s.attendeePhone || '',
+                    })),
+                );
+                this.logger.log(`Generated ${booking.selectedSeats.length} QR tickets for booking ${bookingId}`);
+            } catch (error) {
+                this.logger.error(`Failed to generate QR tickets for booking ${bookingId}:`, error);
+            }
+        }
+
+        return savedBooking;
     }
 
     async uploadReceipt(bookingId: string, userId: string, receiptBase64: string): Promise<BookingDocument> {

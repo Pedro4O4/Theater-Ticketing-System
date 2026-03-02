@@ -1,0 +1,325 @@
+/* ===== QR Tickets Page Styles ===== */
+
+.tickets-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0a1e 0%, #1a1145 50%, #0f0a1e 100%);
+    padding: 24px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.tickets-bg-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tickets-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tickets-loading,
+.tickets-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+    color: #9ca3af;
+}
+
+.tickets-empty h3 {
+    color: white;
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+.tickets-empty p {
+    color: #9ca3af;
+    font-size: 0.95rem;
+    text-align: center;
+    max-width: 400px;
+}
+
+.spinner-ring {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(139, 92, 246, 0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Header */
+.tickets-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.tickets-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d1d5db;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.tickets-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.tickets-event-info h1 {
+    font-size: 1.8rem;
+    color: white;
+    margin: 0 0 4px 0;
+}
+
+.tickets-event-info h2 {
+    font-size: 1.2rem;
+    color: #a78bfa;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+.tickets-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.tickets-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.download-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: fit-content;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.download-all-btn:hover {
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
+}
+
+/* Tickets Grid */
+.tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* Ticket Card */
+.ticket-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.ticket-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.ticket-card.scanned {
+    opacity: 0.7;
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+/* QR Code Section */
+.ticket-qr-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    background: white;
+    margin: 16px;
+    border-radius: 12px;
+}
+
+.ticket-qr-image {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+}
+
+.ticket-scanned-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(34, 197, 94, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 12px;
+}
+
+/* Ticket Info */
+.ticket-info {
+    padding: 0 20px 20px;
+}
+
+.ticket-seat-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.seat-label {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+}
+
+.seat-type-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.seat-type-tag.standard {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.seat-type-tag.vip {
+    background: rgba(249, 115, 22, 0.2);
+    color: #fb923c;
+}
+
+.seat-type-tag.premium {
+    background: rgba(234, 179, 8, 0.2);
+    color: #facc15;
+}
+
+.seat-type-tag.wheelchair {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+/* Ticket Details */
+.ticket-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.ticket-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-label {
+    color: #9ca3af;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.detail-value {
+    color: #e5e7eb;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Download Button */
+.ticket-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ticket-download-btn:hover {
+    background: rgba(139, 92, 246, 0.25);
+    color: #c4b5fd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tickets-page {
+        padding: 16px;
+    }
+
+    .tickets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tickets-event-info h1 {
+        font-size: 1.4rem;
+    }
+
+    .ticket-qr-image {
+        width: 160px;
+        height: 160px;
+    }
+}

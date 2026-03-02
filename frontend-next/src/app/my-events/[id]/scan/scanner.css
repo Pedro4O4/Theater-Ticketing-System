@@ -1,0 +1,438 @@
+/* ===== QR Scanner Page Styles ===== */
+
+.scanner-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0a1e 0%, #1a1145 50%, #0f0a1e 100%);
+    padding: 24px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.scanner-bg-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 70% 70%, rgba(59, 130, 246, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.scanner-container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
+.scanner-header {
+    margin-bottom: 32px;
+}
+
+.scanner-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d1d5db;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+}
+
+.scanner-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.scanner-header h1 {
+    color: white;
+    font-size: 1.8rem;
+    margin: 0 0 4px 0;
+}
+
+.scanner-header h2 {
+    color: #a78bfa;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 16px 0;
+}
+
+/* Stats Bar */
+.scanner-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 20px;
+    border-radius: 12px;
+    min-width: 80px;
+}
+
+.stat-number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.stat-item.scanned .stat-number { color: #4ade80; }
+.stat-item.remaining .stat-number { color: #fbbf24; }
+.stat-item.percentage .stat-number { color: #60a5fa; }
+
+/* Scanner Body */
+.scanner-body {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Scanner Area */
+.scanner-area {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Start Button */
+.start-scan-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.1));
+    border: 2px dashed rgba(139, 92, 246, 0.4);
+    color: #a78bfa;
+    padding: 48px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    max-width: 400px;
+}
+
+.start-scan-btn span {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.start-scan-btn small {
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+
+.start-scan-btn:hover {
+    border-color: rgba(139, 92, 246, 0.7);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(59, 130, 246, 0.15));
+}
+
+/* Active Scanner */
+.scanner-active {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+#qr-scanner-element {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.stop-scan-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stop-scan-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+/* Scan Error */
+.scan-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #f87171;
+    text-align: center;
+    padding: 32px;
+}
+
+.scan-error h3 {
+    color: #fca5a5;
+    margin: 0;
+}
+
+.scan-error p {
+    color: #9ca3af;
+    max-width: 400px;
+}
+
+.retry-scan-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #a78bfa;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Scan Result */
+.scan-result {
+    width: 100%;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+}
+
+.scan-result.valid {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.scan-result.invalid {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.result-icon {
+    margin-bottom: 16px;
+}
+
+.icon-valid { color: #4ade80; }
+.icon-invalid { color: #f87171; }
+
+.result-message {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: white;
+}
+
+/* Result Details */
+.result-details {
+    text-align: left;
+}
+
+.result-section {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.result-section h4 {
+    color: #a78bfa;
+    font-size: 0.9rem;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.result-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.field-label {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.field-value {
+    color: #e5e7eb;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.field-value.seat-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+}
+
+.status-value.free {
+    color: #4ade80;
+    font-weight: 700;
+}
+
+.status-value.not-free {
+    color: #f87171;
+    font-weight: 700;
+}
+
+/* Scan Next Button */
+.scan-next-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    transition: all 0.3s;
+}
+
+.scan-next-btn:hover {
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
+}
+
+/* Scan History */
+.scan-history {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.scan-history h3 {
+    color: white;
+    font-size: 1.1rem;
+    margin: 0 0 16px 0;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+}
+
+.history-item.valid {
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+}
+
+.history-item.invalid {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.history-seat {
+    font-weight: 700;
+    color: white;
+    min-width: 50px;
+}
+
+.history-section {
+    color: #9ca3af;
+    min-width: 70px;
+    font-size: 0.85rem;
+}
+
+.history-name {
+    color: #d1d5db;
+    flex: 1;
+}
+
+.history-status {
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .scanner-page {
+        padding: 16px;
+    }
+
+    .scanner-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .scanner-stats {
+        gap: 8px;
+    }
+
+    .stat-item {
+        padding: 8px 14px;
+        min-width: 60px;
+    }
+
+    .stat-number {
+        font-size: 1.1rem;
+    }
+
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .start-scan-btn {
+        padding: 32px;
+    }
+}

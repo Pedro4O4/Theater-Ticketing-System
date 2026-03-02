@@ -13,6 +13,7 @@
     "aos": "^2.3.4",
     "axios": "^1.13.2",
     "framer-motion": "^12.23.26",
+    "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.562.0",
     "next": "16.1.0",
     "react": "19.2.3",
