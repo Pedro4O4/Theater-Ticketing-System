@@ -36,6 +36,14 @@ let EventsController = class EventsController {
         const data = await this.eventsService.findAll();
         return { success: true, data };
     }
+    async getMyEvents(req) {
+        const data = await this.eventsService.findByOrganizer(req.user._id);
+        return { success: true, data };
+    }
+    async getOrganizerAnalytics(req) {
+        const data = await this.eventsService.getOrganizerAnalytics(req.user._id);
+        return { success: true, data };
+    }
     async findOne(id) {
         const data = await this.eventsService.findOne(id);
         return { success: true, data };
@@ -55,14 +63,6 @@ let EventsController = class EventsController {
     async remove(id) {
         await this.eventsService.delete(id);
         return { success: true, message: 'Event deleted successfully' };
-    }
-    async getMyEvents(req) {
-        const data = await this.eventsService.findByOrganizer(req.user._id);
-        return { success: true, data };
-    }
-    async getOrganizerAnalytics(req) {
-        const data = await this.eventsService.getOrganizerAnalytics(req.user._id);
-        return { success: true, data };
     }
 };
 exports.EventsController = EventsController;
@@ -89,6 +89,22 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('organizer/my-events'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "getMyEvents", null);
+__decorate([
+    (0, common_1.Get)('organizer/analytics'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EventsController.prototype, "getOrganizerAnalytics", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -133,22 +149,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], EventsController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Get)('organizer/my-events'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], EventsController.prototype, "getMyEvents", null);
-__decorate([
-    (0, common_1.Get)('organizer/analytics'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    __param(0, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], EventsController.prototype, "getOrganizerAnalytics", null);
 exports.EventsController = EventsController = __decorate([
     (0, common_1.Controller)('api/v1/event'),
     __metadata("design:paramtypes", [events_service_1.EventsService])

@@ -14,6 +14,14 @@ export declare class EventsController {
         success: boolean;
         data: import("./schemas/event.schema").EventDocument[];
     }>;
+    getMyEvents(req: any): Promise<{
+        success: boolean;
+        data: import("./schemas/event.schema").EventDocument[];
+    }>;
+    getOrganizerAnalytics(req: any): Promise<{
+        success: boolean;
+        data: any;
+    }>;
     findOne(id: string): Promise<{
         success: boolean;
         data: import("./schemas/event.schema").EventDocument;
@@ -33,13 +41,5 @@ export declare class EventsController {
     remove(id: string): Promise<{
         success: boolean;
         message: string;
-    }>;
-    getMyEvents(req: any): Promise<{
-        success: boolean;
-        data: import("./schemas/event.schema").EventDocument[];
-    }>;
-    getOrganizerAnalytics(req: any): Promise<{
-        success: boolean;
-        data: any;
     }>;
 }
