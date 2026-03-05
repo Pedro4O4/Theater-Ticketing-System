@@ -307,7 +307,7 @@ const BookingDetails = ({ id }: BookingDetailsProps) => {
                     {eventData._id && (
                         <Link href={`/events/${eventData._id}`} className="view-event-btn">View Event Page</Link>
                     )}
-                    {booking.status !== 'rejected' && (
+                    {booking.status === 'pending' && (
                         <button
                             onClick={() => setShowCancelConfirm(true)}
                             className="cancel-booking-btn"

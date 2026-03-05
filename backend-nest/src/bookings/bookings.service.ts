@@ -238,6 +238,11 @@ export class BookingsService implements OnModuleInit {
             throw new ForbiddenException('You are not authorised to cancel this booking');
         }
 
+        // Cannot cancel a confirmed booking
+        if (booking.status === 'confirmed') {
+            throw new BadRequestException('Cannot cancel a confirmed booking');
+        }
+
         const event = await this.eventModel.findById(booking.eventId).exec();
         if (!event) {
             throw new NotFoundException('Event not found');

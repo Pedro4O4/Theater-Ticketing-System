@@ -456,7 +456,7 @@ const UserBookingsPage = () => {
                                         <Link href={`/bookings/${booking._id}`} className="view-details-btn">
                                             <FiEye /> Details
                                         </Link>
-                                        {!isCancelled && (
+                                        {!isCancelled && isPending && (
                                             <button
                                                 onClick={() => handleCancelClick(booking._id)}
                                                 className="cancel-btn"
