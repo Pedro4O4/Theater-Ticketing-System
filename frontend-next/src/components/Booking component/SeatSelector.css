@@ -147,8 +147,6 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    transform-origin: top center;
-    transition: transform 0.3s ease;
     position: relative;
 }
 
@@ -174,7 +172,7 @@
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    overflow-x: auto;
+    overflow: visible;
     padding-bottom: 10px;
 }
 
@@ -197,8 +195,7 @@
 .seat-row>.row-label:first-child {
     position: sticky;
     left: 0;
-    z-index: 2;
-    /* Lower z-index to stay behind floating elements */
+    z-index: 20;
     background: linear-gradient(90deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
     padding-right: 8px;
 }
@@ -207,8 +204,7 @@
 .seat-row>.row-label:last-child {
     position: sticky;
     right: 0;
-    z-index: 2;
-    /* Lower z-index to stay behind floating elements */
+    z-index: 20;
     background: linear-gradient(270deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
     padding-left: 8px;
 }
@@ -291,7 +287,7 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 1;
+    z-index: 3;
 }
 
 .theater-label {
@@ -707,7 +703,6 @@
     }
 
     .theater-canvas {
-        transform-origin: top left !important;
         padding: 0 !important;
         background: transparent !important;
         border: none !important;

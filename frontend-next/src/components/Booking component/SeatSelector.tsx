@@ -159,11 +159,11 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             const container = canvasRef.current.parentElement;
             if (!container) return;
 
-            // Temporarily reset scale to measure natural canvas width
-            const originalTransform = canvasRef.current.style.transform;
-            canvasRef.current.style.transform = 'scale(1)';
+            // Temporarily reset zoom to measure natural canvas width
+            const originalZoom = canvasRef.current.style.zoom;
+            canvasRef.current.style.zoom = '1';
             const canvasWidth = canvasRef.current.scrollWidth || canvasRef.current.offsetWidth;
-            canvasRef.current.style.transform = originalTransform;
+            canvasRef.current.style.zoom = originalZoom || '';
 
             if (canvasWidth === 0) return;
 
@@ -385,8 +385,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             <div className="theater-frame">
                 <div className="theater-canvas-container" ref={containerRef}>
                     <div className="theater-canvas" ref={canvasRef} style={{
-                        transform: `scale(${scale})`,
-                        transformOrigin: 'top center'
+                        zoom: scale
                     }}>
                         {/* Stage at top */}
                         {(theaterData?.layout.stage?.position || 'top') === 'top' && (
