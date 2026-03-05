@@ -132,6 +132,11 @@ export class EventsService {
             throw new NotFoundException('Event not found');
         }
 
+        // Only admin can delete approved events
+        if (user.role !== 'System Admin') {
+            throw new ForbiddenException('Only admins can delete approved events');
+        }
+
         if (event.status !== 'approved') {
             throw new BadRequestException(
                 'OTP verification is only required for approved events',

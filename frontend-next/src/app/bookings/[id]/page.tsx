@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/services/api';
-import ConfirmationDialog from '@/components/AdminComponent/ConfirmationDialog';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { Booking, Event } from '@/types/event';
 import { motion } from 'framer-motion';
-import { FiAlertCircle, FiArrowRight, FiTrash2, FiClock, FiGrid } from 'react-icons/fi';
+import { FiAlertCircle, FiArrowRight, FiClock, FiGrid } from 'react-icons/fi';
 import '@/components/Booking component/BookingDetails.css';
 import { getImageUrl } from '@/utils/imageHelper';
 import SeatSelector from '@/components/Booking component/SeatSelector';
@@ -22,7 +21,6 @@ const BookingDetailsPage = () => {
     const [event, setEvent] = useState<Event | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [theaterLayout, setTheaterLayout] = useState<any>(null);
     const [hasCopied, setHasCopied] = useState(false);
     const [timeLeft, setTimeLeft] = useState<string>('');
@@ -91,17 +89,6 @@ const BookingDetailsPage = () => {
         };
         fetchDetails();
     }, [id]);
-
-    const handleCancel = async () => {
-        try {
-            await api.delete(`/booking/${id}`);
-            if (booking) setBooking({ ...booking, status: 'Cancelled' });
-            setShowCancelConfirm(false);
-            toast.success("Booking cancelled");
-        } catch (err: any) {
-            toast.error(err.response?.data?.message || err.message);
-        }
-    };
 
     if (loading) return (
         <div className="booking-details-loading">
@@ -223,17 +210,7 @@ const BookingDetailsPage = () => {
                                         <FiGrid size={14} /> View QR Tickets
                                     </motion.button>
                                 )}
-                                {!isCancelled && !isPending && (
-                                    <motion.button
-                                        className="cancel-booking-btn"
-                                        onClick={() => setShowCancelConfirm(true)}
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        style={{ padding: '8px 16px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-                                    >
-                                        <FiTrash2 size={14} /> Cancel
-                                    </motion.button>
-                                )}
+
                             </div>
                         </motion.div>
 
@@ -251,13 +228,6 @@ const BookingDetailsPage = () => {
                         </div>
                     </div>
 
-                    <ConfirmationDialog
-                        isOpen={showCancelConfirm}
-                        title="Cancel Booking"
-                        message="Are you sure you want to cancel this booking? This action cannot be undone."
-                        onConfirm={handleCancel}
-                        onCancel={() => setShowCancelConfirm(false)}
-                    />
                 </motion.div>
             </ProtectedRoute>
         );
@@ -369,22 +339,12 @@ const BookingDetailsPage = () => {
                                     <FiGrid /> View QR Tickets
                                 </button>
                             )}
-                            {!isCancelled && !isPending && (
-                                <button onClick={() => setShowCancelConfirm(true)} className="cancel-booking-btn">
-                                    <FiTrash2 /> Cancel Booking
-                                </button>
-                            )}
+
                         </div>
                     </div>
                 </div>
 
-                <ConfirmationDialog
-                    isOpen={showCancelConfirm}
-                    title="Cancel Booking"
-                    message="Are you sure you want to cancel this booking? This action cannot be undone."
-                    onConfirm={handleCancel}
-                    onCancel={() => setShowCancelConfirm(false)}
-                />
+
             </div>
         </ProtectedRoute>
     );

@@ -146,14 +146,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px;
-    width: max-content;
-    /* Allow content to expand beyond container */
-    min-width: 100%;
+    padding: 20px;
     transform-origin: top center;
     transition: transform 0.3s ease;
     position: relative;
-    margin: 0 auto;
 }
 
 .section {
@@ -193,7 +189,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 8px;
     position: relative;
 }
 
@@ -204,7 +200,7 @@
     z-index: 2;
     /* Lower z-index to stay behind floating elements */
     background: linear-gradient(90deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
-    padding-right: 4px;
+    padding-right: 8px;
 }
 
 /* Right row label - sticky when scrolling */
@@ -214,14 +210,13 @@
     z-index: 2;
     /* Lower z-index to stay behind floating elements */
     background: linear-gradient(270deg, rgba(20, 20, 35, 1) 0%, rgba(20, 20, 35, 0.95) 80%, transparent 100%);
-    padding-left: 4px;
+    padding-left: 8px;
 }
 
 .row-label {
-    width: 35px;
-    min-width: 35px;
-    font-size: clamp(0.55rem, 1.5vw, 0.8rem);
-    /* Flexible font size */
+    width: 45px;
+    min-width: 45px;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #94A3B8;
     text-align: center;
@@ -373,9 +368,9 @@
 }
 
 .seat-btn.vip {
-    background: linear-gradient(135deg, #fb923c, #f97316) !important;
-    border-color: #fdba74 !important;
-    box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+    background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+    border-color: #fcd34d !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
 }
 
 .seat-btn.premium {

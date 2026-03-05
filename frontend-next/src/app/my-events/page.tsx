@@ -126,15 +126,17 @@ const MyEventsPage = () => {
                                         )}
                                         {event.status === 'approved' && <div className="approval-tooltip">Approved events cannot be edited</div>}
                                     </div>
-                                    <div className="button-tooltip-container">
-                                        <button
-                                            onClick={() => handleDelete(event._id, event.status === 'approved')}
-                                            className="delete-button"
-                                            disabled={isDeleting}
-                                        >
-                                            {isDeleting ? 'Deleting...' : 'Delete'}
-                                        </button>
-                                    </div>
+                                    {event.status !== 'approved' && (
+                                        <div className="button-tooltip-container">
+                                            <button
+                                                onClick={() => handleDelete(event._id, false)}
+                                                className="delete-button"
+                                                disabled={isDeleting}
+                                            >
+                                                {isDeleting ? 'Deleting...' : 'Delete'}
+                                            </button>
+                                        </div>
+                                    )}
                                     <div className="event-status-badge">
                                         <span className={`status-dot ${event.status}`}></span>
                                         <span className="status-text">{event.status}</span>

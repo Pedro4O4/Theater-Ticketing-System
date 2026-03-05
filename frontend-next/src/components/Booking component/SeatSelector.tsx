@@ -14,7 +14,7 @@ import './SeatSelector.css';
 // Match TheaterDesigner colors for consistency
 const SEAT_TYPE_COLORS: Record<string, { bg: string; border: string; label: string }> = {
     standard: { bg: '#6B7280', border: '#94A3B8', label: 'Standard' },
-    vip: { bg: '#F97316', border: '#FB923C', label: 'VIP' },
+    vip: { bg: '#F59E0B', border: '#FCD34D', label: 'VIP' },
     premium: { bg: '#6366F1', border: '#A5B4FC', label: 'Premium' },
     wheelchair: { bg: '#0EA5E9', border: '#7DD3FC', label: 'Wheelchair' }
 };
@@ -147,73 +147,38 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
     const clearSelection = () => setSelectedSeats([]);
 
-    // Auto-scale logic - Calculate scale to fit theater on screen
-    const [baseWidth, setBaseWidth] = useState(1100);
+    // Auto-scale logic - Ref-based measurement matching TheaterDesigner approach
+    const canvasRef = React.useRef<HTMLDivElement>(null);
+    const hasInitialScale = React.useRef(false);
 
     useEffect(() => {
         if (!theaterData) return;
 
         const calculateScale = () => {
+            if (!canvasRef.current) return;
+            const container = canvasRef.current.parentElement;
+            if (!container) return;
+
+            // Temporarily reset scale to measure natural canvas width
+            const originalTransform = canvasRef.current.style.transform;
+            canvasRef.current.style.transform = 'scale(1)';
+            const canvasWidth = canvasRef.current.scrollWidth || canvasRef.current.offsetWidth;
+            canvasRef.current.style.transform = originalTransform;
+
+            if (canvasWidth === 0) return;
+
             const screenWidth = window.innerWidth;
             const isMobile = screenWidth < 768;
-
-            // Calculate actual content dimensions to determine base width
-            let maxSeatsInAnyRow = 0;
-            const sections = [theaterData.layout.mainFloor, theaterData.layout.balcony];
-
-            sections.forEach(section => {
-                if (section?.rows) {
-                    maxSeatsInAnyRow = Math.max(maxSeatsInAnyRow, section.seatsPerRow || 0);
-                }
-            });
-
-            // Seat grid width: seats * (32px + 4px gap) + row labels (2 * 35px) + safety padding
-            const seatGridWidth = (maxSeatsInAnyRow * 36) + 70 + 20;
-
-            // Check max reach of absolute labels
-            let maxLabelX = 0;
-            if (theaterData.layout.labels && Array.isArray(theaterData.layout.labels)) {
-                theaterData.layout.labels.forEach((label: any) => {
-                    // Labels can be pixel-based (offset from center) or legacy percentage-based
-                    if (label.isPixelBased || (label.position?.x && !label.position.x.toString().includes('%'))) {
-                        const xVal = typeof label.position.x === 'number'
-                            ? label.position.x
-                            : parseFloat(label.position.x);
-
-                        if (!isNaN(xVal)) {
-                            // If pixel based, it's offset from center. 
-                            // To fit this label, we need at least (abs(x) + width) * 2 to keep theater centered
-                            const reach = label.isPixelBased
-                                ? (Math.abs(xVal) + 80) * 2
-                                : xVal + 80;
-                            maxLabelX = Math.max(maxLabelX, reach);
-                        }
-                    }
-                });
-            }
-
-            // The true width of the theater content
-            const theaterContentWidth = Math.max(seatGridWidth, maxLabelX);
-
-            // Tighter base width that matches the content exactly
-            // 40px accounts for the .section internal padding (20px each side)
-            const calculatedBaseWidth = Math.max(500, theaterContentWidth + 40);
-            setBaseWidth(calculatedBaseWidth);
 
             // Available width with minimal screen padding
             const padding = isMobile ? 8 : 40;
             const availableWidth = screenWidth - padding;
 
             // Final scale
-            let calculatedScale = availableWidth / calculatedBaseWidth;
+            let calculatedScale = availableWidth / canvasWidth;
 
             // ENHANCED MOBILE VISIBILITY:
-            // Don't let the scale drop too low on mobile. If it's too small, 
-            // we prefer a larger size with horizontal scrolling.
             if (isMobile) {
-                // FORCE EXPANDED VIEW: Minimum scale for "Giant Chairs" visibility: 0.85
-                // This ensures "all chairs" are expanded and big as requested.
-                // We prioritize visibility over fitting the whole map horizontally.
                 calculatedScale = Math.max(0.85, calculatedScale);
             }
 
@@ -223,9 +188,14 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             setScale(calculatedScale);
         };
 
-        calculateScale();
+        // Delay initial calculation to ensure content has rendered
+        const timer = setTimeout(calculateScale, hasInitialScale.current ? 0 : 200);
+        hasInitialScale.current = true;
         window.addEventListener('resize', calculateScale);
-        return () => window.removeEventListener('resize', calculateScale);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', calculateScale);
+        };
     }, [theaterData]);
 
     // Render single seat
@@ -414,9 +384,8 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
 
             <div className="theater-frame">
                 <div className="theater-canvas-container" ref={containerRef}>
-                    <div className="theater-canvas" style={{
+                    <div className="theater-canvas" ref={canvasRef} style={{
                         transform: `scale(${scale})`,
-                        width: `${baseWidth}px`,
                         transformOrigin: 'top center'
                     }}>
                         {/* Stage at top */}
@@ -427,8 +396,8 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                             >
-                                <span>STAGE</span>
                                 <FiChevronsUp className="stage-icon" />
+                                <span>STAGE</span>
                             </motion.div>
                         )}
 
