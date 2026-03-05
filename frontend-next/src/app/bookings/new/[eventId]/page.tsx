@@ -53,6 +53,38 @@ const BookTicketPage = () => {
     const [receiptUploaded, setReceiptUploaded] = useState(false);
     const receiptInputRef = React.useRef<HTMLInputElement>(null);
 
+    // Compress image to reduce payload size (same as UploadReceiptPage)
+    const compressImage = (file: File, maxDimension = 1200, quality = 0.7): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let { width, height } = img;
+                    if (width > maxDimension || height > maxDimension) {
+                        if (width > height) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        } else {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d')!;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = e.target?.result as string;
+            };
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsDataURL(file);
+        });
+    };
+
     useEffect(() => {
         if (!eventId) return;
         const fetchEvent = async () => {
@@ -367,10 +399,11 @@ const BookTicketPage = () => {
                                     <motion.button
                                         type="button"
                                         onClick={async () => {
-                                            if (!receiptPreview || !bookingId) return;
+                                            if (!receiptFile || !bookingId) return;
                                             try {
                                                 setIsUploadingReceipt(true);
-                                                const response = await api.post(`/booking/${bookingId}/receipt`, { receiptBase64: receiptPreview });
+                                                const compressedBase64 = await compressImage(receiptFile);
+                                                const response = await api.post(`/booking/${bookingId}/receipt`, { receiptBase64: compressedBase64 });
                                                 if (response.data?.success) {
                                                     toast.success('Receipt uploaded! Awaiting organizer verification.');
                                                     setReceiptUploaded(true);
