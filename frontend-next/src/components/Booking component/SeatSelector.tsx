@@ -122,7 +122,13 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                     s.section === seat.section
             );
 
-            if (isSelected) return prev;
+            if (isSelected) {
+                return prev.filter(
+                    s => !(s.row === seat.row &&
+                        s.seatNumber === seat.seatNumber &&
+                        s.section === seat.section)
+                );
+            }
             if (prev.length >= maxSeats) return prev;
             return [...prev, seat];
         });

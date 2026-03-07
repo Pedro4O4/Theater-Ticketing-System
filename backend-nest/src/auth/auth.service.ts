@@ -36,6 +36,9 @@ export class AuthService {
         // Check if email already exists as a verified user
         const existingUser = await this.usersService.findOneByEmail(email);
         if (existingUser) {
+            if ((existingUser as any).isBlocked) {
+                throw new ForbiddenException('This account has been blocked. Please contact support.');
+            }
             throw new ConflictException('User already exists');
         }
 
@@ -132,6 +135,10 @@ export class AuthService {
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
             throw new UnauthorizedException('Incorrect password');
+        }
+
+        if ((user as any).isBlocked) {
+            throw new ForbiddenException('Your account has been blocked. Please contact support.');
         }
 
         // Admin-created users must change password on first login

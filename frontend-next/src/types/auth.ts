@@ -12,6 +12,7 @@ export interface User {
     instapayNumber?: string;
     instapayQR?: string;
     isVerified?: boolean;
+    isBlocked?: boolean;
     createdAt?: string;
 }
 

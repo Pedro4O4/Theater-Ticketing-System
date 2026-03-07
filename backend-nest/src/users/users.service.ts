@@ -85,7 +85,6 @@ export class UsersService {
         return await user.save();
     }
 
-    // Admin-only: Create user with Admin or Organizer role (requires password change on first login)
     async createUserByAdmin(createDto: any): Promise<UserDocument> {
         const { email, password, name, role, phone, instapayNumber, instapayQR } = createDto;
 
@@ -121,5 +120,16 @@ export class UsersService {
         const newUser = new this.userModel(newUserPayload);
 
         return newUser.save();
+    }
+
+    async blockUser(id: string, isBlocked: boolean): Promise<UserDocument> {
+        const user = await this.userModel
+            .findByIdAndUpdate(id, { isBlocked }, { new: true })
+            .select('-password')
+            .exec();
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
     }
 }

@@ -109,6 +109,18 @@ export class UsersController {
         return { success: true, data };
     }
 
+    @Put(':id/block')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
+    async blockUser(@Param('id') id: string, @Body('isBlocked') isBlocked: boolean) {
+        const data = await this.usersService.blockUser(id, isBlocked);
+        return {
+            success: true,
+            message: isBlocked ? 'User blocked successfully' : 'User unblocked successfully',
+            data,
+        };
+    }
+
     @Delete(':id')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.ADMIN)
