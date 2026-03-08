@@ -4,6 +4,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/services/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "react-toastify";
 import PasswordStrengthIndicator from '@/components/shared/PasswordStrengthIndicator';
 import "./RegisterForm.css";
@@ -18,6 +19,7 @@ interface FormData {
 }
 
 export default function RegisterForm() {
+    const { t } = useLanguage();
     const [form, setForm] = useState<FormData>({
         name: "",
         email: "",
@@ -109,8 +111,8 @@ export default function RegisterForm() {
                 otp: otpString
             });
 
-            toast.success("Registration successful! Redirecting to login...");
-            setTimeout(() => router.push('/login'), 2000);
+            toast.success("Email verified! Choose your preferred language.");
+            setTimeout(() => router.push('/choose-language'), 1200);
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || "Verification failed. Please try again.";
             setError(errorMessage);
@@ -129,7 +131,7 @@ export default function RegisterForm() {
             </div>
             <div className="login-card">
                 <div className="card-decoration"></div>
-                <h1 className="login-title">{showOtpForm ? "Verify Your Email" : "Join the Theater"}</h1>
+                <h1 className="login-title">{showOtpForm ? t('otp.title') : t('register.title')}</h1>
 
                 {error && <div className="error-message">{error}</div>}
 
@@ -137,13 +139,13 @@ export default function RegisterForm() {
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Full Name</span>
+                                <span className="label-text">{t('register.name')}</span>
                             </label>
                             <div className="input-container">
                                 <input
                                     type="text"
                                     name="name"
-                                    placeholder="Enter your full name"
+                                    placeholder={t('register.name.placeholder')}
                                     className="form-input"
                                     value={form.name}
                                     onChange={handleChange}
@@ -155,13 +157,13 @@ export default function RegisterForm() {
 
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Email Address</span>
+                                <span className="label-text">{t('login.email')}</span>
                             </label>
                             <div className="input-container">
                                 <input
                                     type="email"
                                     name="email"
-                                    placeholder="Enter your email"
+                                    placeholder={t('login.email.placeholder')}
                                     className="form-input"
                                     value={form.email}
                                     onChange={handleChange}
@@ -173,7 +175,7 @@ export default function RegisterForm() {
 
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Phone Number</span>
+                                <span className="label-text">{t('register.phone')}</span>
                             </label>
                             <div className="input-container">
                                 <input
@@ -193,13 +195,13 @@ export default function RegisterForm() {
 
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Password</span>
+                                <span className="label-text">{t('login.password')}</span>
                             </label>
                             <div className="input-container">
                                 <input
                                     type="password"
                                     name="password"
-                                    placeholder="Create a secure password"
+                                    placeholder={t('login.password.placeholder')}
                                     className="form-input"
                                     value={form.password}
                                     onChange={handleChange}
@@ -212,13 +214,13 @@ export default function RegisterForm() {
 
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Confirm Password</span>
+                                <span className="label-text">{t('register.confirmPassword')}</span>
                             </label>
                             <div className="input-container">
                                 <input
                                     type="password"
                                     name="confirmPassword"
-                                    placeholder="Repeat your password"
+                                    placeholder={t('register.confirmPassword.placeholder')}
                                     className="form-input"
                                     value={form.confirmPassword}
                                     onChange={handleChange}
@@ -227,7 +229,7 @@ export default function RegisterForm() {
                                 <i className="input-icon fas fa-lock"></i>
                             </div>
                             {form.confirmPassword && form.password !== form.confirmPassword && (
-                                <div className="password-mismatch">Passwords do not match</div>
+                                <div className="password-mismatch">{t('register.passwordMismatch')}</div>
                             )}
                         </div>
 
@@ -239,10 +241,10 @@ export default function RegisterForm() {
                             {loading ? (
                                 <>
                                     <span className="form-loader"></span>
-                                    Creating Account...
+                                    {t('register.submit.loading')}
                                 </>
                             ) : (
-                                <>Join Now</>
+                                <>{t('register.submit')}</>
                             )}
                         </button>
                     </form>
@@ -250,7 +252,7 @@ export default function RegisterForm() {
                     <div className="otp-form-container">
                         <form className="otp-form" onSubmit={handleVerifyOtp}>
                             <div className="content">
-                                <p style={{ textAlign: "center" }}>Enter verification code</p>
+                                <p style={{ textAlign: "center" }}>{t('otp.enter')}</p>
                                 <div className="inp">
                                     {otp.map((digit, index) => (
                                         <input
@@ -273,7 +275,7 @@ export default function RegisterForm() {
                                     className="verify-btn"
                                     disabled={verifyLoading || otp.some(digit => !digit)}
                                 >
-                                    {verifyLoading ? 'Verifying...' : 'Verify'}
+                                    {verifyLoading ? t('otp.verifying') : t('otp.verify')}
                                 </button>
                             </div>
                             <svg className="svg" xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
@@ -284,7 +286,7 @@ export default function RegisterForm() {
                 )}
 
                 <div className="redirect-link">
-                    <div>Already part of our community? <Link href="/login">Sign In</Link></div>
+                    <div>{t('register.haveAccount')} <Link href="/login">{t('register.signIn')}</Link></div>
                 </div>
             </div>
         </div>

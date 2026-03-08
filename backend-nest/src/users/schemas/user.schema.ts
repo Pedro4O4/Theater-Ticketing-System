@@ -53,6 +53,9 @@ export class User {
 
     @Prop({ default: false })
     isBlocked: boolean;
+
+    @Prop({ default: 'en', enum: ['en', 'ar'] })
+    language: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

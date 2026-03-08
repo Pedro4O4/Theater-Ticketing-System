@@ -85,6 +85,18 @@ export class UsersService {
         return await user.save();
     }
 
+    async updateLanguage(id: string, language: 'en' | 'ar'): Promise<UserDocument> {
+        if (!['en', 'ar'].includes(language)) {
+            throw new BadRequestException('Invalid language. Allowed values: en, ar');
+        }
+        const user = await this.userModel
+            .findByIdAndUpdate(id, { language }, { new: true })
+            .select('-password')
+            .exec();
+        if (!user) throw new NotFoundException('User not found');
+        return user;
+    }
+
     async createUserByAdmin(createDto: any): Promise<UserDocument> {
         const { email, password, name, role, phone, instapayNumber, instapayQR } = createDto;
 

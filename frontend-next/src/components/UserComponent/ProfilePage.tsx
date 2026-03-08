@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import api from '@/services/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import './ProfilePage.css';
 
 interface UserData {
@@ -35,6 +36,7 @@ interface QuickAction {
 
 const ProfilePage = () => {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const [profileImage, setProfileImage] = useState<string | null>(user?.profilePicture || null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
@@ -78,20 +80,20 @@ const ProfilePage = () => {
 
         if (role === "Standard User") {
             return [
-                { label: "Explore Events", icon: FiGrid, path: "/events", variant: "primary" },
-                { label: "My Bookings", icon: FiCalendar, path: "/bookings", variant: "secondary" }
+                { label: t('profile.exploreEvents'), icon: FiGrid, path: "/events", variant: "primary" },
+                { label: t('profile.myBookings'), icon: FiCalendar, path: "/bookings", variant: "secondary" }
             ];
         } else if (role === "Organizer") {
             return [
-                { label: "My Events", icon: FiCalendar, path: "/my-events", variant: "primary" },
-                { label: "Create Event", icon: FiPlus, path: "/my-events/new", variant: "success" },
-                { label: "Analytics", icon: FiPieChart, path: "/my-events/analytics", variant: "secondary" }
+                { label: t('profile.myEvents'), icon: FiCalendar, path: "/my-events", variant: "primary" },
+                { label: t('profile.createEvent'), icon: FiPlus, path: "/my-events/new", variant: "success" },
+                { label: t('nav.analytics'), icon: FiPieChart, path: "/my-events/analytics", variant: "secondary" }
             ];
         } else if (role === "System Admin") {
             return [
-                { label: "Manage Events", icon: FiCalendar, path: "/admin/events", variant: "primary" },
-                { label: "Manage Users", icon: FiUsers, path: "/admin/users", variant: "secondary" },
-                { label: "Theaters", icon: FiSettings, path: "/admin/theaters", variant: "tertiary" }
+                { label: t('profile.manageEvents'), icon: FiCalendar, path: "/admin/events", variant: "primary" },
+                { label: t('profile.manageUsers'), icon: FiUsers, path: "/admin/users", variant: "secondary" },
+                { label: t('profile.theaters'), icon: FiSettings, path: "/admin/theaters", variant: "tertiary" }
             ];
         }
         return [];
@@ -127,7 +129,7 @@ const ProfilePage = () => {
                         <div className="spinner-ring"></div>
                         <div className="spinner-ring"></div>
                     </div>
-                    <p>Loading your profile...</p>
+                    <p>{t('profile.loadingProfile')}</p>
                 </div>
             </div>
         );
@@ -241,7 +243,7 @@ const ProfilePage = () => {
                 <motion.div className="actions-section" variants={itemVariants}>
                     <h2 className="section-title">
                         <FiActivity className="section-icon" />
-                        Quick Actions
+                        {t('profile.quickActions')}
                     </h2>
                     <div className="actions-grid">
                         {getQuickActions().map((action) => (
@@ -271,7 +273,7 @@ const ProfilePage = () => {
                         whileTap={{ scale: 0.98 }}
                     >
                         <FiEdit />
-                        Edit Profile
+                        {t('profile.editProfile')}
                     </motion.button>
                     <motion.button
                         className="profile-btn secondary"
@@ -280,7 +282,7 @@ const ProfilePage = () => {
                         whileTap={{ scale: 0.98 }}
                     >
                         <FiArrowLeft />
-                        Back to Events
+                        {t('profile.backToEvents')}
                     </motion.button>
                 </motion.div>
             </motion.div>

@@ -13,6 +13,7 @@ export interface User {
     instapayQR?: string;
     isVerified?: boolean;
     isBlocked?: boolean;
+    language?: 'en' | 'ar';
     createdAt?: string;
 }
 

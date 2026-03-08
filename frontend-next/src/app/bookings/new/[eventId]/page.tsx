@@ -14,6 +14,7 @@ import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { Event } from '@/types/event';
 import { Seat } from '@/types/booking';
 import { toast } from 'react-toastify';
+import { useLanguage } from '@/contexts/LanguageContext';
 import '@/components/Booking component/BookingTicketForm.css';
 
 interface AttendeeInfo {
@@ -23,6 +24,7 @@ interface AttendeeInfo {
 
 const BookTicketPage = () => {
     const params = useParams();
+    const { t } = useLanguage();
     const eventId = params.eventId as string;
     const router = useRouter();
     const [event, setEvent] = useState<Event | null>(null);
@@ -243,7 +245,7 @@ const BookTicketPage = () => {
                     <div className="loading-spinner-booking">
                         <div className="spinner-ring"></div>
                     </div>
-                    <p>Loading event details...</p>
+                    <p>{t('booking.loadingEvent')}</p>
                 </div>
             </div>
         );
@@ -254,10 +256,10 @@ const BookTicketPage = () => {
             <motion.div className="booking-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <div className="booking-error-state">
                     <FiAlertCircle size={60} />
-                    <h2>Event Not Found</h2>
-                    <p>The event you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+                    <h2>{t('booking.eventNotFound')}</h2>
+                    <p>{t('booking.eventNotFoundDesc')}</p>
                     <motion.button onClick={() => router.push('/events')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <FiArrowLeft /> Browse Events
+                        <FiArrowLeft /> {t('booking.browseEvents')}
                     </motion.button>
                 </div>
             </motion.div>
@@ -456,7 +458,7 @@ const BookTicketPage = () => {
                 <div className="booking-bg-effect"></div>
 
                 {event.hasTheaterSeating ? (
-                    <div className="theater-fullpage-container">
+                    <div className="theater-fullpage-container" dir="ltr">
                         {/* Compact Header Bar */}
                         <motion.div className="theater-header-bar" initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                             <motion.button
@@ -584,6 +586,24 @@ const BookTicketPage = () => {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        {/* Mobile-only selection summary below theater */}
+                        {selectedSeats.length > 0 && !showAttendeeForm && (
+                            <div className="mobile-selection-summary">
+                                <div className="mobile-selection-seats">
+                                    {selectedSeats.map(seat => (
+                                        <span key={`mob-${seat.section}-${seat.row}-${seat.seatNumber}`} className="mobile-seat-chip">
+                                            {seat.row}{seat.seatNumber}
+                                            <span className="mobile-chip-price">{seat.price} EGP</span>
+                                        </span>
+                                    ))}
+                                </div>
+                                <div className="mobile-selection-total">
+                                    <span>{selectedSeats.length} seat{selectedSeats.length !== 1 ? 's' : ''} selected</span>
+                                    <strong>{seatTotalPrice.toFixed(2)} EGP</strong>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Fixed Bottom Action Bar */}
                         <motion.div className="theater-action-bar" initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>

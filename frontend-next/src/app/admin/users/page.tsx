@@ -14,7 +14,7 @@ import UpdateUserRoleModal from '@/components/AdminComponent/UpdateUserRoleModal
 import ConfirmationDialog from "@/components/AdminComponent/ConfirmationDialog";
 import { User, UserRole } from '@/types/auth';
 import '@/components/AdminComponent/AdminUsersPage.css';
-
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'react-toastify';
 
 const ROLE_CONFIG: Record<string, any> = {
@@ -46,6 +46,7 @@ const AdminUsersPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const router = useRouter();
     const { user: currentUser } = useAuth();
+    const { t } = useLanguage();
 
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -164,8 +165,8 @@ const AdminUsersPage = () => {
                 </div>
                 <div className="header-actions">
                     <Link href="/admin/users/create" className="nav-btn" style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)' }}><FiUserPlus /> Create User</Link>
-                    <Link href="/admin/events" className="nav-btn"><FiCalendar /> Events</Link>
-                    <Link href="/admin/theaters" className="nav-btn"><FiGrid /> Theaters</Link>
+                    <Link href="/admin/events" className="nav-btn"><FiCalendar /> {t('footer.link.events')}</Link>
+                    <Link href="/admin/theaters" className="nav-btn"><FiGrid /> {t('admin.theaters')}</Link>
                     <button className="refresh-btn" onClick={fetchUsers} disabled={loading}>
                         <FiRefreshCw className={loading ? 'spinning' : ''} />
                     </button>

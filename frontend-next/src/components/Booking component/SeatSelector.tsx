@@ -342,7 +342,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
     if (error) return <div className="seat-selector error"><FiAlertCircle /><p>{error}</p><button onClick={() => window.location.reload()}>Retry</button></div>;
 
     return (
-        <div className="seat-selector">
+        <div className="seat-selector" dir="ltr">
             {/* Section Switcher - only show if theater has balcony */}
             {theaterData?.layout.hasBalcony && (
                 <div className="section-switcher">

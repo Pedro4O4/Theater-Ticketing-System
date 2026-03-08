@@ -9,6 +9,7 @@ import RequestCancellationModal from './RequestCancellationModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCalendar, FiMapPin, FiClock, FiTrash2, FiEye, FiAlertCircle, FiCheckCircle, FiUploadCloud, FiGrid, FiCopy, FiRotateCcw } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import { useLanguage } from '@/contexts/LanguageContext';
 import './UserBookingPage.css';
 
 interface Booking {
@@ -50,6 +51,7 @@ interface EventData {
 
 const UserBookingsPage = () => {
     const router = useRouter();
+    const { t } = useLanguage();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [eventDetails, setEventDetails] = useState<Record<string, EventData>>({});
     const [loading, setLoading] = useState(true);
@@ -455,9 +457,9 @@ const UserBookingsPage = () => {
             {bookings.length === 0 ? (
                 <div className="empty-bookings">
                     <div className="empty-icon"><FiCalendar size={60} /></div>
-                    <h3>No Bookings Found</h3>
-                    <p>You haven't made any bookings yet. Start exploring events now!</p>
-                    <Link href="/events" className="browse-btn">Browse Events</Link>
+                    <h3>{t('bookings.noBookings')}</h3>
+                    <p>{t('bookings.noBookingsDesc')}</p>
+                    <Link href="/events" className="browse-btn">{t('bookings.browseEvents')}</Link>
                 </div>
             ) : (
                 <div className="bookings-grid">

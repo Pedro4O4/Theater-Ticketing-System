@@ -9,6 +9,7 @@ import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { FaTicketAlt, FaUsers, FaCalendarAlt, FaStar, FaTheaterMasks, FaTrophy, FaMusic, FaPalette } from 'react-icons/fa';
 import api from '@/services/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { getImageUrl } from '@/utils/imageHelper';
 import '@/app/globals.css';
 import './Homepage.css';
@@ -32,6 +33,7 @@ const Homepage = () => {
     const [showFullImage, setShowFullImage] = useState<boolean>(false);
     const [currentImage, setCurrentImage] = useState<EventData | null>(null);
     const router = useRouter();
+    const { t } = useLanguage();
 
     // Refs for counting animation
     const { ref: statsRef, inView: statsInView } = useInView({
@@ -112,12 +114,12 @@ const Homepage = () => {
                 backgroundRepeat: 'no-repeat'
             }}>
                 <div className="hero-content" data-aos="fade-up">
-                    <h1 className="hero-title" data-aos="fade-down" data-aos-delay="200">Experience the Magic of Live Performance</h1>
-                    <p className="hero-subtitle" data-aos="fade-up" data-aos-delay="400">Discover extraordinary events that will leave you breathless</p>
+                    <h1 className="hero-title" data-aos="fade-down" data-aos-delay="200">{t('home.hero.title')}</h1>
+                    <p className="hero-subtitle" data-aos="fade-up" data-aos-delay="400">{t('home.hero.subtitle')}</p>
                     <div className="hero-buttons" data-aos="zoom-in" data-aos-delay="600">
-                        <Link href="/events" className="btn-primary-hero">Browse Events</Link>
+                        <Link href="/events" className="btn-primary-hero">{t('home.hero.browse')}</Link>
                         {!isLoggedIn() && (
-                            <Link href="/register" className="btn-secondary-hero">Get Started</Link>
+                            <Link href="/register" className="btn-secondary-hero">{t('home.hero.start')}</Link>
                         )}
                     </div>
                 </div>
@@ -129,68 +131,68 @@ const Homepage = () => {
                     <div className="stat-item" data-aos="flip-left" data-aos-delay="100">
                         <FaTicketAlt className="stat-icon" />
                         <h3>{statsInView ? <CountUp end={50000} duration={2.5} separator="," /> : '0'}</h3>
-                        <p>Tickets Sold</p>
+                        <p>{t('home.stats.tickets')}</p>
                     </div>
                     <div className="stat-item" data-aos="flip-left" data-aos-delay="200">
                         <FaUsers className="stat-icon" />
                         <h3>{statsInView ? <CountUp end={10000} duration={2.5} separator="," /> : '0'}+</h3>
-                        <p>Happy Customers</p>
+                        <p>{t('home.stats.customers')}</p>
                     </div>
                     <div className="stat-item" data-aos="flip-left" data-aos-delay="300">
                         <FaCalendarAlt className="stat-icon" />
                         <h3>{statsInView ? <CountUp end={500} duration={2.5} /> : '0'}+</h3>
-                        <p>Events Hosted</p>
+                        <p>{t('home.stats.events')}</p>
                     </div>
                     <div className="stat-item" data-aos="flip-left" data-aos-delay="400">
                         <FaStar className="stat-icon" />
                         <h3>{statsInView ? <CountUp end={4.8} duration={2.5} decimals={1} /> : '0'}</h3>
-                        <p>Average Rating</p>
+                        <p>{t('home.stats.rating')}</p>
                     </div>
                 </div>
             </section>
 
             {/* Why Choose Us Section */}
             <section className="features-section" data-aos="fade-up">
-                <h2 className="section-title" data-aos="fade-down" data-aos-duration="1000">Why Choose EventTix?</h2>
+                <h2 className="section-title" data-aos="fade-down" data-aos-duration="1000">{t('home.features.title')}</h2>
                 <div className="features-grid">
                     <div className="feature-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
                         <div className="feature-icon">
                             <FaTheaterMasks />
                         </div>
-                        <h3>Premium Events</h3>
-                        <p>Access to the most exclusive and highly-rated events in your area</p>
+                        <h3>{t('home.features.premium')}</h3>
+                        <p>{t('home.features.premium.desc')}</p>
                     </div>
                     <div className="feature-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
                         <div className="feature-icon">
                             <FaTrophy />
                         </div>
-                        <h3>Best Prices</h3>
-                        <p>Competitive pricing with no hidden fees. What you see is what you pay</p>
+                        <h3>{t('home.features.prices')}</h3>
+                        <p>{t('home.features.prices.desc')}</p>
                     </div>
                     <div className="feature-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
                         <div className="feature-icon">
                             <FaMusic />
                         </div>
-                        <h3>Diverse Selection</h3>
-                        <p>From concerts to theater, sports to festivals - we have it all</p>
+                        <h3>{t('home.features.diverse')}</h3>
+                        <p>{t('home.features.diverse.desc')}</p>
                     </div>
                     <div className="feature-card" data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
                         <div className="feature-icon">
                             <FaPalette />
                         </div>
-                        <h3>Easy Booking</h3>
-                        <p>Simple, fast, and secure booking process in just a few clicks</p>
+                        <h3>{t('home.features.booking')}</h3>
+                        <p>{t('home.features.booking.desc')}</p>
                     </div>
                 </div>
             </section>
 
             {/* Featured Events Section */}
             <section className="featured-section" data-aos="fade-up">
-                <h2 className="section-title" data-aos="fade-down">Featured Shows</h2>
+                <h2 className="section-title" data-aos="fade-down">{t('home.featured.title')}</h2>
                 {error ? (
                     <div className="error-message">{error}</div>
                 ) : featuredEvents.length === 0 ? (
-                    <div className="no-events-message">No events available at the moment.</div>
+                    <div className="no-events-message">{t('home.featured.empty')}</div>
                 ) : (
                     <>
                         <div className="events-grid">
@@ -203,7 +205,7 @@ const Homepage = () => {
                                             className="event-image"
                                         />
                                         <div className="image-overlay">
-                                            <span className="view-full">Click to view full image</span>
+                                            <span className="view-full">{t('home.featured.viewFull')}</span>
                                         </div>
                                     </div>
                                     <div className="event-info">
@@ -223,7 +225,7 @@ const Homepage = () => {
                                             className="view-detail-btn"
                                             onClick={() => handleEventClick(event)}
                                         >
-                                            {isLoggedIn() ? 'View Details' : 'Login to View'}
+                                            {isLoggedIn() ? t('home.featured.viewDetails') : t('home.featured.loginToView')}
                                         </button>
                                     </div>
                                 </div>
@@ -247,12 +249,12 @@ const Homepage = () => {
             {showLoginPrompt && (
                 <div className="login-prompt-overlay" onClick={() => setShowLoginPrompt(false)}>
                     <div className="login-prompt-modal" onClick={e => e.stopPropagation()}>
-                        <h3>Login Required</h3>
-                        <p>Please log in to view event details for &quot;{selectedEvent?.title}&quot;</p>
+                        <h3>{t('home.loginPrompt.title')}</h3>
+                        <p>{t('home.loginPrompt.message')} &quot;{selectedEvent?.title}&quot;</p>
                         <div className="login-prompt-buttons">
-                            <Link href="/login" className="login-btn">Login</Link>
-                            <Link href="/register" className="register-btn">Register</Link>
-                            <button className="cancel-btn" onClick={() => setShowLoginPrompt(false)}>Cancel</button>
+                            <Link href="/login" className="login-btn">{t('home.loginPrompt.login')}</Link>
+                            <Link href="/register" className="register-btn">{t('home.loginPrompt.register')}</Link>
+                            <button className="cancel-btn" onClick={() => setShowLoginPrompt(false)}>{t('home.loginPrompt.cancel')}</button>
                         </div>
                     </div>
                 </div>

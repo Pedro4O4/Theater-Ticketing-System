@@ -58,6 +58,13 @@ export class UsersController {
     }
 
     // User: Get my bookings
+    @Put('language')
+    @UseGuards(JwtAuthGuard)
+    async updateLanguage(@Req() req: any, @Body('language') language: 'en' | 'ar') {
+        const data = await this.usersService.updateLanguage(req.user._id, language);
+        return { success: true, data };
+    }
+
     @Get('bookings')
     @UseGuards(JwtAuthGuard)
     async getMyBookings(@Req() req: any) {

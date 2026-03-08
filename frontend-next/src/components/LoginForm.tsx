@@ -4,6 +4,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/auth/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "react-toastify";
 import api from "@/services/api";
 import './LoginForm.css';
@@ -14,6 +15,7 @@ interface FormData {
 }
 
 export default function LoginForm() {
+    const { t } = useLanguage();
     const [formData, setFormData] = useState<FormData>({
         email: "",
         password: ""
@@ -148,7 +150,7 @@ export default function LoginForm() {
             </div>
             <div className="login-card">
                 <div className="card-decoration"></div>
-                <h1 className="login-title">{showOtpForm ? "Verify Your Account" : "Welcome Back"}</h1>
+                <h1 className="login-title">{showOtpForm ? t('otp.login.title') : t('login.title')}</h1>
 
                 {error && <div className="error-message">{error}</div>}
 
@@ -156,13 +158,13 @@ export default function LoginForm() {
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Email Address</span>
+                                <span className="label-text">{t('login.email')}</span>
                             </label>
                             <div className="input-container">
                                 <input
                                     type="email"
                                     name="email"
-                                    placeholder="Enter your email"
+                                    placeholder={t('login.email.placeholder')}
                                     className="form-input"
                                     value={formData.email}
                                     onChange={handleChange}
@@ -174,13 +176,13 @@ export default function LoginForm() {
 
                         <div className="form-group">
                             <label className="form-label">
-                                <span className="label-text">Password</span>
+                                <span className="label-text">{t('login.password')}</span>
                             </label>
                             <div className="input-container">
                                 <input
                                     type="password"
                                     name="password"
-                                    placeholder="Enter your password"
+                                    placeholder={t('login.password.placeholder')}
                                     className="form-input"
                                     value={formData.password}
                                     onChange={handleChange}
@@ -198,10 +200,10 @@ export default function LoginForm() {
                             {loading ? (
                                 <>
                                     <span className="form-loader"></span>
-                                    Signing In...
+                                    {t('login.submit.loading')}
                                 </>
                             ) : (
-                                <>Sign In</>
+                                <>{t('login.submit')}</>
                             )}
                         </button>
                     </form>
@@ -209,7 +211,7 @@ export default function LoginForm() {
                     <div className="otp-form-container">
                         <form className="otp-form" onSubmit={handleVerifyOtp}>
                             <div className="content">
-                                <p>Enter verification code</p>
+                                <p>{t('otp.enter')}</p>
                                 <div className="inp">
                                     {otp.map((digit, index) => (
                                         <input
@@ -232,7 +234,7 @@ export default function LoginForm() {
                                     className="verify-btn"
                                     disabled={verifyLoading || otp.some(digit => !digit)}
                                 >
-                                    {verifyLoading ? 'Verifying...' : 'Verify'}
+                                    {verifyLoading ? t('otp.verifying') : t('otp.verify')}
                                 </button>
                                 <p style={{ textAlign: "center", marginTop: "10px", fontSize: "0.8rem" }}>
                                     <a
@@ -240,7 +242,7 @@ export default function LoginForm() {
                                         onClick={handleResendCode}
                                         style={{ color: "var(--primary)", textDecoration: "underline" }}
                                     >
-                                        Didn&apos;t receive a code? Resend
+                                        {t('otp.resend')}
                                     </a>
                                 </p>
                             </div>
@@ -252,8 +254,8 @@ export default function LoginForm() {
                 )}
 
                 <div className="redirect-link">
-                    <div>Don&apos;t have an account? <Link href="/register">Register</Link></div>
-                    <div>Forgot your password? <Link href="/forgot-password">Reset Password</Link></div>
+                    <div>{t('login.noAccount')} <Link href="/register">{t('login.register')}</Link></div>
+                    <div>{t('login.forgot')} <Link href="/forgot-password">{t('login.reset')}</Link></div>
                 </div>
             </div>
         </div>

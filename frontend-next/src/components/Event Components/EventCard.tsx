@@ -8,6 +8,7 @@ import './EventCard.css';
 import { getImageUrl } from '@/utils/imageHelper';
 import { Event } from '@/types/event';
 import { useAuth } from '@/auth/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface EventCardProps {
     event: Event;
@@ -19,6 +20,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const router = useRouter();
     const { user } = useAuth();
+    const { t } = useLanguage();
 
     // Support both _id (MongoDB) and id (Standard)
     const eventId = event._id || (event as any).id;
@@ -35,9 +37,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
 
     const getTicketStatus = () => {
         const remaining = event.remainingTickets ?? 0;
-        if (remaining === 0) return { text: 'Sold Out', class: 'sold-out' };
-        if (remaining < 20) return { text: `${remaining} left!`, class: 'limited' };
-        return { text: `${remaining} available`, class: 'available' };
+        if (remaining === 0) return { text: t('card.soldOut'), class: 'sold-out' };
+        if (remaining < 20) return { text: `${remaining} ${t('card.left')}`, class: 'limited' };
+        return { text: `${remaining} ${t('card.available')}`, class: 'available' };
     };
 
     const ticketStatus = getTicketStatus();
@@ -136,7 +138,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
                                 router.push(`/events/${eventId}`);
                             }}
                         >
-                            <FiInfo /> <span>Details</span>
+                            <FiInfo /> <span>{t('card.details')}</span>
                         </button>
 
                         {(user?.role === "Standard User" || !user) && !isSoldOut && (
@@ -147,13 +149,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
                                     router.push(`/bookings/new/${eventId}`);
                                 }}
                             >
-                                <FiShoppingCart /> <span>Book Now</span>
+                                <FiShoppingCart /> <span>{t('card.bookNow')}</span>
                             </button>
                         )}
 
                         {isSoldOut && (
                             <button className="card-action-btn disabled" disabled>
-                                Sold Out
+                                {t('card.soldOut')}
                             </button>
                         )}
                     </div>

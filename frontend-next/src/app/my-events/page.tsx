@@ -4,6 +4,7 @@ import api from "@/services/api";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import EventCard from '@/components/Event Components/EventCard';
 import { Event } from '@/types/event';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
@@ -12,6 +13,7 @@ import '@/components/Event Components/MyEventPage.css';
 import '@/components/Event Components/EventBookings.css';
 
 const MyEventsPage = () => {
+    const { t } = useLanguage();
     const [showOtpModal, setShowOtpModal] = useState(false);
     const [otpValue, setOtpValue] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
@@ -95,20 +97,20 @@ const MyEventsPage = () => {
         }
     };
 
-    if (loading) return <div className="loading">Loading your events...</div>;
+    if (loading) return <div className="loading">{t('myEvents.loading')}</div>;
 
     return (
         <ProtectedRoute requiredRole="Organizer">
             <div className="event-list-container">
                 <div className="event-header">
-                    <h1 className="page-title">My Events</h1>
+                    <h1 className="page-title">{t('myEvents.title')}</h1>
                     <div className="search-container">
-                        <input type="text" placeholder="Search my events..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
+                        <input type="text" placeholder={t('myEvents.search')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
                     </div>
                     <div className="organizer-buttons">
-                        <Link href="/events" className="view-events-button">View All Events</Link>
-                        <Link href="/my-events/new" className="create-event-button">Create New Event</Link>
-                        <Link href="/my-events/analytics" className="analytics-button">Analytics</Link>
+                        <Link href="/events" className="view-events-button">{t('myEvents.viewAll')}</Link>
+                        <Link href="/my-events/new" className="create-event-button">{t('myEvents.create')}</Link>
+                        <Link href="/my-events/analytics" className="analytics-button">{t('myEvents.analytics')}</Link>
                     </div>
                 </div>
 
@@ -120,11 +122,11 @@ const MyEventsPage = () => {
                                 <div className="event-actions">
                                     <div className="button-tooltip-container">
                                         {event.status === 'approved' ? (
-                                            <span className="event-button disabled">Edit</span>
+                                            <span className="event-button disabled">{t('myEvents.edit')}</span>
                                         ) : (
-                                            <Link href={`/my-events/${event._id}/edit`} className="event-button">Edit</Link>
+                                            <Link href={`/my-events/${event._id}/edit`} className="event-button">{t('myEvents.edit')}</Link>
                                         )}
-                                        {event.status === 'approved' && <div className="approval-tooltip">Approved events cannot be edited</div>}
+                                        {event.status === 'approved' && <div className="approval-tooltip">{t('myEvents.editTooltip')}</div>}
                                     </div>
                                     {event.status !== 'approved' && (
                                         <div className="button-tooltip-container">
@@ -133,16 +135,16 @@ const MyEventsPage = () => {
                                                 className="delete-button"
                                                 disabled={isDeleting}
                                             >
-                                                {isDeleting ? 'Deleting...' : 'Delete'}
+                                                {isDeleting ? t('myEvents.deleting') : t('myEvents.delete')}
                                             </button>
                                         </div>
                                     )}
                                     <div className="event-status-badge">
                                         <span className={`status-dot ${event.status}`}></span>
-                                        <span className="status-text">{event.status}</span>
+                                        <span className="status-text">{t(`status.${event.status}`) || event.status}</span>
                                     </div>
                                     <Link href={`/my-events/${event._id}/bookings`} className="view-bookings-btn-card">
-                                        View Bookings
+                                        {t('myEvents.viewBookings')}
                                     </Link>
                                 </div>
                             </div>
@@ -152,11 +154,11 @@ const MyEventsPage = () => {
                     <div className="no-events-container">
                         <div className="no-events">
                             {searchTerm ? (
-                                <><h2>No events found matching "{searchTerm}"</h2><p>Try a different search term or create a new event.</p></>
+                                <><h2>{t('myEvents.notFound')} &quot;{searchTerm}&quot;</h2><p>{t('myEvents.tryDifferent')}</p></>
                             ) : (
-                                <><h2>You haven't created any events yet</h2><p>Create your first event to start selling tickets and managing registrations.</p></>
+                                <><h2>{t('myEvents.noEvents')}</h2><p>{t('myEvents.noEventsDesc')}</p></>
                             )}
-                            <Link href="/my-events/new" className="event-button">Create Your First Event</Link>
+                            <Link href="/my-events/new" className="event-button">{t('myEvents.createFirst')}</Link>
                         </div>
                     </div>
                 )}
@@ -164,8 +166,8 @@ const MyEventsPage = () => {
                 {showOtpModal && (
                     <div className="modal-container">
                         <div className="modal-content">
-                            <div className="modal-header">Verify OTP</div>
-                            <div className="modal-message">Please enter the 6-digit OTP sent to your email to confirm event deletion</div>
+                            <div className="modal-header">{t('myEvents.otp.header')}</div>
+                            <div className="modal-message">{t('myEvents.otp.message')}</div>
                             <div className="otp-input-container">
                                 {[0, 1, 2, 3, 4, 5].map((index) => (
                                     <input
@@ -183,8 +185,8 @@ const MyEventsPage = () => {
                                 ))}
                             </div>
                             <div>
-                                <button className="modal-button confirm" onClick={verifyOtpAndDelete} disabled={isVerifying}>{isVerifying ? 'Verifying...' : 'Verify & Delete'}</button>
-                                <button className="modal-button cancel" onClick={() => { setShowOtpModal(false); setOtpValue(''); }} disabled={isVerifying}>Cancel</button>
+                                <button className="modal-button confirm" onClick={verifyOtpAndDelete} disabled={isVerifying}>{isVerifying ? t('myEvents.otp.verifying') : t('myEvents.otp.verifyDelete')}</button>
+                                <button className="modal-button cancel" onClick={() => { setShowOtpModal(false); setOtpValue(''); }} disabled={isVerifying}>{t('myEvents.otp.cancel')}</button>
                             </div>
                         </div>
                     </div>

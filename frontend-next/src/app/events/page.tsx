@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiCalendar, FiUser, FiArrowRight, FiCamera } from 'react-icons/fi';
 import { useAuth } from '@/auth/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import EventCard from '@/components/Event Components/EventCard';
 import { Event } from '@/types/event';
 import '@/components/Event Components/EventList.css';
@@ -21,6 +22,7 @@ const EventListPage = () => {
     const scanDropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
+    const { t } = useLanguage();
 
     // Fetch events immediately — no dependency on auth state
     useEffect(() => {
@@ -117,7 +119,7 @@ const EventListPage = () => {
                                     <div className="avatar-ring"></div>
                                 </div>
                                 <div className="welcome-text">
-                                    <h2>Welcome back, <span>{user?.name || 'User'}</span></h2>
+                                    <h2>{t('events.welcomeBack')} <span>{user?.name || 'User'}</span></h2>
                                     <p className="user-role">{user?.role}</p>
                                 </div>
                             </div>
@@ -128,16 +130,16 @@ const EventListPage = () => {
                     <div className="actions-bar">
                         <div className="search-wrapper">
                             <FiSearch className="search-icon" />
-                            <input type="text" placeholder="Search events..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
+                            <input type="text" placeholder={t('events.search')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
                             {searchTerm && <motion.button className="clear-search" onClick={() => setSearchTerm('')} initial={{ scale: 0 }} animate={{ scale: 1 }} whileTap={{ scale: 0.9 }}>×</motion.button>}
                         </div>
 
                         <div className="action-buttons">
-                            {user?.role === "Organizer" && <Link href="/my-events" className="action-btn primary"><FiCalendar /> <span>My Events</span></Link>}
+                            {user?.role === "Organizer" && <Link href="/my-events" className="action-btn primary"><FiCalendar /> <span>{t('events.myEvents')}</span></Link>}
                             {user?.role === "Organizer" && (
                                 <div className="scan-qr-wrapper" ref={scanDropdownRef} style={{ position: 'relative' }}>
                                     <button className="action-btn secondary" onClick={handleScanQRClick}>
-                                        <FiCamera /> <span>Scan QR</span>
+                                        <FiCamera /> <span>{t('events.scanQR')}</span>
                                     </button>
                                     <AnimatePresence>
                                         {scanDropdownOpen && (
@@ -160,11 +162,11 @@ const EventListPage = () => {
                                                     overflow: 'hidden',
                                                 }}
                                             >
-                                                <div style={{ padding: '10px 14px 6px', fontSize: '0.75rem', color: 'var(--text-muted, #888)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Select event to scan</div>
+                                                <div style={{ padding: '10px 14px 6px', fontSize: '0.75rem', color: 'var(--text-muted, #888)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t('events.selectToScan')}</div>
                                                 {scanEventsLoading ? (
                                                     <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted, #888)', fontSize: '0.9rem' }}>Loading...</div>
                                                 ) : myEvents.length === 0 ? (
-                                                    <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted, #888)', fontSize: '0.9rem' }}>No events found</div>
+                                                    <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted, #888)', fontSize: '0.9rem' }}>{t('events.noEventsFound')}</div>
                                                 ) : (
                                                     myEvents.map(event => (
                                                         <button
@@ -194,7 +196,7 @@ const EventListPage = () => {
                                     </AnimatePresence>
                                 </div>
                             )}
-                            {user?.role === "Standard User" && <Link href="/bookings" className="action-btn secondary"><FiUser /> <span>My Bookings</span></Link>}
+                            {user?.role === "Standard User" && <Link href="/bookings" className="action-btn secondary"><FiUser /> <span>{t('nav.bookings')}</span></Link>}
                         </div>
                     </div>
                 </motion.div>
@@ -203,7 +205,7 @@ const EventListPage = () => {
                     {loading && (
                         <motion.div className="loading-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                             <div className="loading-spinner"><div className="spinner-ring"></div><div className="spinner-ring"></div><div className="spinner-ring"></div></div>
-                            <p>Loading amazing events...</p>
+                            <p>{t('events.loading')}</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -223,13 +225,13 @@ const EventListPage = () => {
                                 </motion.div>
                             ))
                         ) : (
-                            <motion.div className="no-events" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><span className="no-events-icon">🎭</span><h3>No events found</h3><p>{searchTerm ? `No events matching "${searchTerm}"` : "Check back later for new events"}</p></motion.div>
+                            <motion.div className="no-events" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><span className="no-events-icon">🎭</span><h3>{t('events.noEventsFound')}</h3><p>{searchTerm ? `${t('events.noMatch')} "${searchTerm}"` : t('events.checkLater')}</p></motion.div>
                         )}
                     </motion.div>
                 )}
 
                 {!loading && !error && filteredEvents.length > 0 && (
-                    <motion.div className="results-info" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>Showing {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}</motion.div>
+                    <motion.div className="results-info" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>{t('events.showing')} {filteredEvents.length} {filteredEvents.length !== 1 ? t('events.events') : t('events.event')}</motion.div>
                 )}
             </div>
         </motion.div>

@@ -662,6 +662,20 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
+    .seat-row > .row-label:first-child {
+        position: relative;
+        left: auto;
+        background: none;
+        padding-right: 4px;
+    }
+
+    .seat-row > .row-label:last-child {
+        position: relative;
+        right: auto;
+        background: none;
+        padding-left: 4px;
+    }
+
     .seat-selector {
         padding: 0;
         width: 100%;

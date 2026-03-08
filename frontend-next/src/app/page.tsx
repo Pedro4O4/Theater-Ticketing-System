@@ -12,6 +12,7 @@ import '../app/globals.css';
 import '@/components/homepage/Homepage.css';
 import { Event } from '@/types/event';
 import { useAuth } from '@/auth/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import EventCard from '@/components/Event Components/EventCard';
 
 const Homepage: React.FC = () => {
@@ -20,6 +21,7 @@ const Homepage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
 
   const { ref: statsRef, inView: statsInView } = useInView({
     triggerOnce: true,
@@ -63,12 +65,12 @@ const Homepage: React.FC = () => {
         backgroundRepeat: 'no-repeat'
       }}>
         <div className="hero-content" data-aos="fade-up">
-          <h1 className="hero-title" data-aos="fade-down" data-aos-delay="200">Experience the Magic of Live Performance</h1>
-          <p className="hero-subtitle" data-aos="fade-up" data-aos-delay="400">Discover extraordinary events that will leave you breathless</p>
+          <h1 className="hero-title" data-aos="fade-down" data-aos-delay="200">{t('home.hero.title')}</h1>
+          <p className="hero-subtitle" data-aos="fade-up" data-aos-delay="400">{t('home.hero.subtitle')}</p>
           <div className="hero-buttons" data-aos="zoom-in" data-aos-delay="600">
-            <Link href="/events" className="btn-primary-hero">Browse Events</Link>
+            <Link href="/events" className="btn-primary-hero">{t('home.hero.browse')}</Link>
             {!authLoading && !isAuthenticated && (
-              <Link href="/register" className="btn-secondary-hero">Get Started</Link>
+              <Link href="/register" className="btn-secondary-hero">{t('home.hero.start')}</Link>
             )}
           </div>
         </div>
@@ -79,60 +81,60 @@ const Homepage: React.FC = () => {
           <div className="stat-item" data-aos="flip-left" data-aos-delay="100">
             <FaTicketAlt className="stat-icon" />
             <h3>{statsInView ? <CountUp end={50000} duration={2.5} separator="," /> : '0'}</h3>
-            <p>Tickets Sold</p>
+            <p>{t('home.stats.tickets')}</p>
           </div>
           <div className="stat-item" data-aos="flip-left" data-aos-delay="200">
             <FaUsers className="stat-icon" />
             <h3>{statsInView ? <CountUp end={10000} duration={2.5} separator="," /> : '0'}+</h3>
-            <p>Happy Customers</p>
+            <p>{t('home.stats.customers')}</p>
           </div>
           <div className="stat-item" data-aos="flip-left" data-aos-delay="300">
             <FaCalendarAlt className="stat-icon" />
             <h3>{statsInView ? <CountUp end={500} duration={2.5} /> : '0'}+</h3>
-            <p>Events Hosted</p>
+            <p>{t('home.stats.events')}</p>
           </div>
           <div className="stat-item" data-aos="flip-left" data-aos-delay="400">
             <FaStar className="stat-icon" />
             <h3>{statsInView ? <CountUp end={4.8} duration={2.5} decimals={1} /> : '0'}</h3>
-            <p>Average Rating</p>
+            <p>{t('home.stats.rating')}</p>
           </div>
         </div>
       </section>
 
       <section className="features-section" data-aos="fade-up">
-        <h2 className="section-title" data-aos="fade-down" data-aos-duration="1000">Why Choose EventTix?</h2>
+        <h2 className="section-title" data-aos="fade-down" data-aos-duration="1000">{t('home.features.title')}</h2>
         <div className="features-grid">
           <div className="feature-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
             <div className="feature-icon"><FaTheaterMasks /></div>
-            <h3>Premium Events</h3>
-            <p>Access to the most exclusive and highly-rated events in your area</p>
+            <h3>{t('home.features.premium')}</h3>
+            <p>{t('home.features.premium.desc')}</p>
           </div>
           <div className="feature-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
             <div className="feature-icon"><FaTrophy /></div>
-            <h3>Best Prices</h3>
-            <p>Competitive pricing with no hidden fees. What you see is what you pay</p>
+            <h3>{t('home.features.prices')}</h3>
+            <p>{t('home.features.prices.desc')}</p>
           </div>
           <div className="feature-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
             <div className="feature-icon"><FaMusic /></div>
-            <h3>Diverse Selection</h3>
-            <p>From concerts to theater, sports to festivals - we have it all</p>
+            <h3>{t('home.features.diverse')}</h3>
+            <p>{t('home.features.diverse.desc')}</p>
           </div>
           <div className="feature-card" data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
             <div className="feature-icon"><FaPalette /></div>
-            <h3>Easy Booking</h3>
-            <p>Simple, fast, and secure booking process in just a few clicks</p>
+            <h3>{t('home.features.booking')}</h3>
+            <p>{t('home.features.booking.desc')}</p>
           </div>
         </div>
       </section>
 
       <section className="featured-section" data-aos="fade-up">
-        <h2 className="section-title" data-aos="fade-down">Featured Shows</h2>
+        <h2 className="section-title" data-aos="fade-down">{t('home.featured.title')}</h2>
         {loading ? (
-          <div className="loading-indicator" style={{ textAlign: 'center', padding: '2rem' }}>Loading events...</div>
+          <div className="loading-indicator" style={{ textAlign: 'center', padding: '2rem' }}>{t('home.featured.loading')}</div>
         ) : error ? (
           <div className="error-message">{error}</div>
         ) : featuredEvents.length === 0 ? (
-          <div className="no-events-message">No events available at the moment.</div>
+          <div className="no-events-message">{t('home.featured.empty')}</div>
         ) : (
           <div className="events-grid">
             {featuredEvents.map((event, index) => (

@@ -1,17 +1,31 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthContext';
+import { useLanguage, Language } from '@/contexts/LanguageContext';
 
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
     const { user, isAuthenticated, isAdmin, isOrganizer, logout } = useAuth();
+    const { language, setLanguage, t } = useLanguage();
     const router = useRouter();
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [showLangMenu, setShowLangMenu] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    const langRef = useRef<HTMLDivElement>(null);
+    const navMenuRef = useRef<HTMLDivElement>(null);
+
+    // Sync user's saved language preference from backend
+    useEffect(() => {
+        const userLang = (user as any)?.language as Language | undefined;
+        if (userLang && (userLang === 'en' || userLang === 'ar') && userLang !== language) {
+            setLanguage(userLang);
+        }
+    }, [user]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -24,6 +38,20 @@ const Navbar: React.FC = () => {
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Close lang menu and dropdowns on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (langRef.current && !langRef.current.contains(e.target as Node)) {
+                setShowLangMenu(false);
+            }
+            if (navMenuRef.current && !navMenuRef.current.contains(e.target as Node)) {
+                setOpenDropdown(null);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     const handleLogoutClick = () => {
@@ -55,39 +83,42 @@ const Navbar: React.FC = () => {
                         <span className="logo-emoji">🎟️</span> Event Tickets
                     </Link>
 
-                    <div className="nav-menu">
-                        <Link href="/" className="nav-item">Home</Link>
+                    <div className="nav-menu" ref={navMenuRef}>
+                        <Link href="/" className="nav-item">{t('nav.home')}</Link>
 
                         {isAuthenticated ? (
                             <>
                                 {!isAdmin && !isOrganizer && (
-                                    <div className="nav-dropdown">
-                                        <span className="nav-item">User <i className="fas fa-caret-down"></i></span>
+                                    <div className={`nav-dropdown ${openDropdown === 'user' ? 'dropdown-open' : ''}`}
+                                         onClick={() => setOpenDropdown(openDropdown === 'user' ? null : 'user')}>
+                                        <span className="nav-item">{t('nav.user')} <i className="fas fa-caret-down"></i></span>
                                         <div className="dropdown-content">
-                                            <Link href="/events">Explore Events</Link>
-                                            <Link href="/bookings">My Bookings</Link>
+                                            <Link href="/events">{t('nav.explore')}</Link>
+                                            <Link href="/bookings">{t('nav.bookings')}</Link>
                                         </div>
                                     </div>
                                 )}
 
                                 {isOrganizer && (
-                                    <div className="nav-dropdown">
-                                        <span className="nav-item">Organizer <i className="fas fa-caret-down"></i></span>
+                                    <div className={`nav-dropdown ${openDropdown === 'organizer' ? 'dropdown-open' : ''}`}
+                                         onClick={() => setOpenDropdown(openDropdown === 'organizer' ? null : 'organizer')}>
+                                        <span className="nav-item">{t('nav.organizer')} <i className="fas fa-caret-down"></i></span>
                                         <div className="dropdown-content">
-                                            <Link href="/my-events">My Events</Link>
-                                            <Link href="/my-events/new">Create Event</Link>
-                                            <Link href="/my-events/analytics">Analytics</Link>
+                                            <Link href="/my-events">{t('nav.myEvents')}</Link>
+                                            <Link href="/my-events/new">{t('nav.createEvent')}</Link>
+                                            <Link href="/my-events/analytics">{t('nav.analytics')}</Link>
                                         </div>
                                     </div>
                                 )}
 
                                 {isAdmin && (
-                                    <div className="nav-dropdown">
-                                        <span className="nav-item">Admin <i className="fas fa-caret-down"></i></span>
+                                    <div className={`nav-dropdown ${openDropdown === 'admin' ? 'dropdown-open' : ''}`}
+                                         onClick={() => setOpenDropdown(openDropdown === 'admin' ? null : 'admin')}>
+                                        <span className="nav-item">{t('nav.admin')} <i className="fas fa-caret-down"></i></span>
                                         <div className="dropdown-content">
-                                            <Link href="/admin/events">Manage Events</Link>
-                                            <Link href="/admin/users">Manage Users</Link>
-                                            <Link href="/admin/theaters">Manage Theaters</Link>
+                                            <Link href="/admin/events">{t('nav.manageEvents')}</Link>
+                                            <Link href="/admin/users">{t('nav.manageUsers')}</Link>
+                                            <Link href="/admin/theaters">{t('nav.manageTheaters')}</Link>
                                         </div>
                                     </div>
                                 )}
@@ -100,16 +131,47 @@ const Navbar: React.FC = () => {
                                             {user?.name?.charAt(0)?.toUpperCase() || '?'}
                                         </div>
                                     )}
-                                    <span>Profile</span>
+                                    <span>{t('nav.profile')}</span>
                                 </Link>
-                                <button className="logout-btn" onClick={handleLogoutClick}>Logout</button>
+                                <button className="logout-btn" onClick={handleLogoutClick}>{t('nav.logout')}</button>
                             </>
                         ) : (
                             <>
-                                <Link href="/login" className="nav-item">Login</Link>
-                                <Link href="/register" className="nav-item">Register</Link>
+                                <Link href="/login" className="nav-item">{t('nav.login')}</Link>
+                                <Link href="/register" className="nav-item">{t('nav.register')}</Link>
                             </>
                         )}
+
+                        {/* ── Language toggle ── */}
+                        <div className="lang-toggle" ref={langRef}>
+                            <button
+                                className="lang-btn"
+                                onClick={() => setShowLangMenu(v => !v)}
+                                aria-label="Switch language"
+                            >
+                                🌐 {language === 'ar' ? 'ع' : 'EN'}
+                            </button>
+                            {showLangMenu && (
+                                <div className="lang-dropdown">
+                                    <button
+                                        className={`lang-option ${language === 'en' ? 'active' : ''}`}
+                                        onClick={() => { setLanguage('en'); setShowLangMenu(false); }}
+                                    >
+                                        <span className="lang-flag">🇬🇧</span>
+                                        {t('lang.en')}
+                                        {language === 'en' && ' ✓'}
+                                    </button>
+                                    <button
+                                        className={`lang-option ${language === 'ar' ? 'active' : ''}`}
+                                        onClick={() => { setLanguage('ar'); setShowLangMenu(false); }}
+                                    >
+                                        <span className="lang-flag">🇸🇦</span>
+                                        {t('lang.ar')}
+                                        {language === 'ar' && ' ✓'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -117,22 +179,22 @@ const Navbar: React.FC = () => {
             {showLogoutDialog && (
                 <div className="logout-dialog-overlay">
                     <div className="logout-dialog">
-                        <h3>Logout Confirmation</h3>
-                        <p>Are you sure you want to logout?</p>
+                        <h3>{t('logout.title')}</h3>
+                        <p>{t('logout.confirm')}</p>
                         <div className="logout-dialog-buttons">
                             <button
                                 className="logout-confirm-btn"
                                 onClick={confirmLogout}
                                 disabled={isLoggingOut}
                             >
-                                {isLoggingOut ? 'Logging out...' : 'Yes'}
+                                {isLoggingOut ? t('logout.loading') : t('logout.yes')}
                             </button>
                             <button
                                 className="logout-cancel-btn"
                                 onClick={cancelLogout}
                                 disabled={isLoggingOut}
                             >
-                                No
+                                {t('logout.no')}
                             </button>
                         </div>
                     </div>
