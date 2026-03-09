@@ -524,7 +524,7 @@ const CreateUserPage = () => {
                         color: 'var(--text-secondary)'
                     }}>
                         {formData.role === 'Scanner' ? (
-                            <><strong style={{ color: '#10b981' }}>Scanner Note:</strong> Scanners log in with <code>$username</code> and their password. No email or OTP verification needed.</>
+                            <><strong style={{ color: '#10b981' }}>Scanner Note:</strong> Scanners log in with <code>$username</code> and their password. <br /><strong>Important:</strong> Do NOT type the <code>$</code> prefix in the username field above; it is added automatically during login.</>
                         ) : (
                             <><strong style={{ color: '#667eea' }}>Note:</strong> The password you enter is temporary. When the user logs in, they will be prompted to set their own password and verify via OTP.</>
                         )}

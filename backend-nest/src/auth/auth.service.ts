@@ -134,6 +134,12 @@ export class AuthService {
         if (isUsernameLogin) {
             const username = email.substring(1); // Remove the $ prefix
             user = await this.usersService.findOneByUsername(username);
+
+            // Fallback: search for the full string in case it was stored with the $ prefix
+            if (!user) {
+                user = await this.usersService.findOneByUsername(email);
+            }
+
             if (!user) {
                 throw new NotFoundException('Username not found');
             }

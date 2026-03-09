@@ -23,7 +23,9 @@ export class UsersService {
     }
 
     async findOneByUsername(username: string): Promise<UserDocument | null> {
-        return this.userModel.findOne({ username }).exec();
+        return this.userModel.findOne({
+            username: { $regex: new RegExp(`^${username}$`, 'i') },
+        }).exec();
     }
 
     async findById(id: string): Promise<UserDocument> {
@@ -114,7 +116,8 @@ export class UsersService {
             if (!username) {
                 throw new BadRequestException('Scanner accounts require a username');
             }
-            const existingScanner = await this.findOneByUsername(username);
+            const sanitizedUsername = username.startsWith('$') ? username.substring(1) : username;
+            const existingScanner = await this.findOneByUsername(sanitizedUsername);
             if (existingScanner) {
                 throw new ConflictException('Scanner with this username already exists');
             }
@@ -122,7 +125,7 @@ export class UsersService {
             const hashedPassword = await bcrypt.hash(password, 10);
             const newScanner = new this.userModel({
                 name,
-                username,
+                username: sanitizedUsername,
                 password: hashedPassword,
                 role: UserRole.SCANNER,
                 isVerified: true,
