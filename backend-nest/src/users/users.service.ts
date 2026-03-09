@@ -23,8 +23,10 @@ export class UsersService {
     }
 
     async findOneByUsername(username: string): Promise<UserDocument | null> {
+        if (!username) return null;
+        const escapedUsername = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return this.userModel.findOne({
-            username: { $regex: new RegExp(`^${username}$`, 'i') },
+            username: { $regex: new RegExp(`^${escapedUsername}$`, 'i') },
         }).exec();
     }
 
