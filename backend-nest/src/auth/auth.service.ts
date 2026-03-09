@@ -127,9 +127,21 @@ export class AuthService {
     async login(loginDto: any) {
         const { email, password } = loginDto;
 
-        const user = await this.usersService.findOneByEmail(email);
-        if (!user) {
-            throw new NotFoundException('Email not found');
+        // Check if this is a username-based login (starts with $)
+        const isUsernameLogin = email && email.startsWith('$');
+        let user;
+
+        if (isUsernameLogin) {
+            const username = email.substring(1); // Remove the $ prefix
+            user = await this.usersService.findOneByUsername(username);
+            if (!user) {
+                throw new NotFoundException('Username not found');
+            }
+        } else {
+            user = await this.usersService.findOneByEmail(email);
+            if (!user) {
+                throw new NotFoundException('Email not found');
+            }
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
@@ -141,30 +153,33 @@ export class AuthService {
             throw new ForbiddenException('Your account has been blocked. Please contact support.');
         }
 
-        // Admin-created users must change password on first login
-        if (user.requiresPasswordChange) {
-            throw new ForbiddenException({
-                message: 'Please set your own password.',
-                requiresPasswordChange: true,
-                email: email,
-            });
-        }
+        // Scanners skip password change and verification checks
+        if (user.role !== UserRole.SCANNER) {
+            // Admin-created users must change password on first login
+            if (user.requiresPasswordChange) {
+                throw new ForbiddenException({
+                    message: 'Please set your own password.',
+                    requiresPasswordChange: true,
+                    email: email,
+                });
+            }
 
-        if (!user.isVerified) {
-            const otp = Math.floor(100000 + Math.random() * 900000).toString();
-            const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+            if (!user.isVerified) {
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-            user.otp = otp;
-            user.otpExpires = otpExpires;
-            await user.save();
+                user.otp = otp;
+                user.otpExpires = otpExpires;
+                await user.save();
 
-            await this.mailService.sendVerificationOTP(email, otp);
+                await this.mailService.sendVerificationOTP(user.email, otp);
 
-            throw new ForbiddenException({
-                message:
-                    'Account not verified. A new verification code has been sent to your email.',
-                requiresVerification: true,
-            });
+                throw new ForbiddenException({
+                    message:
+                        'Account not verified. A new verification code has been sent to your email.',
+                    requiresVerification: true,
+                });
+            }
         }
 
         const payload = { sub: user._id, role: user.role };
@@ -175,13 +190,14 @@ export class AuthService {
             token,
             user: {
                 _id: user._id,
-                name: user.name,
-                email: user.email,
+                name: user.role === UserRole.SCANNER ? `$${user.name}` : user.name,
+                email: user.email || '',
                 role: user.role,
                 phone: (user as any).phone,
                 profilePicture: user.profilePicture,
                 instapayNumber: (user as any).instapayNumber,
                 instapayQR: (user as any).instapayQR,
+                username: (user as any).username,
             },
         };
     }

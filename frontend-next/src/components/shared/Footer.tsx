@@ -21,15 +21,7 @@ const Footer: React.FC = () => {
                     <ul>
                         <li><Link href="/">{t('footer.link.events')}</Link></li>
                         <li><Link href="/about">{t('footer.link.about')}</Link></li>
-                        <li><Link href="/contact">{t('footer.link.contact')}</Link></li>
                     </ul>
-                </div>
-
-                <div className="footer-section">
-                    <h3>{t('footer.contactUs')}</h3>
-                    <p>Email: bebonageh68@gmail.com</p>
-                    <p>Phone: 01221627432</p>
-                    <p>Address: 12 st.mary rod al farag Street, City, Country</p>
                 </div>
 
                 <div className="footer-section">

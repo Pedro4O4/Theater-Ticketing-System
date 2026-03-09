@@ -1,0 +1,254 @@
+/* Scanner Dashboard Styles */
+
+.scanner-dashboard {
+    min-height: 100vh;
+    background: #0d0d12;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.scanner-dash-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 20% 20%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.scanner-dash-container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+/* Header */
+.scanner-dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: rgba(21, 21, 28, 0.9);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 16px;
+    margin-bottom: 28px;
+    backdrop-filter: blur(20px);
+}
+
+.scanner-dash-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.scanner-dash-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.scanner-dash-header h1 {
+    color: #f8fafc;
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.scanner-dash-header p {
+    color: #10b981;
+    font-size: 0.85rem;
+    margin: 2px 0 0;
+    font-weight: 500;
+}
+
+.scanner-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    color: #f87171;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.scanner-logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Section Title */
+.scanner-dash-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #f8fafc;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+/* Loading */
+.scanner-dash-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: #94a3b8;
+}
+
+.scanner-dash-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(16, 185, 129, 0.2);
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.scanner-dash-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    text-align: center;
+    color: #64748b;
+}
+
+.scanner-dash-empty h3 {
+    color: #f8fafc;
+    margin: 16px 0 8px;
+}
+
+/* Events Grid */
+.scanner-events-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scanner-event-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: rgba(21, 21, 28, 0.8);
+    border: 1px solid rgba(16, 185, 129, 0.12);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    gap: 16px;
+}
+
+.scanner-event-card:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.08);
+}
+
+.scanner-event-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.scanner-event-title {
+    color: #f8fafc;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scanner-event-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.scanner-event-detail {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+}
+
+/* Scan Button */
+.scanner-scan-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.scanner-scan-btn:hover {
+    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .scanner-dashboard {
+        padding: 12px;
+    }
+
+    .scanner-dash-header {
+        flex-direction: column;
+        gap: 14px;
+        text-align: center;
+    }
+
+    .scanner-dash-header-left {
+        flex-direction: column;
+    }
+
+    .scanner-event-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .scanner-event-details {
+        justify-content: center;
+    }
+
+    .scanner-scan-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

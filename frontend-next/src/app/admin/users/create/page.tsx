@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     FiArrowLeft, FiUserPlus, FiMail, FiLock, FiUser,
-    FiShield, FiStar, FiCheck, FiAlertCircle, FiUpload, FiX
+    FiShield, FiStar, FiCheck, FiAlertCircle, FiUpload, FiX, FiCamera
 } from 'react-icons/fi';
 import api from '@/services/api';
 import { toast } from 'react-toastify';
@@ -14,6 +14,7 @@ import '@/components/AdminComponent/AdminUsersPage.css';
 const ROLES = [
     { value: 'Organizer', label: 'Organizer', icon: FiStar, color: '#f59e0b' },
     { value: 'System Admin', label: 'System Admin', icon: FiShield, color: '#ef4444' },
+    { value: 'Scanner', label: 'Scanner', icon: FiCamera, color: '#10b981' },
 ];
 
 const CreateUserPage = () => {
@@ -21,6 +22,7 @@ const CreateUserPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        username: '',
         password: '',
         confirmPassword: '',
         role: 'Organizer',
@@ -85,10 +87,6 @@ const CreateUserPage = () => {
             setError('Name is required');
             return;
         }
-        if (!formData.email.trim()) {
-            setError('Email is required');
-            return;
-        }
         if (!formData.password) {
             setError('Password is required');
             return;
@@ -101,16 +99,29 @@ const CreateUserPage = () => {
             setError('Passwords do not match');
             return;
         }
+        // Scanner-specific validation
+        if (formData.role === 'Scanner') {
+            if (!formData.username.trim()) {
+                setError('Username is required for scanners');
+                return;
+            }
+        } else {
+            // Email and phone required for non-Scanner roles
+            if (!formData.email.trim()) {
+                setError('Email is required');
+                return;
+            }
 
-        // Validate phone
-        if (!formData.phone.trim()) {
-            setError('Phone is required');
-            return;
-        }
-        const phone = formData.phone.trim();
-        if (!/^01\d{9}$/.test(phone)) {
-            setError('Phone number must be 11 digits starting with 01');
-            return;
+            // Validate phone
+            if (!formData.phone.trim()) {
+                setError('Phone is required');
+                return;
+            }
+            const phone = formData.phone.trim();
+            if (!/^01\d{9}$/.test(phone)) {
+                setError('Phone number must be 11 digits starting with 01');
+                return;
+            }
         }
 
         // Validate InstaPay
@@ -131,14 +142,19 @@ const CreateUserPage = () => {
             setLoading(true);
             const payload: any = {
                 name: formData.name.trim(),
-                email: formData.email.trim(),
                 password: formData.password,
                 role: formData.role,
-                phone: phone
             };
-            if (formData.role === 'Organizer') {
-                payload.instapayNumber = instapayNumber;
-                if (formData.instapayQR) payload.instapayQR = formData.instapayQR;
+
+            if (formData.role === 'Scanner') {
+                payload.username = formData.username.trim();
+            } else {
+                payload.email = formData.email.trim();
+                payload.phone = formData.phone.trim();
+                if (formData.role === 'Organizer') {
+                    payload.instapayNumber = instapayNumber;
+                    if (formData.instapayQR) payload.instapayQR = formData.instapayQR;
+                }
             }
 
             const response = await api.post('/user/create', payload);
@@ -209,7 +225,7 @@ const CreateUserPage = () => {
                         <label style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-secondary)' }}>
                             Select Role *
                         </label>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                             {ROLES.map(role => {
                                 const RoleIcon = role.icon;
                                 const isSelected = formData.role === role.value;
@@ -269,53 +285,83 @@ const CreateUserPage = () => {
                         />
                     </div>
 
-                    {/* Email Field */}
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
-                            <FiMail style={{ marginRight: '0.5rem' }} />
-                            Email Address *
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="Enter email address"
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem 1rem',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                color: 'white',
-                                fontSize: '1rem'
-                            }}
-                        />
-                    </div>
+                    {/* Username Field (Scanner Only) */}
+                    {formData.role === 'Scanner' && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
+                                <FiUser style={{ marginRight: '0.5rem' }} />
+                                Username *
+                            </label>
+                            <input
+                                type="text"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                placeholder="Enter scanner username"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    color: 'white',
+                                    fontSize: '1rem'
+                                }}
+                            />
+                        </div>
+                    )}
 
-                    {/* Phone Field */}
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
-                            <span style={{ marginRight: '0.5rem' }}>📞</span>
-                            Phone Number *
-                        </label>
-                        <input
-                            type="text"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="01xxxxxxxxx"
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem 1rem',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                color: 'white',
-                                fontSize: '1rem'
-                            }}
-                        />
-                    </div>
+                    {/* Email Field (Not for Scanner) */}
+                    {formData.role !== 'Scanner' && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
+                                <FiMail style={{ marginRight: '0.5rem' }} />
+                                Email Address *
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Enter email address"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    color: 'white',
+                                    fontSize: '1rem'
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Phone Field (Not for Scanner) */}
+                    {formData.role !== 'Scanner' && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
+                                <span style={{ marginRight: '0.5rem' }}>📞</span>
+                                Phone Number *
+                            </label>
+                            <input
+                                type="text"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                placeholder="01xxxxxxxxx"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    color: 'white',
+                                    fontSize: '1rem'
+                                }}
+                            />
+                        </div>
+                    )}
 
                     {/* InstaPay Fields (Organizer Only) */}
                     {formData.role === 'Organizer' && (
@@ -471,13 +517,17 @@ const CreateUserPage = () => {
                     <div style={{
                         padding: '1rem',
                         borderRadius: '8px',
-                        background: 'rgba(102, 126, 234, 0.1)',
-                        border: '1px solid rgba(102, 126, 234, 0.2)',
+                        background: formData.role === 'Scanner' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(102, 126, 234, 0.1)',
+                        border: formData.role === 'Scanner' ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(102, 126, 234, 0.2)',
                         marginBottom: '1.5rem',
                         fontSize: '0.9rem',
                         color: 'var(--text-secondary)'
                     }}>
-                        <strong style={{ color: '#667eea' }}>Note:</strong> The password you enter is temporary. When the user logs in, they will be prompted to set their own password and verify via OTP.
+                        {formData.role === 'Scanner' ? (
+                            <><strong style={{ color: '#10b981' }}>Scanner Note:</strong> Scanners log in with <code>$username</code> and their password. No email or OTP verification needed.</>
+                        ) : (
+                            <><strong style={{ color: '#667eea' }}>Note:</strong> The password you enter is temporary. When the user logs in, they will be prompted to set their own password and verify via OTP.</>
+                        )}
                     </div>
 
                     {/* Submit Button */}

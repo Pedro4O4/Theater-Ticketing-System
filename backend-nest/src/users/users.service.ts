@@ -22,6 +22,10 @@ export class UsersService {
         return this.userModel.findOne({ email }).exec();
     }
 
+    async findOneByUsername(username: string): Promise<UserDocument | null> {
+        return this.userModel.findOne({ username }).exec();
+    }
+
     async findById(id: string): Promise<UserDocument> {
         const user = await this.userModel.findById(id).exec();
         if (!user) {
@@ -98,13 +102,36 @@ export class UsersService {
     }
 
     async createUserByAdmin(createDto: any): Promise<UserDocument> {
-        const { email, password, name, role, phone, instapayNumber, instapayQR } = createDto;
+        const { email, password, name, role, phone, instapayNumber, instapayQR, username } = createDto;
 
-        // Only allow Admin or Organizer roles
-        if (role !== UserRole.ADMIN && role !== UserRole.ORGANIZER) {
-            throw new BadRequestException('Admin can only create Admin or Organizer accounts');
+        // Allow Admin, Organizer, or Scanner roles
+        if (role !== UserRole.ADMIN && role !== UserRole.ORGANIZER && role !== UserRole.SCANNER) {
+            throw new BadRequestException('Admin can only create Admin, Organizer, or Scanner accounts');
         }
 
+        // Scanner uses username, others use email
+        if (role === UserRole.SCANNER) {
+            if (!username) {
+                throw new BadRequestException('Scanner accounts require a username');
+            }
+            const existingScanner = await this.findOneByUsername(username);
+            if (existingScanner) {
+                throw new ConflictException('Scanner with this username already exists');
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newScanner = new this.userModel({
+                name,
+                username,
+                password: hashedPassword,
+                role: UserRole.SCANNER,
+                isVerified: true,
+                requiresPasswordChange: false,
+            });
+            return newScanner.save();
+        }
+
+        // Regular admin/organizer creation (email-based)
         const existingUser = await this.findOneByEmail(email);
         if (existingUser) {
             throw new ConflictException('User with this email already exists');

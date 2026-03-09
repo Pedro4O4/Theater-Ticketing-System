@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiUsers, FiShield, FiStar, FiUser, FiSearch,
     FiEdit2, FiTrash2, FiX, FiAlertCircle,
-    FiGrid, FiCalendar, FiRefreshCw
+    FiGrid, FiCalendar, FiRefreshCw, FiCamera
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import api from '@/services/api';
@@ -45,6 +45,12 @@ const ROLE_CONFIG: RoleConfig = {
         color: '#22d3ee',
         bgColor: 'rgba(34, 211, 238, 0.15)',
         borderColor: 'rgba(34, 211, 238, 0.3)'
+    },
+    'Scanner': {
+        icon: FiCamera,
+        color: '#10b981',
+        bgColor: 'rgba(16, 185, 129, 0.15)',
+        borderColor: 'rgba(16, 185, 129, 0.3)'
     }
 };
 
@@ -58,7 +64,7 @@ interface User {
     profilePicture?: string;
 }
 
-type TabType = 'all' | 'admins' | 'organizers' | 'users';
+type TabType = 'all' | 'admins' | 'organizers' | 'users' | 'scanners';
 
 const AdminUsersPage = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -129,7 +135,8 @@ const AdminUsersPage = () => {
             const roleMap: { [key: string]: string } = {
                 admins: 'System Admin',
                 organizers: 'Organizer',
-                users: 'Standard User'
+                users: 'Standard User',
+                scanners: 'Scanner'
             };
             filtered = filtered.filter(u => u.role === roleMap[activeTab]);
         }
@@ -150,7 +157,8 @@ const AdminUsersPage = () => {
             total: users.length,
             admins: users.filter(u => u.role === 'System Admin').length,
             organizers: users.filter(u => u.role === 'Organizer').length,
-            users: users.filter(u => u.role === 'Standard User').length
+            users: users.filter(u => u.role === 'Standard User').length,
+            scanners: users.filter(u => u.role === 'Scanner').length
         };
     }, [users]);
 
@@ -247,6 +255,13 @@ const AdminUsersPage = () => {
                         <span className="stat-label">Standard Users</span>
                     </div>
                 </div>
+                <div className="stat-card scanners">
+                    <FiCamera className="stat-icon" />
+                    <div className="stat-info">
+                        <span className="stat-value">{userStats.scanners}</span>
+                        <span className="stat-label">Scanners</span>
+                    </div>
+                </div>
             </motion.div>
 
             <motion.div
@@ -294,6 +309,12 @@ const AdminUsersPage = () => {
                         onClick={() => setActiveTab('users')}
                     >
                         <FiUser /> Users ({userStats.users})
+                    </button>
+                    <button
+                        className={`tab-btn scanners ${activeTab === 'scanners' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('scanners')}
+                    >
+                        <FiCamera /> Scanners ({userStats.scanners})
                     </button>
                 </div>
             </motion.div>

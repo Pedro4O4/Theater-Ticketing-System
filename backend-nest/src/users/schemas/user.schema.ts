@@ -7,6 +7,7 @@ export enum UserRole {
     STANDARD = 'Standard User',
     ORGANIZER = 'Organizer',
     ADMIN = 'System Admin',
+    SCANNER = 'Scanner',
 }
 
 @Schema({ timestamps: true })
@@ -14,8 +15,11 @@ export class User {
     @Prop({ required: true, minlength: 3, maxlength: 30 })
     name: string;
 
-    @Prop({ required: true, unique: true })
+    @Prop({ required: false, unique: true, sparse: true })
     email: string;
+
+    @Prop({ required: false, unique: true, sparse: true })
+    username: string;
 
     @Prop()
     phone: string;
@@ -59,3 +63,4 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+

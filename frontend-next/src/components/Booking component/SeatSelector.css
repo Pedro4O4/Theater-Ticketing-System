@@ -685,11 +685,13 @@
     .seat-selector {
         padding: 0;
         width: 100%;
+        max-width: 100vw;
         border-radius: 0;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         backdrop-filter: none;
+        overflow: hidden;
     }
 
     .section,
@@ -708,31 +710,30 @@
     .theater-frame {
         border-radius: 0;
         margin: 0;
-        overflow: visible;
+        overflow: hidden;
         width: 100%;
+        max-width: 100vw;
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
     }
 
     .theater-canvas-container {
-        padding: 0 8px !important;
+        padding: 0 !important;
         width: 100% !important;
+        max-width: 100vw !important;
         margin: 0 !important;
-        overflow-x: auto !important;
-        display: flex !important;
+        overflow: hidden !important;
+        display: block !important;
         background: transparent !important;
-        -webkit-overflow-scrolling: touch;
     }
 
     .theater-canvas {
-        /* transform-origin stays as inline 'top center' to match label calc(50% + Xpx) positioning */
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         margin: 0 !important;
-        align-items: center !important;
     }
 
     .stage {

@@ -63,7 +63,12 @@ export default function LoginForm() {
 
             if (result.success) {
                 toast.success("Login successful!");
-                router.push("/events");
+                // Redirect scanners to scanner dashboard
+                if (result.user?.role === 'Scanner') {
+                    router.push("/scanner");
+                } else {
+                    router.push("/events");
+                }
             } else if (result.requiresPasswordChange) {
                 toast.info("Please set your own password");
                 router.push(`/set-password?email=${encodeURIComponent(result.email)}`);
@@ -162,9 +167,9 @@ export default function LoginForm() {
                             </label>
                             <div className="input-container">
                                 <input
-                                    type="email"
+                                    type="text"
                                     name="email"
-                                    placeholder={t('login.email.placeholder')}
+                                    placeholder={t('login.email.placeholder') + ' or $username'}
                                     className="form-input"
                                     value={formData.email}
                                     onChange={handleChange}

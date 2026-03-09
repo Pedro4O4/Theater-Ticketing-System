@@ -64,6 +64,7 @@ const UpdateUserRoleModal: React.FC<UpdateUserRoleModalProps> = ({ isOpen, user,
                             <option value="System Admin">System Admin</option>
                             <option value="Organizer">Organizer</option>
                             <option value="Standard User">Standard User</option>
+                            <option value="Scanner">Scanner</option>
                         </select>
                     </div>
 

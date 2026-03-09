@@ -19,6 +19,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isAdmin: boolean;
     isOrganizer: boolean;
+    isScanner: boolean;
     login: (credentials: { email: string; password: string }) => Promise<LoginResult>;
     logout: () => Promise<{ success: boolean; error?: string }>;
     updateUser: (userData: Partial<User>) => void;
@@ -132,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             isAuthenticated: authenticated,
             isAdmin: user?.role === 'System Admin',
             isOrganizer: user?.role === 'Organizer',
+            isScanner: user?.role === 'Scanner',
             login,
             logout,
             updateUser,

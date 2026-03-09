@@ -162,17 +162,21 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             const container = canvasRef.current.parentElement;
             if (!container) return;
 
-            // Temporarily reset scale to measure natural canvas width & height
+            // Temporarily reset scale AND make canvas absolute so it doesn't inflate parent width
             const originalTransform = canvasRef.current.style.transform;
+            const originalPosition = canvasRef.current.style.position;
             canvasRef.current.style.transform = 'scale(1)';
+            canvasRef.current.style.position = 'absolute';
             const canvasWidth = canvasRef.current.scrollWidth || canvasRef.current.offsetWidth;
             const canvasHeight = canvasRef.current.scrollHeight || canvasRef.current.offsetHeight;
             canvasRef.current.style.transform = originalTransform;
+            canvasRef.current.style.position = originalPosition;
 
             if (canvasWidth === 0) return;
 
-            // Use container width for accurate measurement (respects browser zoom)
-            const availableWidth = container.clientWidth - 16;
+            // On mobile, always use viewport width to avoid inflated measurements
+            const isMobile = window.innerWidth <= 768;
+            const availableWidth = isMobile ? window.innerWidth : Math.min(container.clientWidth, window.innerWidth);
 
             // Final scale: allow as low as 0.3 for very zoomed-out views,
             // cap at 1.0 — never upscale beyond natural size
@@ -402,7 +406,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
                 <div className="theater-canvas-container" ref={containerRef}>
                     <div className="theater-canvas" ref={canvasRef} style={{
                         transform: `scale(${scale})`,
-                        transformOrigin: 'top center'
+                        transformOrigin: scale < 1 ? 'top left' : 'top center'
                     }}>
                         {/* Stage at top */}
                         {(theaterData?.layout.stage?.position || 'top') === 'top' && (

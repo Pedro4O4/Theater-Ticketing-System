@@ -105,18 +105,18 @@
 /* ===== Stats Grid ===== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .stat-card {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 20px;
+    gap: 12px;
+    padding: 14px 16px;
     background: rgba(30, 30, 50, 0.5);
-    border-radius: 14px;
+    border-radius: 12px;
     border: 1px solid rgba(139, 92, 246, 0.15);
     transition: all 0.3s ease;
 }
@@ -127,9 +127,9 @@
 }
 
 .stat-card .stat-icon {
-    font-size: 1.5rem;
-    padding: 12px;
-    border-radius: 10px;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 .stat-card.total .stat-icon {
@@ -152,19 +152,24 @@
     color: #22d3ee;
 }
 
+.stat-card.scanners .stat-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
 .stat-info {
     display: flex;
     flex-direction: column;
 }
 
 .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #f8fafc;
 }
 
 .stat-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #94a3b8;
 }
 
@@ -279,6 +284,12 @@
     color: #22d3ee;
 }
 
+.tab-btn.scanners.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #10b981;
+}
+
 /* ===== Error Banner ===== */
 .error-banner {
     display: flex;
@@ -327,18 +338,18 @@
 /* ===== Users Grid ===== */
 .users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
 }
 
 .user-card {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 20px;
+    gap: 12px;
+    padding: 12px 14px;
     background: rgba(30, 30, 50, 0.5);
     border: 1px solid rgba(139, 92, 246, 0.15);
-    border-radius: 14px;
+    border-radius: 12px;
     transition: all 0.3s ease;
 }
 
@@ -374,14 +385,14 @@
 }
 
 .user-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     background: linear-gradient(135deg, #8b5cf6, #6366f1);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     color: white;
     flex-shrink: 0;
@@ -400,19 +411,19 @@
 }
 
 .user-name {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: #f8fafc;
-    margin: 0 0 3px;
+    margin: 0 0 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .user-email {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #94a3b8;
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -435,8 +446,8 @@
 }
 
 .action-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
