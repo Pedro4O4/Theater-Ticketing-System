@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiUsers, FiShield, FiStar, FiUser, FiSearch,
     FiEdit2, FiTrash2, FiX, FiCheck, FiAlertCircle,
-    FiGrid, FiCalendar, FiRefreshCw, FiUserPlus, FiSlash, FiUnlock
+    FiGrid, FiCalendar, FiRefreshCw, FiUserPlus, FiSlash, FiUnlock, FiEye
 } from 'react-icons/fi';
 import UpdateUserRoleModal from '@/components/AdminComponent/UpdateUserRoleModal';
 import ConfirmationDialog from "@/components/AdminComponent/ConfirmationDialog";
@@ -211,11 +211,11 @@ const AdminUsersPage = () => {
                                     </div>
                                     <div className="user-info">
                                         <h3 className="user-name">{userData.name}</h3>
-                                        <p className="user-email">{userData.email}</p>
                                         <div className="role-badge" style={{ background: roleConfig.bgColor, borderColor: roleConfig.borderColor, color: roleConfig.color }}><RoleIcon /><span>{userData.role}</span></div>
                                         {userData.isBlocked && <div className="blocked-badge"><FiSlash /><span>Blocked</span></div>}
                                     </div>
                                     <div className="user-actions">
+                                        <Link href={`/admin/users/${userData._id}`} className="action-btn" title="View Details" style={{ width: 'auto', padding: '0 12px', gap: '6px', color: '#c4b5fd', borderColor: 'rgba(139, 92, 246, 0.4)' }}><FiEye /> Details</Link>
                                         <button className="action-btn edit" onClick={() => handleEditClick(userData)} title="Edit Role"><FiEdit2 /></button>
                                         <button
                                             className={`action-btn ${userData.isBlocked ? 'unblock' : 'block'}`}

@@ -484,6 +484,25 @@ export class BookingsService implements OnModuleInit {
             .exec();
     }
 
+    async findAllForSpecificUser(targetUserId: string, requestingUser: any): Promise<BookingDocument[]> {
+        // Enforce admin check
+        if (requestingUser.role !== 'System Admin') {
+            throw new ForbiddenException('Only admins can view other users bookings');
+        }
+
+        return this.bookingModel
+            .find({ StandardId: targetUserId } as any)
+            .populate({
+                path: 'eventId',
+                populate: {
+                    path: 'organizerId',
+                    select: 'name instapayNumber instapayQR'
+                }
+            })
+            .sort({ createdAt: -1 })
+            .exec();
+    }
+
     async delete(id: string, userId: string): Promise<void> {
         const booking = await this.bookingModel.findById(id).exec();
         if (!booking) {

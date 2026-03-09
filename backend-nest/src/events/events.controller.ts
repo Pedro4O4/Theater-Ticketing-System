@@ -53,6 +53,13 @@ export class EventsController {
         return { success: true, data };
     }
 
+    @Get('organizer/:id/events')
+    @UseGuards(JwtAuthGuard)
+    async getOrganizerEventsById(@Param('id') id: string) {
+        const data = await this.eventsService.findByOrganizer(id);
+        return { success: true, data };
+    }
+
     @Get('organizer/analytics')
     @UseGuards(JwtAuthGuard)
     async getOrganizerAnalytics(@Req() req: any) {

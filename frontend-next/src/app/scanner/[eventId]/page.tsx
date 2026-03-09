@@ -160,39 +160,43 @@ const ScannerEventPage = () => {
 
     return (
         <ProtectedRoute requiredRole="Scanner">
-            <div className="scanner-page">
-                <div className="scanner-bg-effect"></div>
+            <div className="scanner-dashboard">
+                <div className="scanner-dash-bg"></div>
 
-                <div className="scanner-container">
+                <div className="scanner-dash-container">
                     {/* Header */}
-                    <div className="scanner-header">
-                        <button
-                            className="scanner-back-btn"
-                            onClick={() => router.push('/scanner')}
-                        >
-                            <FiArrowLeft size={18} /> Back to Events
-                        </button>
-
-                        <h1>📷 QR Code Scanner</h1>
-                        <h2>{eventTitle}</h2>
+                    <div className="scanner-dash-header" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <div className="scanner-dash-header-left" style={{ width: '100%', marginBottom: '15px' }}>
+                            <button
+                                className="scanner-logout-btn"
+                                onClick={() => router.push('/scanner')}
+                                style={{ padding: '8px 12px' }}
+                            >
+                                <FiArrowLeft size={16} /> Back
+                            </button>
+                            <div style={{ marginLeft: '10px' }}>
+                                <h1 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>📷 QR Code Scanner</h1>
+                                <p style={{ fontSize: '0.9rem', color: '#94a3b8', margin: 0 }}>{eventTitle}</p>
+                            </div>
+                        </div>
 
                         {stats && (
-                            <div className="scanner-stats">
-                                <div className="stat-item">
-                                    <span className="stat-number">{stats.total}</span>
-                                    <span className="stat-label">Total</span>
+                            <div className="scanner-dash-header-left" style={{ width: '100%', justifyContent: 'space-between', background: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '10px' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 'bold', color: '#f8fafc' }}>{stats.total}</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Total</span>
                                 </div>
-                                <div className="stat-item scanned">
-                                    <span className="stat-number">{stats.scanned}</span>
-                                    <span className="stat-label">Scanned</span>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 'bold', color: '#10b981' }}>{stats.scanned}</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Scanned</span>
                                 </div>
-                                <div className="stat-item remaining">
-                                    <span className="stat-number">{stats.remaining}</span>
-                                    <span className="stat-label">Remaining</span>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 'bold', color: '#f59e0b' }}>{stats.remaining}</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Remaining</span>
                                 </div>
-                                <div className="stat-item percentage">
-                                    <span className="stat-number">{stats.percentage}%</span>
-                                    <span className="stat-label">Progress</span>
+                                <div style={{ textAlign: 'center' }}>
+                                    <span style={{ display: 'block', fontSize: '1.1rem', fontWeight: 'bold', color: '#3b82f6' }}>{stats.percentage}%</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Progress</span>
                                 </div>
                             </div>
                         )}

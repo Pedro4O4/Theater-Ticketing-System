@@ -53,6 +53,15 @@ export class BookingsController {
         return { success: true, count: data.length, data };
     }
 
+    @Get('user/:userId')
+    @UseGuards(JwtAuthGuard)
+    async findAllForSpecificUser(@Param('userId') userId: string, @Req() req: any) {
+        // Here we could add RoleGuard to ensure Admin or Organizer,
+        // but for now, we'll let the service handle authorization if needed
+        const data = await this.bookingsService.findAllForSpecificUser(userId, req.user);
+        return { success: true, count: data.length, data };
+    }
+
     @Get(':id')
     @UseGuards(JwtAuthGuard)
     async findOne(@Param('id') id: string) {

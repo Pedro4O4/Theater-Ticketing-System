@@ -57,6 +57,18 @@ export class TicketsController {
   }
 
   /**
+   * GET /api/v1/tickets/scanner/:scannerId
+   * Get all tickets scanned by a specific scanner (Admin only).
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('scanner/:scannerId')
+  async getTicketsScannedBy(@Param('scannerId') scannerId: string) {
+    const tickets = await this.ticketsService.getTicketsScannedBy(scannerId);
+    return { tickets };
+  }
+
+  /**
    * GET /api/v1/tickets/event/:eventId/stats
    * Get scan statistics for an event.
    */

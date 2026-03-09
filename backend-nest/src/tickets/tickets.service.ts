@@ -22,7 +22,7 @@ export class TicketsService {
     private bookingModel: Model<BookingDocument>,
     @InjectModel(Event.name)
     private eventModel: Model<EventDocument>,
-  ) {}
+  ) { }
 
   /**
    * Generate tickets with QR codes for a confirmed booking.
@@ -336,6 +336,18 @@ export class TicketsService {
     }
 
     return ticket;
+  }
+
+  /**
+   * Get all tickets scanned by a specific user (Scanner).
+   */
+  async getTicketsScannedBy(scannerId: string): Promise<TicketDocument[]> {
+    return this.ticketModel
+      .find({ scannedBy: new Types.ObjectId(scannerId) })
+      .populate('eventId', 'title date location')
+      .populate('userId', 'name email phone')
+      .sort({ scannedAt: -1 })
+      .exec();
   }
 
   /**
