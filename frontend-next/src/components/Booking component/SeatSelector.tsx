@@ -178,7 +178,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             setScale(calculatedScale);
 
             // Adjust container height to match the scaled canvas so nothing is clipped
-            container.style.minHeight = `${Math.ceil(canvasHeight * calculatedScale) + 40}px`;
+            container.style.height = `${Math.ceil(canvasHeight * calculatedScale) + 40}px`;
         };
 
         // Delay initial calculation to ensure content has rendered
