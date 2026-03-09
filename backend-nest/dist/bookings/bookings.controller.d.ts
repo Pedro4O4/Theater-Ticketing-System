@@ -2,6 +2,25 @@ import { BookingsService } from './bookings.service';
 export declare class BookingsController {
     private readonly bookingsService;
     constructor(bookingsService: BookingsService);
+    holdSeats(body: {
+        eventId: string;
+        seats: {
+            row: string;
+            seatNumber: number;
+            section: string;
+        }[];
+    }, req: any): Promise<{
+        success: boolean;
+        data: {
+            holdId: string;
+            expiresAt: Date;
+            seats: any[];
+        };
+    }>;
+    releaseHold(id: string, req: any): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     create(createDto: any, req: any): Promise<{
         success: boolean;
         data: import("./schemas/booking.schema").BookingDocument;

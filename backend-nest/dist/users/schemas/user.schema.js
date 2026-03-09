@@ -30,6 +30,8 @@ let User = class User {
     otpExpires;
     isVerified;
     requiresPasswordChange;
+    isBlocked;
+    language;
 };
 exports.User = User;
 __decorate([
@@ -84,6 +86,14 @@ __decorate([
     (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
 ], User.prototype, "requiresPasswordChange", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isBlocked", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 'en', enum: ['en', 'ar'] }),
+    __metadata("design:type", String)
+], User.prototype, "language", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);

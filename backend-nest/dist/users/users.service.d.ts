@@ -10,5 +10,7 @@ export declare class UsersService {
     updateRole(id: string, role: string): Promise<UserDocument>;
     delete(id: string): Promise<void>;
     updateProfile(id: string, updateDto: any): Promise<UserDocument>;
+    updateLanguage(id: string, language: 'en' | 'ar'): Promise<UserDocument>;
     createUserByAdmin(createDto: any): Promise<UserDocument>;
+    blockUser(id: string, isBlocked: boolean): Promise<UserDocument>;
 }

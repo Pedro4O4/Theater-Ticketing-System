@@ -73,6 +73,9 @@ let AuthService = class AuthService {
         }
         const existingUser = await this.usersService.findOneByEmail(email);
         if (existingUser) {
+            if (existingUser.isBlocked) {
+                throw new common_1.ForbiddenException('This account has been blocked. Please contact support.');
+            }
             throw new common_1.ConflictException('User already exists');
         }
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -137,6 +140,9 @@ let AuthService = class AuthService {
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
             throw new common_1.UnauthorizedException('Incorrect password');
+        }
+        if (user.isBlocked) {
+            throw new common_1.ForbiddenException('Your account has been blocked. Please contact support.');
         }
         if (user.requiresPasswordChange) {
             throw new common_1.ForbiddenException({

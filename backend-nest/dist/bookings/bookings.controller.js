@@ -21,6 +21,14 @@ let BookingsController = class BookingsController {
     constructor(bookingsService) {
         this.bookingsService = bookingsService;
     }
+    async holdSeats(body, req) {
+        const data = await this.bookingsService.holdSeats(body.eventId, body.seats, req.user._id);
+        return { success: true, data };
+    }
+    async releaseHold(id, req) {
+        await this.bookingsService.releaseHold(id, req.user._id);
+        return { success: true, message: 'Hold released' };
+    }
     async create(createDto, req) {
         const data = await this.bookingsService.create(createDto, req.user._id);
         return { success: true, data };
@@ -82,6 +90,24 @@ let BookingsController = class BookingsController {
     }
 };
 exports.BookingsController = BookingsController;
+__decorate([
+    (0, common_1.Post)('hold-seats'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], BookingsController.prototype, "holdSeats", null);
+__decorate([
+    (0, common_1.Delete)('hold-seats/:id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], BookingsController.prototype, "releaseHold", null);
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

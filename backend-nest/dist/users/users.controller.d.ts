@@ -19,6 +19,10 @@ export declare class UsersController {
         data: import("../events/schemas/event.schema").EventDocument[];
     }>;
     getMyEventsAnalytics(req: any): Promise<any>;
+    updateLanguage(req: any, language: 'en' | 'ar'): Promise<{
+        success: boolean;
+        data: import("./schemas/user.schema").UserDocument;
+    }>;
     getMyBookings(req: any): Promise<{
         success: boolean;
         data: import("../bookings/schemas/booking.schema").BookingDocument[];
@@ -45,6 +49,11 @@ export declare class UsersController {
     }>;
     updateRole(id: string, role: string): Promise<{
         success: boolean;
+        data: import("./schemas/user.schema").UserDocument;
+    }>;
+    blockUser(id: string, isBlocked: boolean): Promise<{
+        success: boolean;
+        message: string;
         data: import("./schemas/user.schema").UserDocument;
     }>;
     remove(id: string): Promise<{

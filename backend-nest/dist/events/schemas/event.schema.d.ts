@@ -11,6 +11,7 @@ declare class BookedSeat {
     seatNumber: number;
     section: string;
     bookingId: MongooseSchema.Types.ObjectId;
+    holdId: MongooseSchema.Types.ObjectId;
 }
 declare class EventSeatConfig {
     row: string;

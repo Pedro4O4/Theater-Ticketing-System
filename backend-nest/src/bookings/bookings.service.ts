@@ -631,28 +631,30 @@ export class BookingsService implements OnModuleInit {
             event.bookedSeats.map((s: any) => `${s.section}-${s.row}-${s.seatNumber}`),
         );
 
-        // Find pending bookings to mark seats as pending (yellow)
-        const pendingBookings = await this.bookingModel.find({
-            eventId,
-            status: 'pending',
-        } as any).exec();
+        // Run pending bookings + active holds queries in parallel
+        const [pendingBookings, activeHolds] = await Promise.all([
+            this.bookingModel.find({
+                eventId,
+                status: 'pending',
+            } as any).select('selectedSeats').lean().exec(),
+            this.seatHoldModel.find({
+                eventId,
+                expiresAt: { $gt: new Date() },
+            } as any).select('seats').lean().exec(),
+        ]);
+
         const pendingSeatsSet = new Set<string>();
         for (const pb of pendingBookings) {
-            if (pb.selectedSeats) {
-                for (const s of pb.selectedSeats as any[]) {
+            if ((pb as any).selectedSeats) {
+                for (const s of (pb as any).selectedSeats) {
                     pendingSeatsSet.add(`${s.section}-${s.row}-${s.seatNumber}`);
                 }
             }
         }
 
-        // Find active seat holds to also mark as pending
-        const activeHolds = await this.seatHoldModel.find({
-            eventId,
-            expiresAt: { $gt: new Date() },
-        } as any).exec();
         const heldSeatsSet = new Set<string>();
         for (const hold of activeHolds) {
-            for (const s of hold.seats as any[]) {
+            for (const s of (hold as any).seats) {
                 heldSeatsSet.add(`${(s.section || 'main')}-${s.row}-${s.seatNumber}`);
             }
         }

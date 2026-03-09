@@ -35,6 +35,7 @@ let BookedSeat = class BookedSeat {
     seatNumber;
     section;
     bookingId;
+    holdId;
 };
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
@@ -52,6 +53,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Booking' }),
     __metadata("design:type", mongoose_2.Schema.Types.ObjectId)
 ], BookedSeat.prototype, "bookingId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'SeatHold' }),
+    __metadata("design:type", mongoose_2.Schema.Types.ObjectId)
+], BookedSeat.prototype, "holdId", void 0);
 BookedSeat = __decorate([
     (0, mongoose_1.Schema)()
 ], BookedSeat);

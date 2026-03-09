@@ -121,6 +121,18 @@ let UsersService = class UsersService {
         }
         return await user.save();
     }
+    async updateLanguage(id, language) {
+        if (!['en', 'ar'].includes(language)) {
+            throw new common_1.BadRequestException('Invalid language. Allowed values: en, ar');
+        }
+        const user = await this.userModel
+            .findByIdAndUpdate(id, { language }, { new: true })
+            .select('-password')
+            .exec();
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        return user;
+    }
     async createUserByAdmin(createDto) {
         const { email, password, name, role, phone, instapayNumber, instapayQR } = createDto;
         if (role !== user_schema_1.UserRole.ADMIN && role !== user_schema_1.UserRole.ORGANIZER) {
@@ -151,6 +163,16 @@ let UsersService = class UsersService {
             newUserPayload.instapayQR = instapayQR;
         const newUser = new this.userModel(newUserPayload);
         return newUser.save();
+    }
+    async blockUser(id, isBlocked) {
+        const user = await this.userModel
+            .findByIdAndUpdate(id, { isBlocked }, { new: true })
+            .select('-password')
+            .exec();
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        return user;
     }
 };
 exports.UsersService = UsersService;

@@ -12,6 +12,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const bookings_service_1 = require("./bookings.service");
 const bookings_controller_1 = require("./bookings.controller");
 const booking_schema_1 = require("./schemas/booking.schema");
+const seat_hold_schema_1 = require("./schemas/seat-hold.schema");
 const event_schema_1 = require("../events/schemas/event.schema");
 const theater_schema_1 = require("../theaters/schemas/theater.schema");
 const tickets_module_1 = require("../tickets/tickets.module");
@@ -23,6 +24,7 @@ exports.BookingsModule = BookingsModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: booking_schema_1.Booking.name, schema: booking_schema_1.BookingSchema },
+                { name: seat_hold_schema_1.SeatHold.name, schema: seat_hold_schema_1.SeatHoldSchema },
                 { name: event_schema_1.Event.name, schema: event_schema_1.EventSchema },
                 { name: theater_schema_1.Theater.name, schema: theater_schema_1.TheaterSchema },
             ]),

@@ -46,6 +46,10 @@ let UsersController = class UsersController {
         const data = await this.eventsService.getOrganizerAnalytics(req.user._id);
         return data;
     }
+    async updateLanguage(req, language) {
+        const data = await this.usersService.updateLanguage(req.user._id, language);
+        return { success: true, data };
+    }
     async getMyBookings(req) {
         const data = await this.bookingsService.findAllForUser(req.user._id);
         return { success: true, data };
@@ -75,6 +79,14 @@ let UsersController = class UsersController {
     async updateRole(id, role) {
         const data = await this.usersService.updateRole(id, role);
         return { success: true, data };
+    }
+    async blockUser(id, isBlocked) {
+        const data = await this.usersService.blockUser(id, isBlocked);
+        return {
+            success: true,
+            message: isBlocked ? 'User blocked successfully' : 'User unblocked successfully',
+            data,
+        };
     }
     async remove(id) {
         await this.usersService.delete(id);
@@ -115,6 +127,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getMyEventsAnalytics", null);
+__decorate([
+    (0, common_1.Put)('language'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)('language')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateLanguage", null);
 __decorate([
     (0, common_1.Get)('bookings'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
@@ -159,6 +180,16 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateRole", null);
+__decorate([
+    (0, common_1.Put)(':id/block'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(user_schema_1.UserRole.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('isBlocked')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Boolean]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "blockUser", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

@@ -18,17 +18,20 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const booking_schema_1 = require("./schemas/booking.schema");
+const seat_hold_schema_1 = require("./schemas/seat-hold.schema");
 const event_schema_1 = require("../events/schemas/event.schema");
 const theater_schema_1 = require("../theaters/schemas/theater.schema");
 const tickets_service_1 = require("../tickets/tickets.service");
 let BookingsService = BookingsService_1 = class BookingsService {
     bookingModel;
+    seatHoldModel;
     eventModel;
     theaterModel;
     ticketsService;
     logger = new common_1.Logger(BookingsService_1.name);
-    constructor(bookingModel, eventModel, theaterModel, ticketsService) {
+    constructor(bookingModel, seatHoldModel, eventModel, theaterModel, ticketsService) {
         this.bookingModel = bookingModel;
+        this.seatHoldModel = seatHoldModel;
         this.eventModel = eventModel;
         this.theaterModel = theaterModel;
         this.ticketsService = ticketsService;
@@ -39,6 +42,17 @@ let BookingsService = BookingsService_1 = class BookingsService {
     }
     async cleanupExpiredBookings() {
         try {
+            const expiredHolds = await this.seatHoldModel.find({
+                expiresAt: { $lte: new Date() },
+            }).exec();
+            for (const hold of expiredHolds) {
+                await this.eventModel.findByIdAndUpdate(hold.eventId, {
+                    $pull: { bookedSeats: { holdId: hold._id } },
+                    $inc: { remainingTickets: hold.seats.length },
+                });
+                await this.seatHoldModel.findByIdAndDelete(hold._id).exec();
+                this.logger.log(`Expired seat hold ${hold._id} cleaned up (${hold.seats.length} seats released)`);
+            }
             const expiredBookings = await this.bookingModel.find({
                 status: 'pending',
                 pendingExpiresAt: { $lte: new Date() },
@@ -61,11 +75,103 @@ let BookingsService = BookingsService_1 = class BookingsService {
             }
         }
         catch (err) {
-            this.logger.error('Error cleaning up expired bookings', err);
+            this.logger.error('Error cleaning up expired bookings/holds', err);
+        }
+    }
+    async holdSeats(eventId, seats, userId) {
+        const event = await this.eventModel.findById(eventId).exec();
+        if (!event) {
+            throw new common_1.NotFoundException('Event not found');
+        }
+        if (!event.hasTheaterSeating) {
+            throw new common_1.BadRequestException('This event does not have theater seating');
+        }
+        if (!seats || seats.length === 0) {
+            throw new common_1.BadRequestException('No seats selected');
+        }
+        if (seats.length > 10) {
+            throw new common_1.BadRequestException('Cannot hold more than 10 seats at once');
+        }
+        await this.releaseUserHolds(eventId, userId);
+        const holdExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
+        const normalizedSeats = seats.map(s => ({
+            row: String(s.row),
+            seatNumber: Number(s.seatNumber),
+            section: s.section || 'main',
+        }));
+        const seatHold = new this.seatHoldModel({
+            userId,
+            eventId,
+            seats: normalizedSeats,
+            expiresAt: holdExpiresAt,
+        });
+        const savedHold = await seatHold.save();
+        const seatConditions = normalizedSeats.map(s => ({
+            bookedSeats: {
+                $elemMatch: {
+                    row: s.row,
+                    seatNumber: s.seatNumber,
+                    section: s.section,
+                },
+            },
+        }));
+        const holdEntries = normalizedSeats.map(s => ({
+            row: s.row,
+            seatNumber: s.seatNumber,
+            section: s.section,
+            holdId: savedHold._id,
+        }));
+        const result = await this.eventModel.findOneAndUpdate({
+            _id: eventId,
+            $nor: seatConditions,
+        }, {
+            $push: { bookedSeats: { $each: holdEntries } },
+            $inc: { remainingTickets: -normalizedSeats.length },
+        }, { new: true });
+        if (!result) {
+            await this.seatHoldModel.findByIdAndDelete(savedHold._id).exec();
+            const currentEvent = await this.eventModel.findById(eventId).exec();
+            const bookedSet = new Set((currentEvent?.bookedSeats || []).map((s) => `${s.section}-${s.row}-${s.seatNumber}`));
+            const conflicting = normalizedSeats
+                .filter(s => bookedSet.has(`${s.section}-${s.row}-${s.seatNumber}`))
+                .map(s => `${s.row}${s.seatNumber}`);
+            throw new common_1.BadRequestException(`Seats no longer available: ${conflicting.join(', ')}`);
+        }
+        return {
+            holdId: savedHold._id.toString(),
+            expiresAt: holdExpiresAt,
+            seats: normalizedSeats,
+        };
+    }
+    async releaseHold(holdId, userId) {
+        const hold = await this.seatHoldModel.findById(holdId).exec();
+        if (!hold) {
+            return;
+        }
+        if (hold.userId.toString() !== userId.toString()) {
+            throw new common_1.ForbiddenException('You cannot release this hold');
+        }
+        await this.eventModel.findByIdAndUpdate(hold.eventId, {
+            $pull: { bookedSeats: { holdId: hold._id } },
+            $inc: { remainingTickets: hold.seats.length },
+        });
+        await this.seatHoldModel.findByIdAndDelete(hold._id).exec();
+    }
+    async releaseUserHolds(eventId, userId) {
+        const existingHolds = await this.seatHoldModel.find({
+            eventId,
+            userId,
+        }).exec();
+        for (const hold of existingHolds) {
+            await this.eventModel.findByIdAndUpdate(hold.eventId, {
+                $pull: { bookedSeats: { holdId: hold._id } },
+                $inc: { remainingTickets: hold.seats.length },
+            });
+            await this.seatHoldModel.findByIdAndDelete(hold._id).exec();
         }
     }
     async create(createDto, userId) {
-        const { eventId, numberOfTickets, status, selectedSeats } = createDto;
+        const { eventId, numberOfTickets, status, selectedSeats, holdId } = createDto;
         const event = await this.eventModel.findById(eventId).exec();
         if (!event) {
             throw new common_1.NotFoundException('Event not found');
@@ -78,17 +184,56 @@ let BookingsService = BookingsService_1 = class BookingsService {
             pendingExpiresAt: new Date(Date.now() + 30 * 60 * 1000),
         };
         if (event.hasTheaterSeating && selectedSeats && selectedSeats.length > 0) {
-            const unavailableSeats = [];
-            for (const seat of selectedSeats) {
-                const isBooked = event.bookedSeats.some((bs) => bs.row === seat.row &&
-                    bs.seatNumber === seat.seatNumber &&
-                    bs.section === seat.section);
-                if (isBooked) {
-                    unavailableSeats.push(`${seat.row}${seat.seatNumber}`);
+            let hold = null;
+            if (holdId) {
+                hold = await this.seatHoldModel.findById(holdId).exec();
+                if (!hold) {
+                    throw new common_1.BadRequestException('Seat hold expired or not found. Please select seats again.');
+                }
+                if (hold.userId.toString() !== userId.toString()) {
+                    throw new common_1.ForbiddenException('This hold does not belong to you');
+                }
+                if (hold.eventId.toString() !== eventId.toString()) {
+                    throw new common_1.BadRequestException('Hold does not match this event');
+                }
+                if (new Date() > hold.expiresAt) {
+                    await this.eventModel.findByIdAndUpdate(hold.eventId, {
+                        $pull: { bookedSeats: { holdId: hold._id } },
+                        $inc: { remainingTickets: hold.seats.length },
+                    });
+                    await this.seatHoldModel.findByIdAndDelete(hold._id).exec();
+                    throw new common_1.BadRequestException('Seat hold has expired. Please select seats again.');
+                }
+                const holdSeatKeys = new Set(hold.seats.map((s) => `${s.section || 'main'}-${s.row}-${s.seatNumber}`));
+                for (const seat of selectedSeats) {
+                    const key = `${seat.section || 'main'}-${seat.row}-${seat.seatNumber}`;
+                    if (!holdSeatKeys.has(key)) {
+                        throw new common_1.BadRequestException(`Seat ${seat.row}${seat.seatNumber} is not in your hold. Please select seats again.`);
+                    }
                 }
             }
-            if (unavailableSeats.length > 0) {
-                throw new common_1.BadRequestException(`Seats already booked: ${unavailableSeats.join(', ')}`);
+            else {
+                const seatConditions = selectedSeats.map((seat) => ({
+                    bookedSeats: {
+                        $elemMatch: {
+                            row: String(seat.row),
+                            seatNumber: Number(seat.seatNumber),
+                            section: seat.section || 'main',
+                        },
+                    },
+                }));
+                const unavailableSeats = [];
+                for (const seat of selectedSeats) {
+                    const isBooked = event.bookedSeats.some((bs) => bs.row === String(seat.row) &&
+                        bs.seatNumber === Number(seat.seatNumber) &&
+                        (bs.section || 'main') === (seat.section || 'main'));
+                    if (isBooked) {
+                        unavailableSeats.push(`${seat.row}${seat.seatNumber}`);
+                    }
+                }
+                if (unavailableSeats.length > 0) {
+                    throw new common_1.BadRequestException(`Seats already booked: ${unavailableSeats.join(', ')}`);
+                }
             }
             const theater = await this.theaterModel.findById(event.theater).exec();
             if (!theater) {
@@ -132,16 +277,49 @@ let BookingsService = BookingsService_1 = class BookingsService {
             bookingData.totalPrice = totalPrice;
             const booking = new this.bookingModel(bookingData);
             const savedBooking = await booking.save();
-            const seatUpdates = seatsWithPrices.map((seat) => ({
-                row: seat.row,
-                seatNumber: seat.seatNumber,
-                section: seat.section,
-                bookingId: savedBooking._id,
-            }));
-            await this.eventModel.findByIdAndUpdate(eventId, {
-                $push: { bookedSeats: { $each: seatUpdates } },
-                $inc: { remainingTickets: -selectedSeats.length },
-            });
+            if (hold) {
+                await this.eventModel.findByIdAndUpdate(eventId, {
+                    $pull: { bookedSeats: { holdId: hold._id } },
+                });
+                const seatUpdates = seatsWithPrices.map((seat) => ({
+                    row: seat.row,
+                    seatNumber: seat.seatNumber,
+                    section: seat.section,
+                    bookingId: savedBooking._id,
+                }));
+                await this.eventModel.findByIdAndUpdate(eventId, {
+                    $push: { bookedSeats: { $each: seatUpdates } },
+                });
+                await this.seatHoldModel.findByIdAndDelete(hold._id).exec();
+            }
+            else {
+                const seatUpdates = seatsWithPrices.map((seat) => ({
+                    row: seat.row,
+                    seatNumber: seat.seatNumber,
+                    section: seat.section,
+                    bookingId: savedBooking._id,
+                }));
+                const atomicSeatConditions = seatsWithPrices.map((seat) => ({
+                    bookedSeats: {
+                        $elemMatch: {
+                            row: seat.row,
+                            seatNumber: seat.seatNumber,
+                            section: seat.section,
+                        },
+                    },
+                }));
+                const atomicResult = await this.eventModel.findOneAndUpdate({
+                    _id: eventId,
+                    $nor: atomicSeatConditions,
+                }, {
+                    $push: { bookedSeats: { $each: seatUpdates } },
+                    $inc: { remainingTickets: -selectedSeats.length },
+                }, { new: true });
+                if (!atomicResult) {
+                    await this.bookingModel.findByIdAndDelete(savedBooking._id).exec();
+                    throw new common_1.BadRequestException('Some seats were just booked by another user. Please refresh and try again.');
+                }
+            }
             return savedBooking;
         }
         else {
@@ -302,16 +480,28 @@ let BookingsService = BookingsService_1 = class BookingsService {
         }
         const theater = event.theater;
         const bookedSeatsSet = new Set(event.bookedSeats.map((s) => `${s.section}-${s.row}-${s.seatNumber}`));
-        const pendingBookings = await this.bookingModel.find({
-            eventId,
-            status: 'pending',
-        }).exec();
+        const [pendingBookings, activeHolds] = await Promise.all([
+            this.bookingModel.find({
+                eventId,
+                status: 'pending',
+            }).select('selectedSeats').lean().exec(),
+            this.seatHoldModel.find({
+                eventId,
+                expiresAt: { $gt: new Date() },
+            }).select('seats').lean().exec(),
+        ]);
         const pendingSeatsSet = new Set();
         for (const pb of pendingBookings) {
             if (pb.selectedSeats) {
                 for (const s of pb.selectedSeats) {
                     pendingSeatsSet.add(`${s.section}-${s.row}-${s.seatNumber}`);
                 }
+            }
+        }
+        const heldSeatsSet = new Set();
+        for (const hold of activeHolds) {
+            for (const s of hold.seats) {
+                heldSeatsSet.add(`${(s.section || 'main')}-${s.row}-${s.seatNumber}`);
             }
         }
         const mergedSeatConfig = [...(theater.seatConfig || [])];
@@ -353,7 +543,7 @@ let BookingsService = BookingsService_1 = class BookingsService {
                     seatType,
                     isActive,
                     isBooked: bookedSeatsSet.has(seatKey),
-                    isPending: pendingSeatsSet.has(seatKey),
+                    isPending: pendingSeatsSet.has(seatKey) || heldSeatsSet.has(seatKey),
                     price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                 });
             }
@@ -381,7 +571,7 @@ let BookingsService = BookingsService_1 = class BookingsService {
                         seatType,
                         isActive,
                         isBooked: bookedSeatsSet.has(seatKey),
-                        isPending: pendingSeatsSet.has(seatKey),
+                        isPending: pendingSeatsSet.has(seatKey) || heldSeatsSet.has(seatKey),
                         price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
                     });
                 }
@@ -634,9 +824,11 @@ exports.BookingsService = BookingsService;
 exports.BookingsService = BookingsService = BookingsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(booking_schema_1.Booking.name)),
-    __param(1, (0, mongoose_1.InjectModel)(event_schema_1.Event.name)),
-    __param(2, (0, mongoose_1.InjectModel)(theater_schema_1.Theater.name)),
+    __param(1, (0, mongoose_1.InjectModel)(seat_hold_schema_1.SeatHold.name)),
+    __param(2, (0, mongoose_1.InjectModel)(event_schema_1.Event.name)),
+    __param(3, (0, mongoose_1.InjectModel)(theater_schema_1.Theater.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
         tickets_service_1.TicketsService])
