@@ -662,14 +662,14 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-    .seat-row > .row-label:first-child {
+    .seat-row>.row-label:first-child {
         position: relative;
         left: auto;
         background: none;
         padding-right: 4px;
     }
 
-    .seat-row > .row-label:last-child {
+    .seat-row>.row-label:last-child {
         position: relative;
         right: auto;
         background: none;
@@ -715,20 +715,20 @@
         margin: 0 !important;
         overflow-x: auto !important;
         display: flex !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         background: transparent !important;
         -webkit-overflow-scrolling: touch;
     }
 
     .theater-canvas {
-        transform-origin: top left !important;
+        /* transform-origin stays as inline 'top center' to match label calc(50% + Xpx) positioning */
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         margin: 0 !important;
         width: max-content;
-        align-items: flex-start !important;
+        align-items: center !important;
     }
 
     .stage {
@@ -784,11 +784,8 @@
 @media (max-width: 480px) {
     /* JS handles scaling - keep laptop proportions */
 
-    .theater-canvas-container {
-        min-height: 200px;
-    }
-
-    /* REMOVED: seat-btn, row-label, stage size overrides to match laptop proportions */
+    /* min-height for .theater-canvas-container is set dynamically by JS based on scaled canvas size */
+    /* seat-btn, row-label, stage size overrides removed to match laptop proportions */
 
     .legend-item {
         font-size: 0.55rem;

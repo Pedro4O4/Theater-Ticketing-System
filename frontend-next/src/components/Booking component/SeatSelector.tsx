@@ -158,42 +158,39 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             const container = canvasRef.current.parentElement;
             if (!container) return;
 
-            // Temporarily reset scale to measure natural canvas width
+            // Temporarily reset scale to measure natural canvas width & height
             const originalTransform = canvasRef.current.style.transform;
             canvasRef.current.style.transform = 'scale(1)';
             const canvasWidth = canvasRef.current.scrollWidth || canvasRef.current.offsetWidth;
+            const canvasHeight = canvasRef.current.scrollHeight || canvasRef.current.offsetHeight;
             canvasRef.current.style.transform = originalTransform;
 
             if (canvasWidth === 0) return;
 
-            const screenWidth = window.innerWidth;
-            const isMobile = screenWidth < 768;
+            // Use container width for accurate measurement (respects browser zoom)
+            const availableWidth = container.clientWidth - 16;
 
-            // Available width with minimal screen padding
-            const padding = isMobile ? 8 : 40;
-            const availableWidth = screenWidth - padding;
-
-            // Final scale
+            // Final scale: allow as low as 0.3 for very zoomed-out views,
+            // cap at 1.0 — never upscale beyond natural size
             let calculatedScale = availableWidth / canvasWidth;
-
-            // ENHANCED MOBILE VISIBILITY:
-            if (isMobile) {
-                calculatedScale = Math.max(0.85, calculatedScale);
-            }
-
-            // Max scale for desktop/large screens
-            calculatedScale = Math.min(0.85, calculatedScale);
+            calculatedScale = Math.max(0.3, Math.min(1, calculatedScale));
 
             setScale(calculatedScale);
+
+            // Adjust container height to match the scaled canvas so nothing is clipped
+            container.style.minHeight = `${Math.ceil(canvasHeight * calculatedScale) + 40}px`;
         };
 
         // Delay initial calculation to ensure content has rendered
         const timer = setTimeout(calculateScale, hasInitialScale.current ? 0 : 200);
         hasInitialScale.current = true;
         window.addEventListener('resize', calculateScale);
+        // Mobile zoom changes fire on visualViewport, not window resize
+        window.visualViewport?.addEventListener('resize', calculateScale);
         return () => {
             clearTimeout(timer);
             window.removeEventListener('resize', calculateScale);
+            window.visualViewport?.removeEventListener('resize', calculateScale);
         };
     }, [theaterData]);
 
