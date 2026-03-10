@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
                 <div className="footer-section">
                     <h3>{t('footer.quickLinks')}</h3>
                     <ul>
-                        <li><Link href="/">{t('footer.link.events')}</Link></li>
+                        <li><Link href="/events">{t('footer.link.events')}</Link></li>
                         <li><Link href="/about">{t('footer.link.about')}</Link></li>
                     </ul>
                 </div>
@@ -29,6 +29,13 @@ const Footer: React.FC = () => {
                     <div className="social-links">
                         <a href="https://www.facebook.com/profile.php?id=100066715155700" target="_blank" rel="noopener noreferrer">Facebook</a>
                         <a href="https://www.instagram.com/taralally_theater/" target="_blank" rel="noopener noreferrer">Instagram</a>
+                    </div>
+                </div>
+
+                <div className="footer-section">
+                    <h3>{t('footer.contactUs')}</h3>
+                    <div className="contact-info">
+                        <a href="mailto:Youthmeeting@gmail.com">Youthmeeting@gmail.com</a>
                     </div>
                 </div>
             </div>
