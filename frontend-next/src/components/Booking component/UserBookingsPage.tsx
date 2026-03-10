@@ -437,7 +437,7 @@ const UserBookingsPage = () => {
                                         </div>
                                     )}
 
-                                    {instapayLink ? (
+                                    {instapayLink && (
                                         <div style={{
                                             marginBottom: '16px',
                                             display: 'flex',
@@ -472,11 +472,6 @@ const UserBookingsPage = () => {
                                             >
                                                 <FiExternalLink /> Pay directly via InstaPay Link
                                             </a>
-                                        </div>
-                                    ) : (
-                                        <div style={{ color: '#ef4444', textAlign: 'center', fontSize: '0.8rem', marginBottom: '10px' }}>
-                                            Debug: instapayLink is missing for organizer {event?.organizerId?.name || 'Unknown'}.
-                                            Keys: {event?.organizerId ? Object.keys(event.organizerId).join(', ') : 'No Organizer object'}
                                         </div>
                                     )}
 

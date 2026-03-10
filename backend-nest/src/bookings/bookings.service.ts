@@ -483,13 +483,7 @@ export class BookingsService implements OnModuleInit {
             .sort({ createdAt: -1 })
             .exec();
 
-        if (bookings[0]) {
-            const org = (bookings[0].eventId as any)?.organizerId;
-            try {
-                console.log('DEBUG_BOOKINGS_LINK:', org?.instapayLink);
-                console.log('DEBUG_BOOKINGS_ORG_KEYS:', org ? Object.keys(org.toObject ? org.toObject() : org) : 'NO_ORG');
-            } catch (e) { }
-        }
+
         return bookings;
     }
 
