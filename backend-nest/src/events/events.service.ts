@@ -84,7 +84,7 @@ export class EventsService {
     }
 
     async findOne(id: string): Promise<EventDocument> {
-        const event = await this.eventModel.findById(id).populate('organizerId', 'name instapayNumber instapayQR').exec();
+        const event = await this.eventModel.findById(id).populate('organizerId', 'name instapayNumber instapayQR instapayLink').exec();
         if (!event) {
             throw new NotFoundException('Event not found');
         }

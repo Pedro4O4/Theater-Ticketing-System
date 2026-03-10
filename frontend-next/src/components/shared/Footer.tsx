@@ -27,9 +27,8 @@ const Footer: React.FC = () => {
                 <div className="footer-section">
                     <h3>{t('footer.followUs')}</h3>
                     <div className="social-links">
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter</a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+                        <a href="https://www.facebook.com/profile.php?id=100066715155700" target="_blank" rel="noopener noreferrer">Facebook</a>
+                        <a href="https://www.instagram.com/taralally_theater/" target="_blank" rel="noopener noreferrer">Instagram</a>
                     </div>
                 </div>
             </div>

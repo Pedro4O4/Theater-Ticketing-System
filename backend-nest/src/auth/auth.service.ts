@@ -203,6 +203,7 @@ export class AuthService {
                 profilePicture: user.profilePicture,
                 instapayNumber: (user as any).instapayNumber,
                 instapayQR: (user as any).instapayQR,
+                instapayLink: (user as any).instapayLink,
                 username: (user as any).username,
             },
         };
@@ -326,6 +327,7 @@ export class AuthService {
                 profilePicture: user.profilePicture,
                 instapayNumber: (user as any).instapayNumber,
                 instapayQR: (user as any).instapayQR,
+                instapayLink: (user as any).instapayLink,
             },
         };
     }

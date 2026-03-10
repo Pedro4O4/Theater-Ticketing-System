@@ -131,7 +131,7 @@ const UserBookingsPage = () => {
 
             setBookings(bookingsData);
 
-            // Fetch event details for each unique eventId
+            // Extract and map event details
             const events: Record<string, EventData> = {};
             const missingEventIds: string[] = [];
 
@@ -141,11 +141,11 @@ const UserBookingsPage = () => {
                     const id = (eventVal as any)._id || (eventVal as any).id;
                     if (id) {
                         events[id] = eventVal as any;
-                        // Replace the object with its ID in the booking record for local lookup
-                        booking.eventId = id;
                     }
-                } else if (typeof eventVal === 'string' && eventVal && !events[eventVal]) {
-                    missingEventIds.push(eventVal);
+                } else if (typeof eventVal === 'string' && eventVal) {
+                    if (!events[eventVal]) {
+                        missingEventIds.push(eventVal);
+                    }
                 }
             });
 
@@ -169,6 +169,7 @@ const UserBookingsPage = () => {
             }
 
             setEventDetails(events);
+            console.log('DEBUG: eventDetails populated:', events);
         } catch (err: any) {
             console.error("Error fetching bookings:", err);
             setError(err.response?.data?.message || "Failed to load bookings");
@@ -335,7 +336,8 @@ const UserBookingsPage = () => {
                         </div>
 
                         {pendingBookings.map(booking => {
-                            const event = eventDetails[booking.eventId];
+                            const bEventId = typeof booking.eventId === 'object' ? (booking.eventId as any)._id : booking.eventId;
+                            const event = eventDetails[bEventId];
                             const timeLeft = timers[booking._id];
                             const instapayQR = event?.organizerId?.instapayQR;
                             const instapayNumber = event?.organizerId?.instapayNumber ?? '';
@@ -435,7 +437,7 @@ const UserBookingsPage = () => {
                                         </div>
                                     )}
 
-                                    {instapayLink && (
+                                    {instapayLink ? (
                                         <div style={{
                                             marginBottom: '16px',
                                             display: 'flex',
@@ -471,43 +473,10 @@ const UserBookingsPage = () => {
                                                 <FiExternalLink /> Pay directly via InstaPay Link
                                             </a>
                                         </div>
-                                    )}
-
-                                    {instapayLink && (
-                                        <div style={{
-                                            marginBottom: '16px',
-                                            display: 'flex',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <a
-                                                href={instapayLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '8px',
-                                                    padding: '12px 24px',
-                                                    background: 'rgba(16, 185, 129, 0.15)',
-                                                    color: '#10b981',
-                                                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                                                    borderRadius: '12px',
-                                                    textDecoration: 'none',
-                                                    fontWeight: 600,
-                                                    transition: 'all 0.2s',
-                                                    boxShadow: '0 4px 15px rgba(16, 185, 129, 0.1)'
-                                                }}
-                                                onMouseOver={(e) => {
-                                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.25)';
-                                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                                }}
-                                                onMouseOut={(e) => {
-                                                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.15)';
-                                                    e.currentTarget.style.transform = 'translateY(0)';
-                                                }}
-                                            >
-                                                <FiExternalLink /> Pay directly via InstaPay Link
-                                            </a>
+                                    ) : (
+                                        <div style={{ color: '#ef4444', textAlign: 'center', fontSize: '0.8rem', marginBottom: '10px' }}>
+                                            Debug: instapayLink is missing for organizer {event?.organizerId?.name || 'Unknown'}.
+                                            Keys: {event?.organizerId ? Object.keys(event.organizerId).join(', ') : 'No Organizer object'}
                                         </div>
                                     )}
 
@@ -544,7 +513,8 @@ const UserBookingsPage = () => {
                 <div className="bookings-grid">
                     <AnimatePresence>
                         {bookings.map((booking, index) => {
-                            const event = eventDetails[booking.eventId];
+                            const eventId = typeof booking.eventId === 'object' ? (booking.eventId as any)._id : booking.eventId;
+                            const event = eventDetails[eventId];
                             const isCancelled = booking.status === 'canceled';
 
                             const isPending = booking.status === 'pending';
@@ -780,7 +750,11 @@ const UserBookingsPage = () => {
                 isOpen={showDeleteConfirm}
                 title="Cancel Booking"
                 message="Are you sure you want to cancel this booking? Your seats will be released."
-                itemName={eventDetails[bookings.find(b => b._id === deleteBookingId)?.eventId || '']?.title}
+                itemName={(() => {
+                    const booking = bookings.find(b => b._id === deleteBookingId);
+                    const bEventId = typeof booking?.eventId === 'object' ? (booking?.eventId as any)._id : booking?.eventId;
+                    return eventDetails[bEventId || '']?.title;
+                })()}
                 confirmText={cancellationLoading ? "Cancelling..." : "Yes, Cancel Booking"}
                 cancelText="Keep Booking"
                 variant="danger"

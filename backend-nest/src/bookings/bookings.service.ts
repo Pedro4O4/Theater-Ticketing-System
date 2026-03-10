@@ -460,7 +460,7 @@ export class BookingsService implements OnModuleInit {
                 path: 'eventId',
                 populate: {
                     path: 'organizerId',
-                    select: 'name instapayNumber instapayQR'
+                    select: 'name instapayNumber instapayQR instapayLink'
                 }
             })
             .exec();
@@ -471,17 +471,26 @@ export class BookingsService implements OnModuleInit {
     }
 
     async findAllForUser(userId: string): Promise<BookingDocument[]> {
-        return this.bookingModel
+        const bookings = await this.bookingModel
             .find({ StandardId: userId } as any)
             .populate({
                 path: 'eventId',
                 populate: {
                     path: 'organizerId',
-                    select: 'name instapayNumber instapayQR'
+                    select: 'name instapayNumber instapayQR instapayLink'
                 }
             })
             .sort({ createdAt: -1 })
             .exec();
+
+        if (bookings[0]) {
+            const org = (bookings[0].eventId as any)?.organizerId;
+            try {
+                console.log('DEBUG_BOOKINGS_LINK:', org?.instapayLink);
+                console.log('DEBUG_BOOKINGS_ORG_KEYS:', org ? Object.keys(org.toObject ? org.toObject() : org) : 'NO_ORG');
+            } catch (e) { }
+        }
+        return bookings;
     }
 
     async findAllForSpecificUser(targetUserId: string, requestingUser: any): Promise<BookingDocument[]> {
@@ -496,7 +505,7 @@ export class BookingsService implements OnModuleInit {
                 path: 'eventId',
                 populate: {
                     path: 'organizerId',
-                    select: 'name instapayNumber instapayQR'
+                    select: 'name instapayNumber instapayQR instapayLink'
                 }
             })
             .sort({ createdAt: -1 })
