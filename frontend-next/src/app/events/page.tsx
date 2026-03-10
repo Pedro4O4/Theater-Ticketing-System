@@ -54,7 +54,22 @@ const EventListPage = () => {
         try {
             const response = await api.get<any>('/user/events');
             const data = response.data.success ? response.data.data : response.data;
-            setMyEvents(Array.isArray(data) ? data : []);
+            if (Array.isArray(data)) {
+                const now = new Date();
+                const validEvents = data.filter((event: any) => {
+                    const isApproved = event.status === 'approved';
+                    let isExpired = false;
+                    if (event.date) {
+                        const eventDate = new Date(event.date);
+                        const expirationDate = new Date(eventDate.getTime() + 24 * 60 * 60 * 1000);
+                        isExpired = now >= expirationDate;
+                    }
+                    return isApproved && !isExpired;
+                });
+                setMyEvents(validEvents);
+            } else {
+                setMyEvents([]);
+            }
         } catch {
             setMyEvents([]);
         } finally {

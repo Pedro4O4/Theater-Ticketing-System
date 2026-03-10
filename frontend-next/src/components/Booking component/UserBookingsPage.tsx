@@ -719,7 +719,7 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                                 <FiUploadCloud /> Upload Receipt
                                             </button>
                                         )}
-                                        {booking.status === 'confirmed' && booking.hasTheaterSeating && (
+                                        {booking.status === 'confirmed' && booking.hasTheaterSeating && !isPrevious && (
                                             <Link
                                                 href={`/bookings/${booking._id}/tickets`}
                                                 className="view-tickets-btn"
@@ -748,7 +748,7 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                                         <FiClock size={14} /> Cancellation Pending
                                                     </span>
                                                 )}
-                                                {booking.cancellationRequest?.status === 'rejected' && !isPastCancellationDeadline && (
+                                                {booking.cancellationRequest?.status === 'rejected' && !isPastCancellationDeadline && !isPrevious && (
                                                     <button
                                                         onClick={() => handleRequestCancellationClick(booking._id)}
                                                         style={{
@@ -763,6 +763,7 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                                     </button>
                                                 )}
                                                 {(() => {
+                                                    if (isPrevious) return null;
                                                     const pendingKeys = new Set(
                                                         (booking.cancellationRequest?.seatsToCancel || []).map(s => `${s.section}-${s.row}-${s.seatNumber}`)
                                                     );

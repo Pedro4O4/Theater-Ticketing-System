@@ -27,6 +27,9 @@ export class EventsController {
         @Body() createDto: any,
         @Req() req: any,
     ) {
+        console.log("=== INCOMING EVENT CREATION PAYLOAD ===");
+        console.log(JSON.stringify(createDto, null, 2));
+        
         // Image is expected to be sent as base64 string in createDto.image
         const data = await this.eventsService.create(createDto, req.user._id, req.user.role);
         return { success: true, data };
