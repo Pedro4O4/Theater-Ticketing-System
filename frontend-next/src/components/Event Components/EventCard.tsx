@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCalendar, FiMapPin, FiTag, FiX, FiMaximize2, FiShoppingCart, FiInfo, FiAlertCircle } from 'react-icons/fi';
+import { FiCalendar, FiMapPin, FiTag, FiX, FiMaximize2, FiShoppingCart, FiInfo, FiAlertCircle, FiClock, FiShieldOff } from 'react-icons/fi';
 import './EventCard.css';
 import { getImageUrl } from '@/utils/imageHelper';
 import { Event } from '@/types/event';
@@ -52,6 +52,22 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
         const expirationDate = new Date(eventDate.getTime() + 24 * 60 * 60 * 1000); // 1 day after event date
         return new Date() >= expirationDate;
     }, [event.date]);
+
+    const isPastDeadline = useMemo(() => {
+        if (!event.cancellationDeadline) return false;
+        return new Date() > new Date(event.cancellationDeadline);
+    }, [event.cancellationDeadline]);
+
+    const formatDeadline = (deadline?: string) => {
+        if (!deadline) return null;
+        return new Date(deadline).toLocaleDateString('en-US', {
+            timeZone: 'Africa/Cairo',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     // Get price from standard chairs if it's a theater event
     const standardPrice = useMemo(() => {
@@ -129,6 +145,26 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
                             <div className="meta-item">
                                 <FiCalendar className="meta-icon" />
                                 <span>{formatDate(event.date)}</span>
+                            </div>
+                        )}
+                        {event.startTime && (
+                            <div className="meta-item">
+                                <FiClock className="meta-icon" />
+                                <span>{event.startTime} {event.endTime ? `- ${event.endTime}` : ''}</span>
+                            </div>
+                        )}
+                        {event.cancellationDeadline && (
+                            <div className={`meta-item ${isPastDeadline ? 'deadline-passed' : 'deadline-active'}`}>
+                                <FiShieldOff className="meta-icon" />
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Refund Deadline:</span>
+                                    <span>{formatDeadline(event.cancellationDeadline)}</span>
+                                    {isPastDeadline && !isExpired && (
+                                        <span className="deadline-warning-text" style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: 700 }}>
+                                            Returns Disabled
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         )}
                         {event.location && (

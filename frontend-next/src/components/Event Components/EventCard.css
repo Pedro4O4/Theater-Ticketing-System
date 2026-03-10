@@ -291,6 +291,26 @@
     color: var(--text-primary);
 }
 
+.meta-item.deadline-passed {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.meta-item.deadline-active {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.deadline-warning-text {
+    animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0.5;
+    }
+}
+
 .meta-icon {
     color: var(--accent-purple);
     flex-shrink: 0;

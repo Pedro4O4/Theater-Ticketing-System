@@ -7,18 +7,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiCalendar, FiMapPin, FiTag, FiUsers,
     FiInfo, FiArrowLeft, FiX, FiMaximize2, FiShoppingCart,
-    FiCheck, FiGrid
+    FiCheck, FiGrid, FiClock, FiShieldOff, FiAlertTriangle
 } from 'react-icons/fi';
 import { useAuth } from '@/auth/AuthContext';
 import api from '@/services/api';
 import { getImageUrl } from '@/utils/imageHelper';
+import { Event, SeatPricing } from '@/types/event';
 import SeatSelector from '@/components/Booking component/SeatSelector';
 import './EventDetailPage.css';
 
-interface SeatPricing {
-    seatType: string;
-    price: number;
-}
+// Using global Event and SeatPricing from @/types/event
 
 interface SeatData {
     availableCount: number;
@@ -28,21 +26,6 @@ interface SeatData {
     theater?: {
         layout?: any;
     };
-}
-
-interface Event {
-    _id: string;
-    title: string;
-    description?: string;
-    date?: string;
-    location?: string;
-    category?: string;
-    image?: string;
-    ticketPrice?: number;
-    totalTickets?: number;
-    remainingTickets?: number;
-    hasTheaterSeating?: boolean;
-    seatPricing?: SeatPricing[];
 }
 
 interface DateInfo {
@@ -143,6 +126,14 @@ const EventDetailsPage = ({ id }: EventDetailsPageProps) => {
 
         fetchAllData();
     }, [id]);
+
+    const isPastDeadline = event?.cancellationDeadline
+        ? new Date() > new Date(event.cancellationDeadline)
+        : false;
+
+    const isExpired = event?.date
+        ? new Date() >= new Date(new Date(event.date).getTime() + 24 * 60 * 60 * 1000)
+        : false;
 
     const formatDate = (dateString: string): DateInfo => {
         const date = new Date(dateString);
@@ -316,9 +307,51 @@ const EventDetailsPage = ({ id }: EventDetailsPageProps) => {
                                 </div>
                                 <div className="info-text">
                                     <span className="info-label">Date & Time</span>
-                                    <span className="info-value">{dateInfo?.full || 'TBA'}</span>
+                                    <span className="info-value">
+                                        {dateInfo ? (
+                                            <>
+                                                {dateInfo.full}
+                                                {event.startTime && (
+                                                    <div style={{ fontSize: '0.85rem', color: 'var(--accent-purple)', marginTop: '4px', fontWeight: 600 }}>
+                                                        <FiClock style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                                                        {event.startTime} {event.endTime ? `— ${event.endTime}` : ''}
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : 'TBA'}
+                                    </span>
                                 </div>
                             </motion.div>
+
+                            {event.cancellationDeadline && (
+                                <motion.div
+                                    className={`info-card ${isPastDeadline ? 'deadline-passed' : 'deadline-active'}`}
+                                    whileHover={{ y: -3, scale: 1.02 }}
+                                    style={{
+                                        background: isPastDeadline ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)',
+                                        borderColor: isPastDeadline ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'
+                                    }}
+                                >
+                                    <div className="info-icon" style={{ color: isPastDeadline ? '#ef4444' : '#10b981' }}>
+                                        {isPastDeadline ? <FiShieldOff /> : <FiCheck />}
+                                    </div>
+                                    <div className="info-text">
+                                        <span className="info-label">Cancellation Deadline</span>
+                                        <span className="info-value" style={{ color: isPastDeadline ? '#ef4444' : '#10b981' }}>
+                                            {new Date(event.cancellationDeadline).toLocaleString('en-US', {
+                                                timeZone: 'Africa/Cairo',
+                                                dateStyle: 'medium',
+                                                timeStyle: 'short'
+                                            })}
+                                        </span>
+                                        {isPastDeadline && !isExpired && (
+                                            <div style={{ fontSize: '0.75rem', marginTop: '4px', fontWeight: 800, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <FiAlertTriangle /> RETURNS DISABLED
+                                            </div>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            )}
 
                             <motion.div
                                 className="info-card"
