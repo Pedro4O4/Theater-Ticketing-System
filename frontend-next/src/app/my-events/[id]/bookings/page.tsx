@@ -266,8 +266,13 @@ const EventBookingsPage = () => {
             const rows = sortedLayoutSeats.map(ls => {
                 const key = `${ls.section}-${ls.row}-${ls.seatNumber}`;
                 const activeInfo = activeBookingsMap.get(key);
+                
+                // Dynamic side designation for the report: 1-11 Right, 12+ Left
+                const side = ls.seatNumber <= 11 ? 'Right' : 'Left';
+                const seatLabel = `${ls.row}${ls.seatNumber} (${side})`;
+
                 return [
-                    ls.seatLabel || `${ls.row}${ls.seatNumber}`,
+                    seatLabel,
                     activeInfo ? (activeInfo.seat.attendeeFirstName || '') : '',
                     activeInfo ? (activeInfo.seat.attendeeLastName || '') : '',
                     activeInfo ? (activeInfo.seat.attendeePhone || '') : '',
