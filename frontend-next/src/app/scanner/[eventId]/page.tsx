@@ -208,7 +208,6 @@ const ScannerEventPage = () => {
                         </div>
                     )}
 
-
                     <div className="scanner-body">
                         <div className="scanner-area">
                             {!isScanning && !scanResult && !scanError && (

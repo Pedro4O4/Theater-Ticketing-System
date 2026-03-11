@@ -8,16 +8,12 @@ import { useLanguage, Language } from '@/contexts/LanguageContext';
 import './Navbar.css';
 
 const Navbar: React.FC = () => {
-    const { user, isAuthenticated, isAdmin, isOrganizer, logout } = useAuth();
+    const { user, isAuthenticated, isAdmin, isOrganizer, isScanner, logout } = useAuth();
     const { language, setLanguage, t } = useLanguage();
     const router = useRouter();
     const pathname = usePathname();
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
-    // Hide navbar for scanner routes
-    if (pathname?.startsWith('/scanner')) {
-        return null;
-    }
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [showLangMenu, setShowLangMenu] = useState(false);
@@ -81,6 +77,11 @@ const Navbar: React.FC = () => {
         setShowLogoutDialog(false);
     };
 
+    // Hide navbar for scanner routes
+    if (pathname?.startsWith('/scanner')) {
+        return null;
+    }
+
     return (
         <>
             <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
@@ -94,7 +95,13 @@ const Navbar: React.FC = () => {
 
                         {isAuthenticated ? (
                             <>
-                                {!isAdmin && !isOrganizer && (
+                                {isScanner && (
+                                    <Link href="/scanner" className="nav-item">
+                                        <i className="fas fa-qrcode"></i> Scanner
+                                    </Link>
+                                )}
+
+                                {!isAdmin && !isOrganizer && !isScanner && (
                                     <div className={`nav-dropdown ${openDropdown === 'user' ? 'dropdown-open' : ''}`}
                                          onClick={() => setOpenDropdown(openDropdown === 'user' ? null : 'user')}>
                                         <span className="nav-item">{t('nav.user')} <i className="fas fa-caret-down"></i></span>
@@ -129,16 +136,18 @@ const Navbar: React.FC = () => {
                                     </div>
                                 )}
 
-                                <Link href="/profile" className="nav-item profile-nav">
-                                    {(user as any)?.profilePicture ? (
-                                        <img src={(user as any).profilePicture} alt="Profile" className="nav-avatar" />
-                                    ) : (
-                                        <div className="nav-avatar-placeholder">
-                                            {user?.name?.charAt(0)?.toUpperCase() || '?'}
-                                        </div>
-                                    )}
-                                    <span>{t('nav.profile')}</span>
-                                </Link>
+                                {!isScanner && (
+                                    <Link href="/profile" className="nav-item profile-nav">
+                                        {(user as any)?.profilePicture ? (
+                                            <img src={(user as any).profilePicture} alt="Profile" className="nav-avatar" />
+                                        ) : (
+                                            <div className="nav-avatar-placeholder">
+                                                {user?.name?.charAt(0)?.toUpperCase() || '?'}
+                                            </div>
+                                        )}
+                                        <span>{t('nav.profile')}</span>
+                                    </Link>
+                                )}
                                 <button className="logout-btn" onClick={handleLogoutClick}>{t('nav.logout')}</button>
                             </>
                         ) : (
