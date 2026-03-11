@@ -18,7 +18,8 @@ interface BookingSeat {
     seatType: string;
     price: number;
     seatLabel?: string;
-    attendeeName?: string;
+    attendeeFirstName?: string;
+    attendeeLastName?: string;
     attendeePhone?: string;
 }
 
@@ -63,6 +64,10 @@ const EventBookingsPage = () => {
     // Receipt Modal State
     const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+
+    // Seat Detail Modal State
+    const [selectedSeatInfo, setSelectedSeatInfo] = useState<BookingSeat | null>(null);
+    const [isSeatModalOpen, setIsSeatModalOpen] = useState(false);
 
     // Cancellation Requests
     const [cancellationRequests, setCancellationRequests] = useState<Booking[]>([]);
@@ -161,21 +166,7 @@ const EventBookingsPage = () => {
     };
 
     const formatSeatLabel = (seat: { seatLabel?: string; row: string; seatNumber: number }) => {
-        const raw = seat.seatLabel || `${seat.row}${seat.seatNumber}`;
-        const lower = raw.toLowerCase();
-
-        let side = '';
-        if (lower.includes('left side')) side = 'Left Side';
-        else if (lower.includes('right side')) side = 'Right Side';
-
-        if (!side) return raw;
-
-        const base = raw
-            .replace(/-?\s*left side/i, '')
-            .replace(/-?\s*right side/i, '')
-            .trim();
-
-        return `${base} (${side})`;
+        return seat.seatLabel || `${seat.row}${seat.seatNumber}`;
     };
 
     const handleViewReceipt = (receiptBase64?: string) => {
@@ -347,15 +338,26 @@ const EventBookingsPage = () => {
                                                         <h4><FiGrid size={14} /> {booking.selectedSeats.length} Seat{booking.selectedSeats.length > 1 ? 's' : ''} Booked</h4>
                                                         <div className="eb-seats-grid">
                                                             {booking.selectedSeats.map((seat, sIdx) => (
-                                                                <div key={sIdx} className="eb-seat-item">
-                                                                    <span className="eb-seat-label">
-                                                                        {formatSeatLabel(seat)}
-                                                                    </span>
+                                                                <div 
+                                                                    key={sIdx} 
+                                                                    className="eb-seat-item"
+                                                                    onClick={() => {
+                                                                        setSelectedSeatInfo(seat);
+                                                                        setIsSeatModalOpen(true);
+                                                                    }}
+                                                                    style={{ cursor: 'pointer' }}
+                                                                >
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                        <span className="eb-seat-label">
+                                                                            {formatSeatLabel(seat)}
+                                                                        </span>
+                                                                        <FiEye size={14} style={{ color: '#8b5cf6', opacity: 0.7 }} title="View attendee details" />
+                                                                    </div>
                                                                     <span className="eb-seat-type">{seat.seatType}</span>
                                                                     <span className="eb-seat-price">{seat.price} EGP</span>
-                                                                    {seat.attendeeName && (
+                                                                    {(seat.attendeeFirstName || seat.attendeeLastName) && (
                                                                         <div className="eb-seat-attendee">
-                                                                            <FiUser size={12} /> {seat.attendeeName}
+                                                                            <FiUser size={12} /> {seat.attendeeFirstName} {seat.attendeeLastName}
                                                                             {seat.attendeePhone && (
                                                                                 <span className="eb-att-phone"><FiPhone size={11} /> {seat.attendeePhone}</span>
                                                                             )}
@@ -525,21 +527,33 @@ const EventBookingsPage = () => {
                                                                     (cs) => cs.row === seat.row && cs.seatNumber === seat.seatNumber && cs.section === seat.section
                                                                 ) || booking.cancellationRequest?.cancelAll;
                                                                 return (
-                                                                    <div key={sIdx} className="eb-seat-item" style={{
-                                                                        borderColor: isRequestedForCancel ? 'rgba(239, 68, 68, 0.4)' : undefined,
-                                                                        background: isRequestedForCancel ? 'rgba(239, 68, 68, 0.08)' : undefined,
-                                                                    }}>
-                                                                        <span className="eb-seat-label">
-                                                                            {formatSeatLabel(seat)}
-                                                                        </span>
+                                                                    <div 
+                                                                        key={sIdx} 
+                                                                        className="eb-seat-item" 
+                                                                        onClick={() => {
+                                                                            setSelectedSeatInfo(seat);
+                                                                            setIsSeatModalOpen(true);
+                                                                        }}
+                                                                        style={{
+                                                                            borderColor: isRequestedForCancel ? 'rgba(239, 68, 68, 0.4)' : undefined,
+                                                                            background: isRequestedForCancel ? 'rgba(239, 68, 68, 0.08)' : undefined,
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                    >
+                                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                            <span className="eb-seat-label">
+                                                                                {formatSeatLabel(seat)}
+                                                                            </span>
+                                                                            <FiEye size={14} style={{ color: '#8b5cf6', opacity: 0.7 }} title="View attendee details" />
+                                                                        </div>
                                                                         <span className="eb-seat-type">{seat.seatType}</span>
                                                                         <span className="eb-seat-price">{seat.price} EGP</span>
                                                                         {isRequestedForCancel && (
                                                                             <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 700 }}>RETURN</span>
                                                                         )}
-                                                                        {seat.attendeeName && (
+                                                                        {(seat.attendeeFirstName || seat.attendeeLastName) && (
                                                                             <div className="eb-seat-attendee">
-                                                                                <FiUser size={12} /> {seat.attendeeName}
+                                                                                <FiUser size={12} /> {seat.attendeeFirstName} {seat.attendeeLastName}
                                                                                 {seat.attendeePhone && (
                                                                                     <span className="eb-att-phone"><FiPhone size={11} /> {seat.attendeePhone}</span>
                                                                                 )}
@@ -629,6 +643,120 @@ const EventBookingsPage = () => {
                                     alt="Transaction Receipt"
                                     style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain' }}
                                 />
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Seat Detail Modal */}
+            <AnimatePresence>
+                {isSeatModalOpen && selectedSeatInfo && (
+                    <div className="modal-overlay" onClick={() => setIsSeatModalOpen(false)} style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 9999,
+                        display: 'flex', justifyContent: 'center', alignItems: 'center',
+                        backdropFilter: 'blur(5px)'
+                    }}>
+                        <motion.div
+                            className="seat-modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            style={{
+                                background: '#11111a', padding: '30px', borderRadius: '24px',
+                                maxWidth: '400px', width: '90%', display: 'flex', flexDirection: 'column',
+                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ 
+                                        width: '40px', height: '40px', borderRadius: '12px', 
+                                        background: 'rgba(139, 92, 246, 0.15)', display: 'flex', 
+                                        alignItems: 'center', justifyContent: 'center', color: '#8b5cf6' 
+                                    }}>
+                                        <FiGrid size={20} />
+                                    </div>
+                                    <h3 style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>Seat Information</h3>
+                                </div>
+                                <button
+                                    onClick={() => setIsSeatModalOpen(false)}
+                                    style={{ 
+                                        background: 'rgba(255,255,255,0.05)', border: 'none', 
+                                        color: '#9ca3af', cursor: 'pointer', padding: '8px',
+                                        borderRadius: '10px', display: 'flex', alignItems: 'center'
+                                    }}
+                                >
+                                    <FiX size={20} />
+                                </button>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <div style={{ 
+                                    padding: '16px', background: 'rgba(255,255,255,0.02)', 
+                                    borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' 
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                        <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Seat Label</span>
+                                        <span style={{ color: '#22d3ee', fontWeight: 700, fontSize: '1rem' }}>{formatSeatLabel(selectedSeatInfo)}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Section / Type</span>
+                                        <span style={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.9rem' }}>
+                                            {selectedSeatInfo.section} / {selectedSeatInfo.seatType}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <h4 style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Attendee Details</h4>
+                                    
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '4px 0' }}>
+                                        <div style={{ color: '#8b5cf6', opacity: 0.8 }}><FiUser size={18} /></div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>First Name</span>
+                                            <span style={{ color: '#f8fafc', fontWeight: 600 }}>{selectedSeatInfo.attendeeFirstName || 'Not provided'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '4px 0' }}>
+                                        <div style={{ color: '#8b5cf6', opacity: 0.8 }}><FiUser size={18} /></div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>Last Name</span>
+                                            <span style={{ color: '#f8fafc', fontWeight: 600 }}>{selectedSeatInfo.attendeeLastName || 'Not provided'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '4px 0' }}>
+                                        <div style={{ color: '#22c55e', opacity: 0.8 }}><FiPhone size={18} /></div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>Phone Number</span>
+                                            <span style={{ color: '#f8fafc', fontWeight: 600 }}>{selectedSeatInfo.attendeePhone || 'Not provided'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => setIsSeatModalOpen(false)}
+                                    style={{
+                                        marginTop: '10px',
+                                        padding: '14px',
+                                        borderRadius: '14px',
+                                        background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                                        color: 'white',
+                                        border: 'none',
+                                        fontWeight: 700,
+                                        cursor: 'pointer',
+                                        boxShadow: '0 10px 20px -5px rgba(139, 92, 246, 0.4)'
+                                    }}
+                                >
+                                    Close Details
+                                </motion.button>
                             </div>
                         </motion.div>
                     </div>

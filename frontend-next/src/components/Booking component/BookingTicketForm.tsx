@@ -22,7 +22,8 @@ interface Seat {
 }
 
 interface AttendeeInfo {
-    attendeeName: string;
+    attendeeFirstName: string;
+    attendeeLastName: string;
     attendeePhone: string;
 }
 
@@ -118,7 +119,7 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
         // Initialize attendee info for each seat (preserve existing data)
         const newAttendeeInfo = selectedSeats.map((seat, index) => {
             const existing = attendeeInfo[index];
-            return existing || { attendeeName: '', attendeePhone: '' };
+            return (existing as any) || { attendeeFirstName: '', attendeeLastName: '', attendeePhone: '' };
         });
         setAttendeeInfo(newAttendeeInfo);
         setShowAttendeeForm(true);
@@ -151,11 +152,23 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
 
         // Validate attendee info
         if (selectedEvent.hasTheaterSeating) {
+            const seenNames = new Set<string>();
+
             for (let i = 0; i < attendeeInfo.length; i++) {
-                if (!attendeeInfo[i].attendeeName.trim()) {
-                    setError(`Please enter name for ${selectedSeats[i].seatLabel || `Seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
+                const firstName = attendeeInfo[i].attendeeFirstName.trim();
+                const lastName = attendeeInfo[i].attendeeLastName.trim();
+                const fullName = `${firstName.toLowerCase()} ${lastName.toLowerCase()}`.trim();
+
+                if (!firstName || !lastName) {
+                    setError(`Please enter first and last name for ${selectedSeats[i].seatLabel || `Seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
                     return;
                 }
+
+                if (seenNames.has(fullName)) {
+                    setError(`Duplicate attendee name detected: ${firstName} ${lastName}. Each attendee must have a unique name.`);
+                    return;
+                }
+                seenNames.add(fullName);
 
                 const phone = attendeeInfo[i].attendeePhone.trim();
                 if (!/^01\d{9}$/.test(phone)) {
@@ -179,7 +192,8 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                     seatNumber: seat.seatNumber,
                     section: seat.section,
                     seatLabel: seat.seatLabel,
-                    attendeeName: attendeeInfo[index]?.attendeeName || '',
+                    attendeeFirstName: attendeeInfo[index]?.attendeeFirstName || '',
+                    attendeeLastName: attendeeInfo[index]?.attendeeLastName || '',
                     attendeePhone: attendeeInfo[index]?.attendeePhone.trim() || '',
                 }));
             } else {
@@ -406,9 +420,19 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                                                         <FiUser className="field-icon" />
                                                         <input
                                                             type="text"
-                                                            placeholder="Full Name"
-                                                            value={attendeeInfo[index]?.attendeeName || ''}
-                                                            onChange={(e) => handleAttendeeChange(index, 'attendeeName', e.target.value)}
+                                                            placeholder="First Name"
+                                                            value={attendeeInfo[index]?.attendeeFirstName || ''}
+                                                            onChange={(e) => handleAttendeeChange(index, 'attendeeFirstName', e.target.value)}
+                                                            className="attendee-input"
+                                                        />
+                                                    </div>
+                                                    <div className="attendee-field">
+                                                        <FiUser className="field-icon" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Last Name"
+                                                            value={attendeeInfo[index]?.attendeeLastName || ''}
+                                                            onChange={(e) => handleAttendeeChange(index, 'attendeeLastName', e.target.value)}
                                                             className="attendee-input"
                                                         />
                                                     </div>

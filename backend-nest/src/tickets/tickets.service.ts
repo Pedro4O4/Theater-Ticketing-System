@@ -38,7 +38,8 @@ export class TicketsService {
       section: string;
       seatType: string;
       price: number;
-      attendeeName?: string;
+      attendeeFirstName?: string;
+      attendeeLastName?: string;
       attendeePhone?: string;
       seatLabel?: string;
     }>,
@@ -77,7 +78,8 @@ export class TicketsService {
         section: seat.section,
         seatType: seat.seatType,
         price: seat.price,
-        attendeeName: seat.attendeeName || '',
+        attendeeFirstName: seat.attendeeFirstName || '',
+        attendeeLastName: seat.attendeeLastName || '',
         attendeePhone: seat.attendeePhone || '',
         seatLabel: seat.seatLabel || '',
         qrData,
@@ -128,7 +130,8 @@ export class TicketsService {
             section: s.section || 'main',
             seatType: s.seatType || 'standard',
             price: s.price || 0,
-            attendeeName: s.attendeeName || '',
+            attendeeFirstName: s.attendeeFirstName || '',
+            attendeeLastName: s.attendeeLastName || '',
             attendeePhone: s.attendeePhone || '',
             seatLabel: s.seatLabel || '',
           })),
@@ -175,7 +178,8 @@ export class TicketsService {
     section: string;
     seatType: string;
     seatLabel: string;
-    attendeeName: string;
+    attendeeFirstName: string;
+    attendeeLastName: string;
     attendeePhone: string;
     isFree: boolean;
     message: string;
@@ -240,7 +244,8 @@ export class TicketsService {
       section: ticket.section,
       seatType: ticket.seatType,
       seatLabel: ticket.seatLabel || '',
-      attendeeName: ticket.attendeeName,
+      attendeeFirstName: ticket.attendeeFirstName,
+      attendeeLastName: ticket.attendeeLastName,
       attendeePhone: ticket.attendeePhone,
       eventId: eventData?._id?.toString() || '',
       eventTitle: eventData?.title || '',

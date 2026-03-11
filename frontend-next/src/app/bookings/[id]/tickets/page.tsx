@@ -21,7 +21,8 @@ interface Ticket {
     section: string;
     seatType: string;
     price: number;
-    attendeeName: string;
+    attendeeFirstName?: string;
+    attendeeLastName?: string;
     attendeePhone: string;
     seatLabel?: string;
     qrData: string;
@@ -204,8 +205,12 @@ const BookingTicketsPage = () => {
             y += 55;
         }
 
-        if (ticket.attendeeName) {
-            drawInfoRow('Attendee', ticket.attendeeName, leftCol, y);
+        const attendeeFullName = (ticket.attendeeFirstName || ticket.attendeeLastName)
+            ? `${ticket.attendeeFirstName || ''} ${ticket.attendeeLastName || ''}`.trim()
+            : '';
+
+        if (attendeeFullName) {
+            drawInfoRow('Attendee', attendeeFullName, leftCol, y);
             if (ticket.attendeePhone) drawInfoRow('Phone', ticket.attendeePhone, rightCol, y);
             y += 55;
         }
@@ -455,10 +460,10 @@ const BookingTicketsPage = () => {
                                                 <span className="detail-label">Price</span>
                                                 <span className="detail-value">{ticket.price} EGP</span>
                                             </div>
-                                            {ticket.attendeeName && (
+                                            {(ticket.attendeeFirstName || ticket.attendeeLastName) && (
                                                 <div className="ticket-detail-row">
                                                     <span className="detail-label"><FiUser size={12} /> Attendee</span>
-                                                    <span className="detail-value">{ticket.attendeeName}</span>
+                                                    <span className="detail-value">{ticket.attendeeFirstName} {ticket.attendeeLastName}</span>
                                                 </div>
                                             )}
                                             {ticket.attendeePhone && (

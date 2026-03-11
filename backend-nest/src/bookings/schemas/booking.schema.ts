@@ -26,7 +26,10 @@ class SelectedSeat {
     price: number;
 
     @Prop()
-    attendeeName: string;
+    attendeeFirstName: string;
+
+    @Prop()
+    attendeeLastName: string;
 
     @Prop()
     attendeePhone: string;

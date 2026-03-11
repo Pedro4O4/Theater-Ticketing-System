@@ -31,7 +31,10 @@ export class Ticket {
   price: number;
 
   @Prop({ default: '' })
-  attendeeName: string;
+  attendeeFirstName: string;
+
+  @Prop({ default: '' })
+  attendeeLastName: string;
 
   @Prop({ default: '' })
   attendeePhone: string;

@@ -363,7 +363,8 @@ export class BookingsService implements OnModuleInit {
                     seatType,
                     price,
                     seatLabel: seat.seatLabel,
-                    attendeeName: seat.attendeeName || '',
+                    attendeeFirstName: seat.attendeeFirstName || '',
+                    attendeeLastName: seat.attendeeLastName || '',
                     attendeePhone: seat.attendeePhone || '',
                 };
             });
@@ -615,7 +616,8 @@ export class BookingsService implements OnModuleInit {
                         seatType: s.seatType || 'standard',
                         price: s.price || 0,
                         seatLabel: s.seatLabel,
-                        attendeeName: s.attendeeName || '',
+                        attendeeFirstName: s.attendeeFirstName || '',
+                        attendeeLastName: s.attendeeLastName || '',
                         attendeePhone: s.attendeePhone || '',
                     })),
                 );

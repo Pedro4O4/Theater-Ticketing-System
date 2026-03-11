@@ -63,7 +63,8 @@ interface ScannedTicket {
     section: string;
     seatType: string;
     seatLabel?: string;
-    attendeeName: string;
+    attendeeFirstName?: string;
+    attendeeLastName?: string;
     attendeePhone: string;
     scannedAt: string;
 }
@@ -318,6 +319,7 @@ const UserDetailsPage = () => {
                                                     {booking.selectedSeats.map((seat, i) => (
                                                         <span key={i} className="seat-tag">
                                                             {seat.seatLabel || `${seat.row}-${seat.seatNumber} (${seat.section})`}
+                                                            {(seat.attendeeFirstName || seat.attendeeLastName) && ` - ${seat.attendeeFirstName || ''} ${seat.attendeeLastName || ''}`.trim()}
                                                         </span>
                                                     ))}
                                                 </div>
@@ -438,7 +440,12 @@ const UserDetailsPage = () => {
                                         <div className="seats-preview" style={{ marginTop: '10px' }}>
                                             <span className="detail-label" style={{ display: 'block', marginBottom: '8px' }}>Attendee Information:</span>
                                             <div className="detail-col">
-                                                <span className="detail-val" style={{ fontSize: '0.9rem' }}><FiUser size={12} style={{ marginRight: '4px' }} /> {ticket.attendeeName || ticket.userId?.name || 'N/A'}</span>
+                                                <span className="detail-val" style={{ fontSize: '0.9rem' }}>
+                                                    <FiUser size={12} style={{ marginRight: '4px' }} /> 
+                                                    {(ticket.attendeeFirstName || ticket.attendeeLastName) 
+                                                        ? `${ticket.attendeeFirstName || ''} ${ticket.attendeeLastName || ''}`.trim() 
+                                                        : (ticket.userId?.name || 'N/A')}
+                                                </span>
                                                 <span className="detail-val" style={{ fontSize: '0.9rem', color: '#94a3b8' }}><FiPhone size={12} style={{ marginRight: '4px' }} /> {ticket.attendeePhone || ticket.userId?.phone || 'N/A'}</span>
                                             </div>
                                         </div>

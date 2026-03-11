@@ -19,7 +19,7 @@ interface Booking {
     numberOfTickets: number;
     totalPrice: number;
     status: 'pending' | 'confirmed' | 'canceled' | 'rejected';
-    selectedSeats?: { section: string; row: string; seatNumber: number; seatType?: string; price?: number; seatLabel?: string }[];
+    selectedSeats?: { section: string; row: string; seatNumber: number; seatType?: string; price?: number; seatLabel?: string; attendeeFirstName?: string; attendeeLastName?: string; attendeePhone?: string }[];
     createdAt: string;
     pendingExpiresAt?: string;
     isReceiptUploaded?: boolean;
@@ -304,8 +304,12 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
         });
     };
 
-    const formatSeatLabel = (seat: { seatLabel?: string; row: string; seatNumber: number }) => {
-        return seat.seatLabel || `${seat.row}${seat.seatNumber}`;
+    const formatSeatLabel = (seat: { seatLabel?: string; row: string; seatNumber: number; attendeeFirstName?: string; attendeeLastName?: string }) => {
+        const label = seat.seatLabel || `${seat.row}${seat.seatNumber}`;
+        const attendee = (seat.attendeeFirstName || seat.attendeeLastName) 
+            ? ` (${seat.attendeeFirstName || ''} ${seat.attendeeLastName || ''}`.trim() + ')'
+            : '';
+        return label + attendee;
     };
 
     if (loading) return (

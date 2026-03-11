@@ -20,7 +20,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import '@/components/Booking component/BookingTicketForm.css';
 
 interface AttendeeInfo {
-    attendeeName: string;
+    attendeeFirstName: string;
+    attendeeLastName: string;
     attendeePhone: string;
 }
 
@@ -297,7 +298,7 @@ const BookTicketPage = () => {
                 // Initialize attendee info for each seat (preserve existing data)
                 const newAttendeeInfo = selectedSeats.map((_seat, index) => {
                     const existing = attendeeInfo[index];
-                    return existing || { attendeeName: '', attendeePhone: '' };
+                    return existing || { attendeeFirstName: '', attendeeLastName: '', attendeePhone: '' };
                 });
                 setAttendeeInfo(newAttendeeInfo);
                 setShowAttendeeForm(true);
@@ -419,11 +420,28 @@ const BookTicketPage = () => {
 
         // Validate attendee info for theater events
         if (event.hasTheaterSeating) {
+            const seenNames = new Set<string>();
+
             for (let i = 0; i < attendeeInfo.length; i++) {
-                if (!attendeeInfo[i]?.attendeeName?.trim()) {
-                    toast.error(`Please enter name for ${selectedSeats[i].seatLabel || `seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
+                const fName = attendeeInfo[i]?.attendeeFirstName?.trim() || '';
+                const lName = attendeeInfo[i]?.attendeeLastName?.trim() || '';
+
+                if (!fName) {
+                    toast.error(`Please enter first name for ${selectedSeats[i].seatLabel || `seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
                     return;
                 }
+                if (!lName) {
+                    toast.error(`Please enter last name for ${selectedSeats[i].seatLabel || `seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
+                    return;
+                }
+
+                // Check for duplicate names within the same booking
+                const fullName = `${fName.toLowerCase()} ${lName.toLowerCase()}`;
+                if (seenNames.has(fullName)) {
+                    toast.error(`Duplicate name detected: "${fName} ${lName}". Each seat must have a unique attendee.`);
+                    return;
+                }
+                seenNames.add(fullName);
 
                 const phoneField = attendeeInfo[i]?.attendeePhone?.trim() || '';
                 if (!phoneField) {
@@ -436,6 +454,8 @@ const BookTicketPage = () => {
                     return;
                 }
 
+                attendeeInfo[i].attendeeFirstName = fName;
+                attendeeInfo[i].attendeeLastName = lName;
                 attendeeInfo[i].attendeePhone = phoneField;
             }
         }
@@ -456,7 +476,8 @@ const BookTicketPage = () => {
                     seatNumber: seat.seatNumber,
                     section: seat.section,
                     seatLabel: seat.seatLabel,
-                    attendeeName: attendeeInfo[index]?.attendeeName || '',
+                    attendeeFirstName: attendeeInfo[index]?.attendeeFirstName || '',
+                    attendeeLastName: attendeeInfo[index]?.attendeeLastName || '',
                     attendeePhone: attendeeInfo[index]?.attendeePhone || '',
                 }));
             } else {
@@ -888,9 +909,19 @@ const BookTicketPage = () => {
                                                             <FiUser className="field-icon" />
                                                             <input
                                                                 type="text"
-                                                                placeholder="Full Name"
-                                                                value={attendeeInfo[index]?.attendeeName || ''}
-                                                                onChange={(e) => handleAttendeeChange(index, 'attendeeName', e.target.value)}
+                                                                placeholder="First Name"
+                                                                value={attendeeInfo[index]?.attendeeFirstName || ''}
+                                                                onChange={(e) => handleAttendeeChange(index, 'attendeeFirstName', e.target.value)}
+                                                                className="attendee-input"
+                                                            />
+                                                        </div>
+                                                        <div className="attendee-field">
+                                                            <FiUser className="field-icon" />
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Last Name"
+                                                                value={attendeeInfo[index]?.attendeeLastName || ''}
+                                                                onChange={(e) => handleAttendeeChange(index, 'attendeeLastName', e.target.value)}
                                                                 className="attendee-input"
                                                             />
                                                         </div>

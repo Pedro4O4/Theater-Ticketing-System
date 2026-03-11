@@ -22,7 +22,8 @@ interface ScanResult {
     section: string;
     seatType: string;
     seatLabel?: string;
-    attendeeName: string;
+    attendeeFirstName?: string;
+    attendeeLastName?: string;
     attendeePhone: string;
     isFree: boolean;
     message: string;
@@ -373,14 +374,14 @@ const QRScannerPage = () => {
                                             </div>
 
                                             {/* Attendee Info */}
-                                            {(scanResult.attendeeName || scanResult.attendeePhone) && (
+                                            {(scanResult.attendeeFirstName || scanResult.attendeeLastName || scanResult.attendeePhone) && (
                                                 <div className="result-section">
                                                     <h4><FiUser size={16} /> Attendee Details</h4>
                                                     <div className="result-grid">
-                                                        {scanResult.attendeeName && (
+                                                        {(scanResult.attendeeFirstName || scanResult.attendeeLastName) && (
                                                             <div className="result-field">
                                                                 <span className="field-label"><FiUser size={12} /> Name</span>
-                                                                <span className="field-value">{scanResult.attendeeName}</span>
+                                                                <span className="field-value">{scanResult.attendeeFirstName} {scanResult.attendeeLastName}</span>
                                                             </div>
                                                         )}
                                                         {scanResult.attendeePhone && (
@@ -437,7 +438,7 @@ const QRScannerPage = () => {
                                                 {item.seatLabel || `${item.seatRow}${item.seatNumber}`}
                                             </span>
                                             <span className="history-section">{item.section}</span>
-                                            <span className="history-name">{item.attendeeName || item.userName}</span>
+                                            <span className="history-name">{(item.attendeeFirstName || item.attendeeLastName) ? `${item.attendeeFirstName || ''} ${item.attendeeLastName || ''}`.trim() : item.userName}</span>
                                             <span className={`history-status ${item.isFree ? 'free' : 'not-free'}`}>
                                                 {item.isFree ? '✅' : '❌'}
                                             </span>

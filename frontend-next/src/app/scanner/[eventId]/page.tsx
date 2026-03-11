@@ -19,7 +19,8 @@ interface ScanResult {
     seatRow: string;
     seatNumber: number;
     section: string;
-    attendeeName: string;
+    attendeeFirstName?: string;
+    attendeeLastName?: string;
     attendeePhone: string;
     seatLabel?: string;
     isFree: boolean;
@@ -329,14 +330,14 @@ const ScannerEventPage = () => {
                                             </div>
                                         </div>
 
-                                        {(scanResult.attendeeName || scanResult.attendeePhone) && (
+                                        {(scanResult.attendeeFirstName || scanResult.attendeeLastName || scanResult.attendeePhone) && (
                                             <div className="result-section">
                                                 <h4><FiUser size={16} /> Attendee</h4>
                                                 <div className="result-grid">
-                                                    {scanResult.attendeeName && (
+                                                    {(scanResult.attendeeFirstName || scanResult.attendeeLastName) && (
                                                         <div className="result-field">
                                                             <span className="field-label"><FiUser size={12} /> Name</span>
-                                                            <span className="field-value">{scanResult.attendeeName}</span>
+                                                            <span className="field-value">{scanResult.attendeeFirstName} {scanResult.attendeeLastName}</span>
                                                         </div>
                                                     )}
                                                     {scanResult.attendeePhone && (
@@ -387,7 +388,7 @@ const ScannerEventPage = () => {
                                         <div key={index} className={`history-item ${item.isFree ? 'valid' : 'invalid'}`}>
                                             <span className="history-seat">{item.seatLabel || `${item.seatRow}${item.seatNumber}`}</span>
                                             <span className="history-section">{item.section}</span>
-                                            <span className="history-name">{item.attendeeName || item.userName}</span>
+                                            <span className="history-name">{(item.attendeeFirstName || item.attendeeLastName) ? `${item.attendeeFirstName || ''} ${item.attendeeLastName || ''}`.trim() : item.userName}</span>
                                             <span className={`history-status ${item.isFree ? 'free' : 'not-free'}`}>
                                                 {item.isFree ? '✅' : '❌'}
                                             </span>
