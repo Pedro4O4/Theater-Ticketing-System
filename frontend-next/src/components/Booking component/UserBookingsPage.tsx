@@ -535,21 +535,40 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                         </div>
                                     )}
 
-                                    <motion.button
-                                        onClick={() => handleUploadClick(booking._id)}
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%',
-                                            padding: '14px', borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white',
-                                            border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: 700,
-                                            boxShadow: '0 6px 20px rgba(139, 92, 246, 0.35)',
-                                            letterSpacing: '0.3px'
-                                        }}
-                                    >
-                                        <FiUploadCloud size={20} /> Upload Receipt Now
-                                    </motion.button>
+                                    <div style={{ display: 'flex', gap: '12px' }}>
+                                        <motion.button
+                                            onClick={() => handleCancelClick(booking._id)}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            style={{
+                                                flex: 1,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                                padding: '14px', borderRadius: '12px',
+                                                background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444',
+                                                border: '1px solid rgba(239, 68, 68, 0.3)', cursor: 'pointer', fontSize: '1rem', fontWeight: 700,
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            <FiTrash2 size={20} /> Cancel Booking
+                                        </motion.button>
+
+                                        <motion.button
+                                            onClick={() => handleUploadClick(booking._id)}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            style={{
+                                                flex: 2,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                                padding: '14px', borderRadius: '12px',
+                                                background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white',
+                                                border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: 700,
+                                                boxShadow: '0 6px 20px rgba(139, 92, 246, 0.35)',
+                                                letterSpacing: '0.3px'
+                                            }}
+                                        >
+                                            <FiUploadCloud size={20} /> Upload Receipt Now
+                                        </motion.button>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -710,19 +729,35 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                             </>
                                         )}
                                         {isPending && !booking.isReceiptUploaded && (
-                                            <button
-                                                onClick={() => handleUploadClick(booking._id)}
-                                                className="upload-receipt-btn"
-                                                style={{
-                                                    display: 'flex', alignItems: 'center', gap: '6px',
-                                                    padding: '0.5rem 1rem', borderRadius: '8px',
-                                                    background: 'rgba(139, 92, 246, 0.2)', color: '#a78bfa',
-                                                    border: '1px solid rgba(139, 92, 246, 0.4)', cursor: 'pointer',
-                                                    fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s'
-                                                }}
-                                            >
-                                                <FiUploadCloud /> Upload Receipt
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                                                <button
+                                                    onClick={() => handleCancelClick(booking._id)}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                                        padding: '0.5rem 1rem', borderRadius: '8px',
+                                                        background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444',
+                                                        border: '1px solid rgba(239, 68, 68, 0.3)', cursor: 'pointer',
+                                                        fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s',
+                                                        flex: 1, justifyContent: 'center'
+                                                    }}
+                                                >
+                                                    <FiTrash2 size={14} /> Cancel
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUploadClick(booking._id)}
+                                                    className="upload-receipt-btn"
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                                        padding: '0.5rem 1rem', borderRadius: '8px',
+                                                        background: 'rgba(139, 92, 246, 0.2)', color: '#a78bfa',
+                                                        border: '1px solid rgba(139, 92, 246, 0.4)', cursor: 'pointer',
+                                                        fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.2s',
+                                                        flex: 2, justifyContent: 'center'
+                                                    }}
+                                                >
+                                                    <FiUploadCloud /> Upload Receipt
+                                                </button>
+                                            </div>
                                         )}
                                         {booking.status === 'confirmed' && booking.hasTheaterSeating && !isPrevious && (
                                             <Link

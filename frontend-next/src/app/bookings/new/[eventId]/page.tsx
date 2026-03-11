@@ -6,13 +6,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiCalendar, FiMapPin, FiTag, FiMinus, FiPlus,
     FiShoppingCart, FiArrowLeft, FiCheckCircle, FiAlertCircle,
-    FiCreditCard, FiUsers, FiGrid, FiUser, FiPhone, FiArrowRight, FiClock, FiCopy, FiExternalLink
+    FiCreditCard, FiUsers, FiGrid, FiUser, FiPhone, FiArrowRight, FiClock, FiCopy, FiExternalLink, FiTrash2
 } from 'react-icons/fi';
 import { getImageUrl } from '@/utils/imageHelper';
 import SeatSelector from '@/components/Booking component/SeatSelector';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { Event } from '@/types/event';
 import { Seat } from '@/types/booking';
+import CancelSeatsModal from '@/components/Booking component/CancelSeatsModal';
 import { toast } from 'react-toastify';
 import { useLanguage } from '@/contexts/LanguageContext';
 import '@/components/Booking component/BookingTicketForm.css';
@@ -61,6 +62,7 @@ const BookTicketPage = () => {
     const [holdId, setHoldId] = useState<string | null>(null);
     const [holdExpiresAt, setHoldExpiresAt] = useState<Date | null>(null);
     const [holdCountdown, setHoldCountdown] = useState<number>(0);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const holdIdRef = useRef<string | null>(null); // for cleanup in useEffect
 
     // Compress image to reduce payload size (same as UploadReceiptPage)
@@ -265,6 +267,77 @@ const BookTicketPage = () => {
             toast.error(msg);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleCancelSeatsConfirm = async (seatKeys: string[], cancelAll: boolean) => {
+        setIsLoading(true);
+        try {
+            // 1. Release the current hold
+            if (holdId) {
+                await api.delete(`/booking/hold-seats/${holdId}`);
+            }
+
+            if (cancelAll) {
+                // If canceling all, just go back to seat selection
+                setHoldId(null);
+                holdIdRef.current = null;
+                setHoldExpiresAt(null);
+                setShowAttendeeForm(false);
+                setSelectedSeats([]);
+                setSeatTotalPrice(0);
+                setIsCancelModalOpen(false);
+                toast.info('All seats released.');
+                return;
+            }
+
+            // 2. Filter remaining seats
+            const remainingSeats = selectedSeats.filter(seat => {
+                const key = `${seat.section}-${seat.row}-${seat.seatNumber}`;
+                return !seatKeys.includes(key);
+            });
+
+            // Update attendee info as well (by index)
+            const remainingIndices = selectedSeats
+                .map((seat, index) => ({ seat, index }))
+                .filter(item => {
+                    const key = `${item.seat.section}-${item.seat.row}-${item.seat.seatNumber}`;
+                    return !seatKeys.includes(key);
+                })
+                .map(item => item.index);
+
+            const newAttendeeInfo = remainingIndices.map(idx => attendeeInfo[idx]);
+            setAttendeeInfo(newAttendeeInfo);
+
+            // 3. Re-hold the remaining seats
+            const response = await api.post('/booking/hold-seats', {
+                eventId: event?._id,
+                seats: remainingSeats.map(s => ({
+                    row: s.row,
+                    seatNumber: s.seatNumber,
+                    section: s.section || 'main',
+                })),
+            });
+
+            if (response.data.success) {
+                const { holdId: newHoldId, expiresAt } = response.data.data;
+                setHoldId(newHoldId);
+                holdIdRef.current = newHoldId;
+                setHoldExpiresAt(new Date(expiresAt));
+                setSelectedSeats(remainingSeats);
+                
+                // Recalculate total price
+                const newTotal = remainingSeats.reduce((sum, s) => sum + (s.price || 0), 0);
+                setSeatTotalPrice(newTotal);
+
+                toast.success(`${seatKeys.length} seat(s) released.`);
+            }
+        } catch (err: any) {
+            console.error("Cancellation error:", err);
+            toast.error(err.response?.data?.message || "Failed to cancel seats. Please try again.");
+        } finally {
+            setIsLoading(false);
+            setIsCancelModalOpen(false);
         }
     };
 
@@ -701,28 +774,55 @@ const BookTicketPage = () => {
                                                 <h3>Attendee Information</h3>
                                                 <p>Enter name and phone for each seat</p>
                                             </div>
-                                            {holdExpiresAt && holdCountdown > 0 && (
+                                             {holdExpiresAt && holdCountdown > 0 && (
                                                 <div style={{
                                                     marginLeft: 'auto',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: '8px',
-                                                    padding: '8px 16px',
-                                                    borderRadius: '12px',
-                                                    background: holdCountdown <= 60
-                                                        ? 'rgba(239, 68, 68, 0.15)'
-                                                        : 'rgba(139, 92, 246, 0.12)',
-                                                    border: `1px solid ${holdCountdown <= 60
-                                                        ? 'rgba(239, 68, 68, 0.4)'
-                                                        : 'rgba(139, 92, 246, 0.3)'}`,
-                                                    color: holdCountdown <= 60 ? '#ef4444' : '#a78bfa',
-                                                    fontWeight: 600,
-                                                    fontSize: '0.95rem',
-                                                    fontVariantNumeric: 'tabular-nums',
-                                                    animation: holdCountdown <= 30 ? 'pulse 1s infinite' : undefined,
+                                                    gap: '12px'
                                                 }}>
-                                                    <FiClock size={16} />
-                                                    {Math.floor(holdCountdown / 60)}:{String(holdCountdown % 60).padStart(2, '0')}
+                                                    <motion.button
+                                                        className="cancel-hold-btn"
+                                                        onClick={() => setIsCancelModalOpen(true)}
+                                                        whileHover={{ scale: 1.05 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                        style={{
+                                                            background: 'rgba(239, 68, 68, 0.1)',
+                                                            color: '#ef4444',
+                                                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                                                            padding: '6px 12px',
+                                                            borderRadius: '8px',
+                                                            fontSize: '0.85rem',
+                                                            fontWeight: 600,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '6px'
+                                                        }}
+                                                    >
+                                                        <FiTrash2 size={14} /> Cancel
+                                                    </motion.button>
+
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        padding: '8px 16px',
+                                                        borderRadius: '12px',
+                                                        background: holdCountdown <= 60
+                                                            ? 'rgba(239, 68, 68, 0.15)'
+                                                            : 'rgba(139, 92, 246, 0.12)',
+                                                        border: `1px solid ${holdCountdown <= 60
+                                                            ? 'rgba(239, 68, 68, 0.4)'
+                                                            : 'rgba(139, 92, 246, 0.3)'}`,
+                                                        color: holdCountdown <= 60 ? '#ef4444' : '#a78bfa',
+                                                        fontWeight: 600,
+                                                        fontSize: '0.95rem',
+                                                        fontVariantNumeric: 'tabular-nums',
+                                                        animation: holdCountdown <= 30 ? 'pulse 1s infinite' : undefined,
+                                                    }}>
+                                                        <FiClock size={16} />
+                                                        {Math.floor(holdCountdown / 60)}:{String(holdCountdown % 60).padStart(2, '0')}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
@@ -889,6 +989,15 @@ const BookTicketPage = () => {
                         </motion.div>
                     </div>
                 )}
+
+                <CancelSeatsModal
+                    isOpen={isCancelModalOpen}
+                    onClose={() => setIsCancelModalOpen(false)}
+                    onConfirm={handleCancelSeatsConfirm}
+                    seats={selectedSeats}
+                    isLoading={isLoading}
+                    bookingType="pending"
+                />
             </motion.div>
         </ProtectedRoute>
     );
