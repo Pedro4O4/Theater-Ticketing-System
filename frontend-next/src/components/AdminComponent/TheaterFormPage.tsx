@@ -113,7 +113,8 @@ const TheaterFormPage = ({ id }: TheaterFormPageProps) => {
                     vCorridors: designerData.vCorridors,
                     labels: designerData.labels
                 },
-                seatConfig: designerData.seatConfig
+                seatConfig: designerData.seatConfig,
+                totalSeats: designerData.totalSeats
             };
 
             if (isEditMode) {

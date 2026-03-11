@@ -128,29 +128,30 @@ export const TheaterSchema = SchemaFactory.createForClass(Theater);
 
 // Pre-save hook
 TheaterSchema.pre('save', async function (this: TheaterDocument) {
-    const mainFloor = this.layout?.mainFloor;
-    const balcony = this.layout?.balcony;
+    const self = this as any;
+    const layout = self.layout;
+    const mainFloor = layout?.mainFloor;
+    const balcony = layout?.balcony;
 
     const mainSeats = (mainFloor?.rows || 0) * (mainFloor?.seatsPerRow || 0);
-    const balconySeats = (this.layout?.hasBalcony)
+    const balconySeats = (layout?.hasBalcony)
         ? (balcony?.rows || 0) * (balcony?.seatsPerRow || 0)
         : 0;
 
-    const seatConfigs = this.seatConfig || [];
+    const removedCount = layout?.removedSeats?.length || 0;
+    const disabledCount = layout?.disabledSeats?.length || 0;
 
-    // Subtract disabled seats (either explicit 'disabled' type or isActive = false)
-    const disabledCount = seatConfigs.filter(
-        (s) => !s.isActive || s.seatType === 'disabled',
-    ).length;
+    // totalSeats covers the physical bookable chairs (not removed, not disabled)
+    self.totalSeats = Math.max(0, mainSeats + balconySeats - removedCount - disabledCount);
 
-    this.totalSeats = Math.max(0, mainSeats + balconySeats - disabledCount);
+    const seatConfigs = self.seatConfig || [];
 
     // Count VIP and Premium seats correctly from the actual configuration
-    this.vipSeats = seatConfigs.filter(
-        (s) => s.seatType === 'vip' && s.isActive,
+    self.vipSeats = seatConfigs.filter(
+        (s: any) => s.seatType === 'vip' && s.isActive,
     ).length;
-    this.premiumSeats = seatConfigs.filter(
-        (s) => s.seatType === 'premium' && s.isActive,
+    self.premiumSeats = seatConfigs.filter(
+        (s: any) => s.seatType === 'premium' && s.isActive,
     ).length;
 });
 

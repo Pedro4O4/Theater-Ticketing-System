@@ -121,12 +121,12 @@ const EventDetailsPage = () => {
     const deadlineStr = event?.cancellationDeadline ? formatDeadline(event.cancellationDeadline) : null;
     const isPastDeadline = event?.cancellationDeadline ? new Date() > new Date(event.cancellationDeadline) : false;
 
-    const mainSeatCounts = React.useMemo(() => {
+    const totalSeatCounts = React.useMemo(() => {
         if (!seatData || !seatData.seats) return { available: 0, booked: 0, total: 0 };
-        const mainSeats = seatData.seats.filter((s: any) => s.section !== 'balcony' && s.isActive);
-        const available = mainSeats.filter((s: any) => !s.isBooked).length;
-        const booked = mainSeats.filter((s: any) => s.isBooked).length;
-        return { available, booked, total: mainSeats.length };
+        const activeSeats = seatData.seats.filter((s: any) => s.isActive);
+        const available = activeSeats.filter((s: any) => !s.isBooked).length;
+        const booked = activeSeats.filter((s: any) => s.isBooked).length;
+        return { available, booked, total: activeSeats.length };
     }, [seatData]);
 
     if (loading) {
@@ -168,8 +168,8 @@ const EventDetailsPage = () => {
                         <div className="booking-summary-compact">
                             {seatData && (
                                 <>
-                                    <span className="seats-count">{mainSeatCounts.available} available of {mainSeatCounts.total}</span>
-                                    <span className="seats-count" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}>{mainSeatCounts.booked} booked</span>
+                                    <span className="seats-count">{totalSeatCounts.available} available of {totalSeatCounts.total}</span>
+                                    <span className="seats-count" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}>{totalSeatCounts.booked} booked</span>
                                 </>
                             )}
                             {user?.role === "Standard User" && (
