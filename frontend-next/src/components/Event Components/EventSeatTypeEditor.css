@@ -295,11 +295,13 @@
 }
 
 .row-label {
-    width: 40px;
+    min-width: 70px;
     font-size: 0.75rem;
     font-weight: 600;
     color: #64748b;
     text-align: center;
+    padding: 0 4px;
+    white-space: nowrap;
 }
 
 .seats-container {
@@ -459,7 +461,7 @@
     }
 
     .row-label {
-        width: 30px;
+        min-width: 50px;
         font-size: 0.65rem;
     }
 

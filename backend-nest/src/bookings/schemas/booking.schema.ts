@@ -30,6 +30,9 @@ class SelectedSeat {
 
     @Prop()
     attendeePhone: string;
+
+    @Prop({ default: '' })
+    seatLabel: string;
 }
 
 @Schema()
@@ -42,6 +45,9 @@ class CancellationSeat {
 
     @Prop({ enum: ['main', 'balcony'], default: 'main' })
     section: string;
+
+    @Prop({ default: '' })
+    seatLabel?: string;
 }
 
 @Schema()

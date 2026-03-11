@@ -62,6 +62,7 @@ interface ScannedTicket {
     seatNumber: number;
     section: string;
     seatType: string;
+    seatLabel?: string;
     attendeeName: string;
     attendeePhone: string;
     scannedAt: string;
@@ -316,7 +317,7 @@ const UserDetailsPage = () => {
                                                 <div className="seat-tags">
                                                     {booking.selectedSeats.map((seat, i) => (
                                                         <span key={i} className="seat-tag">
-                                                            {seat.row}-{seat.seatNumber} ({seat.section})
+                                                            {seat.seatLabel || `${seat.row}-${seat.seatNumber} (${seat.section})`}
                                                         </span>
                                                     ))}
                                                 </div>
@@ -426,7 +427,7 @@ const UserDetailsPage = () => {
                                             </div>
                                             <div className="detail-col">
                                                 <span className="detail-label">Seat</span>
-                                                <span className="detail-val">{ticket.section} - {ticket.seatRow}{ticket.seatNumber}</span>
+                                                <span className="detail-val">{ticket.seatLabel || `${ticket.section} - ${ticket.seatRow}${ticket.seatNumber}`}</span>
                                             </div>
                                             <div className="detail-col">
                                                 <span className="detail-label">Type</span>

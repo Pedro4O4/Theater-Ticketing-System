@@ -40,6 +40,7 @@ export class TicketsService {
       price: number;
       attendeeName?: string;
       attendeePhone?: string;
+      seatLabel?: string;
     }>,
   ): Promise<TicketDocument[]> {
     // Check if tickets already exist for this booking
@@ -78,6 +79,7 @@ export class TicketsService {
         price: seat.price,
         attendeeName: seat.attendeeName || '',
         attendeePhone: seat.attendeePhone || '',
+        seatLabel: seat.seatLabel || '',
         qrData,
         qrCodeImage,
         isScanned: false,
@@ -128,6 +130,7 @@ export class TicketsService {
             price: s.price || 0,
             attendeeName: s.attendeeName || '',
             attendeePhone: s.attendeePhone || '',
+            seatLabel: s.seatLabel || '',
           })),
         );
 
@@ -171,6 +174,7 @@ export class TicketsService {
     seatNumber: number;
     section: string;
     seatType: string;
+    seatLabel: string;
     attendeeName: string;
     attendeePhone: string;
     isFree: boolean;
@@ -235,6 +239,7 @@ export class TicketsService {
       seatNumber: ticket.seatNumber,
       section: ticket.section,
       seatType: ticket.seatType,
+      seatLabel: ticket.seatLabel || '',
       attendeeName: ticket.attendeeName,
       attendeePhone: ticket.attendeePhone,
       eventId: eventData?._id?.toString() || '',

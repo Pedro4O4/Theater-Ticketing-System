@@ -284,11 +284,15 @@ const EventSeatTypeEditor = ({
             seats.push(renderSeat(rowLabel, s, section, isAisle, isRemoved));
         }
 
+        const isStageTop = theater?.layout?.stage?.position === 'top';
+        const leftSideLabel = isStageTop ? `${rowLabel} Left` : `${rowLabel} Right`;
+        const rightSideLabel = isStageTop ? `${rowLabel} Right` : `${rowLabel} Left`;
+
         return (
             <div key={`${section}-${rowLabel}`} className="seat-row">
-                <div className="row-label">{rowLabel}</div>
+                <div className="row-label">{leftSideLabel}</div>
                 <div className="seats-container">{seats}</div>
-                <div className="row-label">{rowLabel}</div>
+                <div className="row-label">{rightSideLabel}</div>
             </div>
         );
     };

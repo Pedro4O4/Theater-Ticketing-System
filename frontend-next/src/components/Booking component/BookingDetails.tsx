@@ -16,6 +16,7 @@ interface Seat {
     section: string;
     seatType: string;
     price: number;
+    seatLabel?: string;
 }
 
 interface Booking {
@@ -342,7 +343,7 @@ const BookingDetails = ({ id }: BookingDetailsProps) => {
                                                 color: chipTextColor
                                             }}
                                         >
-                                            <strong>{seat.row}{seat.seatNumber}</strong>
+                                            <strong>{seat.seatLabel || `${seat.row}${seat.seatNumber}`}</strong>
                                             <span style={{
                                                 marginLeft: '8px',
                                                 fontSize: '0.8rem',

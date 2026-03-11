@@ -631,20 +631,20 @@
 }
 
 .row-label {
-    width: 45px;
-    min-width: 45px;
+    min-width: 70px;
     font-size: 0.8rem;
     font-weight: 600;
     color: #64748b;
     text-align: center;
     flex-shrink: 0;
+    padding: 0 4px;
+    white-space: nowrap;
 }
 
 /* Clickable row label button for category mode */
 .row-label-btn {
-    width: 45px;
-    min-width: 45px;
-    padding: 4px 2px;
+    min-width: 70px;
+    padding: 4px 4px;
     font-size: 0.8rem;
     font-weight: 700;
     color: #9ca3af;

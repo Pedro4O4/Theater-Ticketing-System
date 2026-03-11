@@ -86,6 +86,9 @@ class SeatConfig {
 
     @Prop({ default: true })
     isActive: boolean;
+
+    @Prop({ default: '' })
+    seatLabel: string;
 }
 
 @Schema({ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })

@@ -19,9 +19,9 @@ interface ScanResult {
     seatRow: string;
     seatNumber: number;
     section: string;
-    seatType: string;
     attendeeName: string;
     attendeePhone: string;
+    seatLabel?: string;
     isFree: boolean;
     message: string;
     eventId: string;
@@ -301,7 +301,7 @@ const ScannerEventPage = () => {
                                                 </div>
                                                 <div className="result-field">
                                                     <span className="field-label">Seat</span>
-                                                    <span className="field-value seat-name">{scanResult.seatRow}{scanResult.seatNumber}</span>
+                                                    <span className="field-value seat-name">{scanResult.seatLabel || `${scanResult.seatRow}${scanResult.seatNumber}`}</span>
                                                 </div>
                                                 <div className="result-field">
                                                     <span className="field-label">Status</span>
@@ -368,7 +368,7 @@ const ScannerEventPage = () => {
                                 <div className="history-list">
                                     {scanHistory.map((item, index) => (
                                         <div key={index} className={`history-item ${item.isFree ? 'valid' : 'invalid'}`}>
-                                            <span className="history-seat">{item.seatRow}{item.seatNumber}</span>
+                                            <span className="history-seat">{item.seatLabel || `${item.seatRow}${item.seatNumber}`}</span>
                                             <span className="history-section">{item.section}</span>
                                             <span className="history-name">{item.attendeeName || item.userName}</span>
                                             <span className={`history-status ${item.isFree ? 'free' : 'not-free'}`}>

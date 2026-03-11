@@ -10,6 +10,7 @@ interface Seat {
     section: string;
     seatType?: string;
     price?: number;
+    seatLabel?: string;
 }
 
 interface RequestCancellationModalProps {
@@ -117,7 +118,7 @@ const RequestCancellationModal: React.FC<RequestCancellationModalProps> = ({
                                     </div>
                                     <div className="csm-seat-info">
                                         <span className="csm-seat-label">
-                                            {seat.row}{seat.seatNumber}
+                                            {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                         </span>
                                         <span className="csm-seat-type">{seat.seatType || 'standard'}</span>
                                     </div>

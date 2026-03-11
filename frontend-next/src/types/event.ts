@@ -56,6 +56,7 @@ export interface Booking {
         seatNumber: number;
         seatType?: string;
         price?: number;
+        seatLabel?: string;
     }>;
     selectedSeats?: Array<{
         section: string;
@@ -63,6 +64,7 @@ export interface Booking {
         seatNumber: number;
         seatType?: string;
         price?: number;
+        seatLabel?: string;
     }>;
 }
 

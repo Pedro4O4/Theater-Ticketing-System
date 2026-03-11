@@ -2,6 +2,7 @@ export interface SelectedSeat {
     section: string;
     row: string;
     seatNumber: number;
+    seatLabel?: string;
 }
 
 export interface Seat extends SelectedSeat {
@@ -12,6 +13,7 @@ export interface Seat extends SelectedSeat {
     isBooked: boolean;
     isPending?: boolean;
     isActive: boolean;
+    seatLabel?: string;
 }
 
 export interface SeatPricing {

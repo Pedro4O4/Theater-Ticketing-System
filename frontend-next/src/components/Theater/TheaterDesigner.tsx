@@ -60,6 +60,7 @@ interface SeatConfig {
     seatNumber: number;
     seatType: string;
     isActive: boolean;
+    seatLabel?: string;
 }
 
 interface SaveData {
@@ -654,12 +655,21 @@ const TheaterDesigner = ({
             for (let s = 1; s <= layout.mainFloor.seatsPerRow; s++) {
                 const seatKey = `main-${rowLabel}-${s}`;
                 if (!removedSeats.has(seatKey)) {
+                    const half = Math.ceil(layout.mainFloor.seatsPerRow / 2);
+                    const isStageTop = layout.stage.position === 'top';
+                    const isLeft = isStageTop ? (s <= half) : (s > half);
+                    const side = isLeft ? 'Left' : 'Right';
+                    // Seat number remains the same logical number from screen-left to right, or adjust if you want it relative to the side
+                    const localNum = s <= half ? s : s - half;
+                    const computedLabel = `Row ${rowLabel} - ${side} - Seat ${localNum}`;
+
                     seatConfigArray.push({
                         section: 'main',
                         row: rowLabel,
                         seatNumber: s,
                         seatType: seatCategories[seatKey] || 'standard',
-                        isActive: !disabledSeats.has(seatKey)
+                        isActive: !disabledSeats.has(seatKey),
+                        seatLabel: computedLabel
                     });
                 }
             }
@@ -670,12 +680,20 @@ const TheaterDesigner = ({
                 for (let s = 1; s <= layout.balcony.seatsPerRow; s++) {
                     const seatKey = `balcony-${rowLabel}-${s}`;
                     if (!removedSeats.has(seatKey)) {
+                        const half = Math.ceil(layout.balcony.seatsPerRow / 2);
+                        const isStageTop = layout.stage.position === 'top';
+                        const isLeft = isStageTop ? (s <= half) : (s > half);
+                        const side = isLeft ? 'Left' : 'Right';
+                        const localNum = s <= half ? s : s - half;
+                        const computedLabel = `Row ${rowLabel} - ${side} - Seat ${localNum}`;
+
                         seatConfigArray.push({
                             section: 'balcony',
                             row: rowLabel,
                             seatNumber: s,
                             seatType: seatCategories[seatKey] || 'standard',
-                            isActive: !disabledSeats.has(seatKey)
+                            isActive: !disabledSeats.has(seatKey),
+                            seatLabel: computedLabel
                         });
                     }
                 }
@@ -966,6 +984,10 @@ const TheaterDesigner = ({
             seats.push(renderSeat(rowLabel, s, section, seatsPerRow));
         }
 
+        const isStageTop = layout.stage.position === 'top';
+        const leftSideLabel = isStageTop ? `${rowLabel} Left` : `${rowLabel} Right`;
+        const rightSideLabel = isStageTop ? `${rowLabel} Right` : `${rowLabel} Left`;
+
         return (
             <React.Fragment key={`${section}-${rowLabel}`}>
                 <div className="seat-row">
@@ -975,10 +997,10 @@ const TheaterDesigner = ({
                             onClick={() => onRowClick(section, rowLabel, seatsPerRow)}
                             title={`Click to set entire row ${rowLabel} to ${currentCategory}`}
                         >
-                            {rowLabel}
+                            {leftSideLabel}
                         </button>
                     ) : (
-                        <div className="row-label">{rowLabel}</div>
+                        <div className="row-label">{leftSideLabel}</div>
                     )}
                     <div className="seats-container">
                         {seats}
@@ -989,10 +1011,10 @@ const TheaterDesigner = ({
                             onClick={() => onRowClick(section, rowLabel, seatsPerRow)}
                             title={`Click to set entire row ${rowLabel} to ${currentCategory}`}
                         >
-                            {rowLabel}
+                            {rightSideLabel}
                         </button>
                     ) : (
-                        <div className="row-label">{rowLabel}</div>
+                        <div className="row-label">{rightSideLabel}</div>
                     )}
                 </div>
                 {renderHCorridorSlot(section, rowIndex)}

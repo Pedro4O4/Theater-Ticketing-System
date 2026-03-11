@@ -19,7 +19,7 @@ interface Booking {
     numberOfTickets: number;
     totalPrice: number;
     status: 'pending' | 'confirmed' | 'canceled' | 'rejected';
-    selectedSeats?: { section: string; row: string; seatNumber: number; seatType?: string; price?: number }[];
+    selectedSeats?: { section: string; row: string; seatNumber: number; seatType?: string; price?: number; seatLabel?: string }[];
     createdAt: string;
     pendingExpiresAt?: string;
     isReceiptUploaded?: boolean;
@@ -29,7 +29,7 @@ interface Booking {
         status: 'none' | 'pending' | 'approved' | 'rejected';
         requestedAt?: string;
         reason?: string;
-        seatsToCancel?: { row: string; seatNumber: number; section: string }[];
+        seatsToCancel?: { row: string; seatNumber: number; section: string; seatLabel?: string }[];
         cancelAll?: boolean;
     };
 }
@@ -412,7 +412,7 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                                 <span>{booking.numberOfTickets} ticket{booking.numberOfTickets > 1 ? 's' : ''}</span>
                                                 {booking.selectedSeats && booking.selectedSeats.length > 0 && (
                                                     <span style={{ color: '#a78bfa' }}>
-                                                        Seats: {booking.selectedSeats.map(s => `${s.row}${s.seatNumber}`).join(', ')}
+                                                        Seats: {booking.selectedSeats.map(s => s.seatLabel || `${s.row}${s.seatNumber}`).join(', ')}
                                                     </span>
                                                 )}
                                             </span>
@@ -644,7 +644,7 @@ const UserBookingsPage: React.FC<UserBookingsPageProps> = ({ isPrevious = false 
                                                 <div className="summary-row seats">
                                                     <span>Seats</span>
                                                     <div className="seats-list">
-                                                        {booking.selectedSeats.map(s => `${s.row}${s.seatNumber}`).join(', ')}
+                                                        {booking.selectedSeats.map(s => s.seatLabel || `${s.row}${s.seatNumber}`).join(', ')}
                                                     </div>
                                                 </div>
                                             )}

@@ -307,18 +307,18 @@ const BookTicketPage = () => {
         if (event.hasTheaterSeating) {
             for (let i = 0; i < attendeeInfo.length; i++) {
                 if (!attendeeInfo[i]?.attendeeName?.trim()) {
-                    toast.error(`Please enter name for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    toast.error(`Please enter name for ${selectedSeats[i].seatLabel || `seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
                     return;
                 }
 
                 const phoneField = attendeeInfo[i]?.attendeePhone?.trim() || '';
                 if (!phoneField) {
-                    toast.error(`Please enter phone for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    toast.error(`Please enter phone for ${selectedSeats[i].seatLabel || `seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
                     return;
                 }
 
                 if (!/^01\d{9}$/.test(phoneField)) {
-                    toast.error(`Phone for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber} must be 11 digits starting with 01`);
+                    toast.error(`Phone for ${selectedSeats[i].seatLabel || `seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`} must be 11 digits starting with 01`);
                     return;
                 }
 
@@ -424,7 +424,7 @@ const BookTicketPage = () => {
                         <div className="success-seats">
                             {selectedSeats.map(seat => (
                                 <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="seat-chip">
-                                    {seat.row}{seat.seatNumber}
+                                    {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                 </span>
                             ))}
                         </div>
@@ -661,7 +661,7 @@ const BookTicketPage = () => {
                                         <div className="header-seats-chips">
                                             {selectedSeats.map(seat => (
                                                 <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="header-seat-chip">
-                                                    {seat.row}{seat.seatNumber}
+                                                    {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                                     <span className="header-chip-price">{seat.price} EGP</span>
                                                 </span>
                                             ))}
@@ -737,7 +737,7 @@ const BookTicketPage = () => {
                                                 >
                                                     <div className="attendee-card-header">
                                                         <span className="attendee-seat-badge">
-                                                            Seat {seat.row}{seat.seatNumber}
+                                                            {seat.seatLabel || `Seat ${seat.row}${seat.seatNumber}`}
                                                         </span>
                                                         <span className="attendee-seat-price">{seat.price} EGP</span>
                                                     </div>
@@ -791,7 +791,7 @@ const BookTicketPage = () => {
                                 <div className="mobile-selection-seats">
                                     {selectedSeats.map(seat => (
                                         <span key={`mob-${seat.section}-${seat.row}-${seat.seatNumber}`} className="mobile-seat-chip">
-                                            {seat.row}{seat.seatNumber}
+                                            {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                             <span className="mobile-chip-price">{seat.price} EGP</span>
                                         </span>
                                     ))}

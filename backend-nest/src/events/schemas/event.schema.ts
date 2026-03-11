@@ -33,6 +33,9 @@ class BookedSeat {
 
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'SeatHold' })
     holdId: MongooseSchema.Types.ObjectId;
+
+    @Prop({ default: '' })
+    seatLabel: string;
 }
 
 @Schema()
@@ -51,6 +54,9 @@ class EventSeatConfig {
 
     @Prop({ default: 'main' })
     section: string;
+
+    @Prop({ default: '' })
+    seatLabel: string;
 }
 
 @Schema({ timestamps: true })

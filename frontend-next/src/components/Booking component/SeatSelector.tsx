@@ -312,14 +312,18 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             slots.push(renderSeatSlot(section, rowLabel, s));
         }
 
+        const isStageTop = theaterData?.layout?.stage?.position === 'top';
+        const leftSideLabel = isStageTop ? `${rowLabel} Left` : `${rowLabel} Right`;
+        const rightSideLabel = isStageTop ? `${rowLabel} Right` : `${rowLabel} Left`;
+
         return (
             <React.Fragment key={`${section}-${rowLabel}`}>
                 <div className="seat-row">
-                    <div className="row-label">{rowLabel}</div>
+                    <div className="row-label">{leftSideLabel}</div>
                     <div className="seats-container">
                         {slots}
                     </div>
-                    <div className="row-label">{rowLabel}</div>
+                    <div className="row-label">{rightSideLabel}</div>
                 </div>
                 {renderHCorridorGap(section, rowIndex)}
             </React.Fragment>

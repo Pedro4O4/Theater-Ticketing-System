@@ -36,6 +36,9 @@ export class Ticket {
   @Prop({ default: '' })
   attendeePhone: string;
 
+  @Prop({ default: '' })
+  seatLabel: string;
+
   // QR code
   @Prop({ required: true })
   qrData: string; // unique identifier encoded in QR

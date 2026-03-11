@@ -17,6 +17,7 @@ interface BookingSeat {
     section: string;
     seatType: string;
     price: number;
+    seatLabel?: string;
     attendeeName?: string;
     attendeePhone?: string;
 }
@@ -44,7 +45,7 @@ interface Booking {
         status: 'none' | 'pending' | 'approved' | 'rejected';
         requestedAt?: string;
         reason?: string;
-        seatsToCancel?: { row: string; seatNumber: number; section: string }[];
+        seatsToCancel?: { row: string; seatNumber: number; section: string; seatLabel?: string }[];
         cancelAll?: boolean;
     };
 }
@@ -329,7 +330,7 @@ const EventBookingsPage = () => {
                                                         <div className="eb-seats-grid">
                                                             {booking.selectedSeats.map((seat, sIdx) => (
                                                                 <div key={sIdx} className="eb-seat-item">
-                                                                    <span className="eb-seat-label">{seat.row}{seat.seatNumber}</span>
+                                                                    <span className="eb-seat-label">{seat.seatLabel || `${seat.row}${seat.seatNumber}`}</span>
                                                                     <span className="eb-seat-type">{seat.seatType}</span>
                                                                     <span className="eb-seat-price">{seat.price} EGP</span>
                                                                     {seat.attendeeName && (
@@ -476,7 +477,7 @@ const EventBookingsPage = () => {
                                                                 border: '1px solid rgba(239, 68, 68, 0.25)',
                                                                 color: '#fca5a5', fontSize: '0.85rem', fontWeight: 600,
                                                             }}>
-                                                                {seat.row}{seat.seatNumber}
+                                                                {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                                             </span>
                                                         ))}
                                                     </div>
@@ -508,7 +509,7 @@ const EventBookingsPage = () => {
                                                                         borderColor: isRequestedForCancel ? 'rgba(239, 68, 68, 0.4)' : undefined,
                                                                         background: isRequestedForCancel ? 'rgba(239, 68, 68, 0.08)' : undefined,
                                                                     }}>
-                                                                        <span className="eb-seat-label">{seat.row}{seat.seatNumber}</span>
+                                                                        <span className="eb-seat-label">{seat.seatLabel || `${seat.row}${seat.seatNumber}`}</span>
                                                                         <span className="eb-seat-type">{seat.seatType}</span>
                                                                         <span className="eb-seat-price">{seat.price} EGP</span>
                                                                         {isRequestedForCancel && (

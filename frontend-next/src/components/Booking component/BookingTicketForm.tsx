@@ -18,6 +18,7 @@ interface Seat {
     seatNumber: number;
     section?: string;
     price?: number;
+    seatLabel?: string;
 }
 
 interface AttendeeInfo {
@@ -152,13 +153,13 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
         if (selectedEvent.hasTheaterSeating) {
             for (let i = 0; i < attendeeInfo.length; i++) {
                 if (!attendeeInfo[i].attendeeName.trim()) {
-                    setError(`Please enter name for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`);
+                    setError(`Please enter name for ${selectedSeats[i].seatLabel || `Seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`}`);
                     return;
                 }
 
                 const phone = attendeeInfo[i].attendeePhone.trim();
                 if (!/^01\d{9}$/.test(phone)) {
-                    setError(`Phone for seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber} must be 11 digits starting with 01`);
+                    setError(`Phone for ${selectedSeats[i].seatLabel || `Seat ${selectedSeats[i].row}${selectedSeats[i].seatNumber}`} must be 11 digits starting with 01`);
                     return;
                 }
             }
@@ -177,6 +178,7 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                     row: seat.row,
                     seatNumber: seat.seatNumber,
                     section: seat.section,
+                    seatLabel: seat.seatLabel,
                     attendeeName: attendeeInfo[index]?.attendeeName || '',
                     attendeePhone: attendeeInfo[index]?.attendeePhone.trim() || '',
                 }));
@@ -285,7 +287,7 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                         <div className="success-seats">
                             {selectedSeats.map(seat => (
                                 <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="seat-chip">
-                                    {seat.row}{seat.seatNumber}
+                                    {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                 </span>
                             ))}
                         </div>
@@ -340,7 +342,7 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                                     <div className="header-seats-chips">
                                         {selectedSeats.map(seat => (
                                             <span key={`${seat.section}-${seat.row}-${seat.seatNumber}`} className="header-seat-chip">
-                                                {seat.row}{seat.seatNumber}
+                                                {seat.seatLabel || `${seat.row}${seat.seatNumber}`}
                                                 <span className="header-chip-price">{seat.price} EGP</span>
                                             </span>
                                         ))}
@@ -395,7 +397,7 @@ const BookTicketForm = ({ event: preSelectedEvent, eventId, onBookingComplete }:
                                             >
                                                 <div className="attendee-card-header">
                                                     <span className="attendee-seat-badge">
-                                                        Seat {seat.row}{seat.seatNumber}
+                                                        {seat.seatLabel || `Seat ${seat.row}${seat.seatNumber}`}
                                                     </span>
                                                     <span className="attendee-seat-price">{seat.price} EGP</span>
                                                 </div>

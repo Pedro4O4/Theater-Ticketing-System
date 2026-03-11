@@ -138,6 +138,7 @@ export class BookingsService implements OnModuleInit {
             row: s.row,
             seatNumber: s.seatNumber,
             section: s.section,
+            seatLabel: (s as any).seatLabel,
             holdId: savedHold._id,
         }));
 
@@ -350,6 +351,7 @@ export class BookingsService implements OnModuleInit {
                     section: seat.section || 'main',
                     seatType,
                     price,
+                    seatLabel: seat.seatLabel,
                     attendeeName: seat.attendeeName || '',
                     attendeePhone: seat.attendeePhone || '',
                 };
@@ -379,6 +381,7 @@ export class BookingsService implements OnModuleInit {
                     row: seat.row,
                     seatNumber: seat.seatNumber,
                     section: seat.section,
+                    seatLabel: seat.seatLabel,
                     bookingId: savedBooking._id,
                 }));
 
@@ -394,6 +397,7 @@ export class BookingsService implements OnModuleInit {
                     row: seat.row,
                     seatNumber: seat.seatNumber,
                     section: seat.section,
+                    seatLabel: seat.seatLabel,
                     bookingId: savedBooking._id,
                 }));
 
@@ -599,6 +603,7 @@ export class BookingsService implements OnModuleInit {
                         section: s.section || 'main',
                         seatType: s.seatType || 'standard',
                         price: s.price || 0,
+                        seatLabel: s.seatLabel,
                         attendeeName: s.attendeeName || '',
                         attendeePhone: s.attendeePhone || '',
                     })),
@@ -734,6 +739,7 @@ export class BookingsService implements OnModuleInit {
                     isBooked: bookedSeatsSet.has(seatKey),
                     isPending: pendingSeatsSet.has(seatKey) || heldSeatsSet.has(seatKey),
                     price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
+                    seatLabel: seatConfig?.seatLabel,
                 });
             }
         }
@@ -771,6 +777,7 @@ export class BookingsService implements OnModuleInit {
                         isBooked: bookedSeatsSet.has(seatKey),
                         isPending: pendingSeatsSet.has(seatKey) || heldSeatsSet.has(seatKey),
                         price: pricingRecord ? pricingRecord.price : (event.ticketPrice || 0),
+                        seatLabel: seatConfig?.seatLabel,
                     });
                 }
             }

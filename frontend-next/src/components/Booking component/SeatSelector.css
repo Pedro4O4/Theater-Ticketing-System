@@ -214,8 +214,7 @@
 }
 
 .row-label {
-    width: 45px;
-    min-width: 45px;
+    min-width: 70px;
     font-size: 0.8rem;
     font-weight: 600;
     color: #94A3B8;
@@ -227,6 +226,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 0 4px;
 }
 
 .row-seats {
