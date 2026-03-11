@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { FaWhatsapp } from 'react-icons/fa';
 import './Footer.css';
 
 const Footer: React.FC = () => {
@@ -43,7 +44,9 @@ const Footer: React.FC = () => {
                     <h3>{t('footer.contactUs')}</h3>
                     <div className="contact-info">
                         <a href="mailto:Youthmeeting@gmail.com">Youthmeeting@gmail.com</a>
-                        <a href="https://wa.me/message/3EXT2TKWUGFII1" target="_blank" rel="noopener noreferrer" className="whatsapp-support">WhatsApp Support</a>
+                        <a href="https://wa.me/message/3EXT2TKWUGFII1" target="_blank" rel="noopener noreferrer" className="whatsapp-support">
+                            <FaWhatsapp className="whatsapp-icon" /> WhatsApp Support
+                        </a>
                     </div>
                 </div>
             </div>

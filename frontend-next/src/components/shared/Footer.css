@@ -124,6 +124,13 @@
 .whatsapp-support {
   color: #25D366 !important; /* WhatsApp Green */
   font-weight: 600;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.whatsapp-icon {
+  font-size: 1.2rem;
 }
 
 .whatsapp-support:hover {
