@@ -190,43 +190,54 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({
             const container = canvasRef.current.parentElement;
             if (!container) return;
 
-            // Temporarily reset scale AND make canvas absolute so it doesn't inflate parent width
-            const originalTransform = canvasRef.current.style.transform;
-            const originalPosition = canvasRef.current.style.position;
-            canvasRef.current.style.transform = 'scale(1)';
-            canvasRef.current.style.position = 'absolute';
-            const canvasWidth = canvasRef.current.scrollWidth || canvasRef.current.offsetWidth;
-            const canvasHeight = canvasRef.current.scrollHeight || canvasRef.current.offsetHeight;
-            canvasRef.current.style.transform = originalTransform;
-            canvasRef.current.style.position = originalPosition;
+            window.requestAnimationFrame(() => {
+                if (!canvasRef.current || !container) return;
 
-            if (canvasWidth === 0) return;
+                // Temporarily reset scale AND make canvas absolute so it doesn't inflate parent width
+                const originalTransform = canvasRef.current.style.transform;
+                const originalPosition = canvasRef.current.style.position;
+                canvasRef.current.style.transform = 'scale(1)';
+                canvasRef.current.style.position = 'absolute';
+                const canvasWidth = canvasRef.current.scrollWidth || canvasRef.current.offsetWidth;
+                const canvasHeight = canvasRef.current.scrollHeight || canvasRef.current.offsetHeight;
+                canvasRef.current.style.transform = originalTransform;
+                canvasRef.current.style.position = originalPosition;
 
-            // On mobile, always use viewport width to avoid inflated measurements
-            const isMobile = window.innerWidth <= 768;
-            const availableWidth = isMobile ? window.innerWidth : Math.min(container.clientWidth, window.innerWidth);
+                if (canvasWidth === 0) return;
 
-            // Final scale: allow as low as 0.3 for very zoomed-out views,
-            // cap at 1.0 — never upscale beyond natural size
-            let calculatedScale = availableWidth / canvasWidth;
-            calculatedScale = Math.max(0.3, Math.min(1, calculatedScale));
+                // On mobile, always use viewport width for initial layout, but DON'T fight zoom
+                // Use window.innerWidth instead of visualViewport to avoid shrinking when zooming in
+                const isMobile = window.innerWidth <= 768;
+                const availableWidth = isMobile ? window.innerWidth : Math.min(container.clientWidth, window.innerWidth);
 
-            setScale(calculatedScale);
+                // Final scale: allow as low as 0.3 for very zoomed-out views,
+                // cap at 1.0 — never upscale beyond natural size
+                let calculatedScale = availableWidth / canvasWidth;
+                calculatedScale = Math.max(0.3, Math.min(1, calculatedScale));
 
-            // Adjust container height to match the scaled canvas so nothing is clipped
-            container.style.height = `${Math.ceil(canvasHeight * calculatedScale) + 40}px`;
+                setScale(calculatedScale);
+
+                // Adjust container height to match the scaled canvas so nothing is clipped
+                container.style.height = `${Math.ceil(canvasHeight * calculatedScale) + 40}px`;
+            });
         };
 
         // Delay initial calculation to ensure content has rendered
         const timer = setTimeout(calculateScale, hasInitialScale.current ? 0 : 200);
         hasInitialScale.current = true;
-        window.addEventListener('resize', calculateScale);
-        // Mobile zoom changes fire on visualViewport, not window resize
-        window.visualViewport?.addEventListener('resize', calculateScale);
+
+        // Use a throttled resize handler
+        let resizeTimer: any;
+        const handleResize = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(calculateScale, 150);
+        };
+
+        window.addEventListener('resize', handleResize);
         return () => {
             clearTimeout(timer);
-            window.removeEventListener('resize', calculateScale);
-            window.visualViewport?.removeEventListener('resize', calculateScale);
+            clearTimeout(resizeTimer);
+            window.removeEventListener('resize', handleResize);
         };
     }, [theaterData]);
 

@@ -148,7 +148,6 @@
     align-items: center;
     padding: 20px;
     transform-origin: top center;
-    transition: transform 0.3s ease;
     position: relative;
     min-width: max-content;
 }
