@@ -526,48 +526,51 @@ const EventBookingsPage = () => {
                                                 <div className="eb-card-bottom">
                                                     <span className="eb-date">Booked: {formatDate(booking.createdAt)}</span>
 
-                                                    {booking.status === 'pending' && !isExpired && (
-                                                        <div className="eb-actions">
-                                                            {booking.isReceiptUploaded && (
-                                                                <motion.button
-                                                                    className="eb-view-receipt-btn"
-                                                                    onClick={() => handleViewReceipt(booking.instapayReceipt)}
-                                                                    whileHover={{ scale: 1.03 }}
-                                                                    whileTap={{ scale: 0.97 }}
-                                                                    style={{
-                                                                        background: 'rgba(139, 92, 246, 0.2)',
-                                                                        color: '#a78bfa',
-                                                                        border: '1px solid rgba(139, 92, 246, 0.4)',
-                                                                        display: 'flex', alignItems: 'center', gap: '6px',
-                                                                        padding: '6px 12px', borderRadius: '6px',
-                                                                        fontSize: '0.85rem'
-                                                                    }}
-                                                                >
-                                                                    <FiEye /> View Receipt
-                                                                </motion.button>
-                                                            )}
+                                                    <div className="eb-actions">
+                                                        {booking.isReceiptUploaded && (
                                                             <motion.button
-                                                                className="eb-approve-btn"
-                                                                onClick={() => handleStatusUpdate(booking._id, 'confirmed')}
-                                                                disabled={actionLoading === booking._id || !booking.isReceiptUploaded}
-                                                                whileHover={booking.isReceiptUploaded ? { scale: 1.03 } : {}}
-                                                                whileTap={booking.isReceiptUploaded ? { scale: 0.97 } : {}}
-                                                                title={!booking.isReceiptUploaded ? 'Waiting for user to upload receipt' : 'Approve this booking'}
-                                                                style={{ opacity: !booking.isReceiptUploaded ? 0.4 : 1, cursor: !booking.isReceiptUploaded ? 'not-allowed' : 'pointer' }}
-                                                            >
-                                                                {actionLoading === booking._id ? '...' : <><FiCheckCircle /> Approve</>}
-                                                            </motion.button>
-                                                            <motion.button
-                                                                className="eb-reject-btn"
-                                                                onClick={() => handleStatusUpdate(booking._id, 'rejected')}
-                                                                disabled={actionLoading === booking._id}
+                                                                className="eb-view-receipt-btn"
+                                                                onClick={() => handleViewReceipt(booking.instapayReceipt)}
                                                                 whileHover={{ scale: 1.03 }}
                                                                 whileTap={{ scale: 0.97 }}
+                                                                style={{
+                                                                    background: 'rgba(139, 92, 246, 0.2)',
+                                                                    color: '#a78bfa',
+                                                                    border: '1px solid rgba(139, 92, 246, 0.4)',
+                                                                    display: 'flex', alignItems: 'center', gap: '6px',
+                                                                    padding: '6px 12px', borderRadius: '6px',
+                                                                    fontSize: '0.85rem'
+                                                                }}
                                                             >
-                                                                {actionLoading === booking._id ? '...' : <><FiXCircle /> Reject</>}
+                                                                <FiEye /> View Receipt
                                                             </motion.button>
-                                                        </div>
-                                                    )}
+                                                        )}
+
+                                                        {booking.status === 'pending' && !isExpired && (
+                                                            <>
+                                                                <motion.button
+                                                                    className="eb-approve-btn"
+                                                                    onClick={() => handleStatusUpdate(booking._id, 'confirmed')}
+                                                                    disabled={actionLoading === booking._id || !booking.isReceiptUploaded}
+                                                                    whileHover={booking.isReceiptUploaded ? { scale: 1.03 } : {}}
+                                                                    whileTap={booking.isReceiptUploaded ? { scale: 0.97 } : {}}
+                                                                    title={!booking.isReceiptUploaded ? 'Waiting for user to upload receipt' : 'Approve this booking'}
+                                                                    style={{ opacity: !booking.isReceiptUploaded ? 0.4 : 1, cursor: !booking.isReceiptUploaded ? 'not-allowed' : 'pointer' }}
+                                                                >
+                                                                    {actionLoading === booking._id ? '...' : <><FiCheckCircle /> Approve</>}
+                                                                </motion.button>
+                                                                <motion.button
+                                                                    className="eb-reject-btn"
+                                                                    onClick={() => handleStatusUpdate(booking._id, 'rejected')}
+                                                                    disabled={actionLoading === booking._id}
+                                                                    whileHover={{ scale: 1.03 }}
+                                                                    whileTap={{ scale: 0.97 }}
+                                                                >
+                                                                    {actionLoading === booking._id ? '...' : <><FiXCircle /> Reject</>}
+                                                                </motion.button>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </motion.div>
                                         ))}
