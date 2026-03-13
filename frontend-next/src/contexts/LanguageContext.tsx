@@ -199,6 +199,13 @@ const translations: Record<Language, Record<string, string>> = {
         'events.previousTitle': 'Previous Events',
         'events.noPreviousEvents': 'No Previous Events Found',
         'events.noPreviousEventsDesc': 'There are no expired events yet.',
+        // Event stats
+        'events.stats.available': 'Available',
+        'events.stats.total': 'Total',
+        'events.stats.main': 'Main Floor',
+        'events.stats.balcony': 'Balcony',
+        'events.stats.seats': 'seats',
+        'events.stats.of': 'of',
         // Booking page
         'booking.loadingEvent': 'Loading event details...',
         'booking.eventNotFound': 'Event Not Found',
@@ -559,6 +566,13 @@ const translations: Record<Language, Record<string, string>> = {
         'events.previousTitle': 'العروض المسرحية السابقة',
         'events.noPreviousEvents': 'لا توجد عروض مسرحية سابقة',
         'events.noPreviousEventsDesc': 'لا توجد عروض مسرحية منتهية بعد.',
+        // Event stats
+        'events.stats.available': 'متاح',
+        'events.stats.total': 'إجمالي',
+        'events.stats.main': 'صالة',
+        'events.stats.balcony': 'بلكون',
+        'events.stats.seats': 'مقعد',
+        'events.stats.of': 'من',
         // Booking page
         'booking.loadingEvent': 'جارٍ تحميل تفاصيل العرض المسرحي...',
         'booking.eventNotFound': 'العرض المسرحي غير موجود',

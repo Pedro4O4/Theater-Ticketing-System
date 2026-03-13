@@ -14,7 +14,10 @@ import { useAuth } from '@/auth/AuthContext';
 import { Event } from '@/types/event';
 import SeatSelector from '@/components/Booking component/SeatSelector';
 
+import { useLanguage } from '@/contexts/LanguageContext';
+
 const EventDetailsPage = () => {
+    const { t } = useLanguage();
     const params = useParams();
     const id = params.id as string;
     const router = useRouter();
@@ -190,27 +193,27 @@ const EventDetailsPage = () => {
                         <div className="booking-summary-compact">
                             {seatData && (
                                 <div className="availability-stats-grid">
-                                    <div className="stat-pill total" title="إجمالي المقاعد المتاحة">
+                                    <div className="stat-pill total" title={t('events.stats.total')}>
                                         <div className="stat-content">
                                             <span className="stat-value">{seatCounts.total.available}</span>
-                                            <span className="stat-label">متاح</span>
+                                            <span className="stat-label">{t('events.stats.available')}</span>
                                         </div>
-                                        <div className="stat-total">من {seatCounts.total.count} إجمالي</div>
+                                        <div className="stat-total">{t('events.stats.of')} {seatCounts.total.count} {t('events.stats.total')}</div>
                                     </div>
-                                    <div className="stat-pill main" title="توافر الصالة">
+                                    <div className="stat-pill main" title={t('events.stats.main')}>
                                         <div className="stat-content">
                                             <span className="stat-value">{seatCounts.main.available}</span>
-                                            <span className="stat-label">الصالة</span>
+                                            <span className="stat-label">{t('events.stats.main')}</span>
                                         </div>
-                                        <div className="stat-total">{seatCounts.main.count} مقعد</div>
+                                        <div className="stat-total">{seatCounts.main.count} {t('events.stats.seats')}</div>
                                     </div>
                                     {seatCounts.hasBalcony && (
-                                        <div className="stat-pill balcony" title="توافر البلكونة">
+                                        <div className="stat-pill balcony" title={t('events.stats.balcony')}>
                                             <div className="stat-content">
                                                 <span className="stat-value">{seatCounts.balcony.available}</span>
-                                                <span className="stat-label">البلكونة</span>
+                                                <span className="stat-label">{t('events.stats.balcony')}</span>
                                             </div>
-                                            <div className="stat-total">{seatCounts.balcony.count} مقعد</div>
+                                            <div className="stat-total">{seatCounts.balcony.count} {t('events.stats.seats')}</div>
                                         </div>
                                     )}
                                 </div>

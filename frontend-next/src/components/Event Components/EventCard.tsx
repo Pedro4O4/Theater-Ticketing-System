@@ -177,18 +177,18 @@ const EventCard: React.FC<EventCardProps> = ({ event, index = 0 }) => {
                                         </div>
                                     ) : seatCounts ? (
                                         <>
-                                            <div className="mini-stat total" title="إجمالي المتاح">
+                                            <div className="mini-stat total" title={t('events.stats.total')}>
                                                 <span className="mini-value">{seatCounts.total.available}</span>
-                                                <span className="mini-label">إجمالي</span>
+                                                <span className="mini-label">{t('events.stats.total')}</span>
                                             </div>
-                                            <div className="mini-stat main" title="متاح بالصالة">
+                                            <div className="mini-stat main" title={t('events.stats.main')}>
                                                 <span className="mini-value">{seatCounts.main.available}</span>
-                                                <span className="mini-label">صالة</span>
+                                                <span className="mini-label">{t('events.stats.main')}</span>
                                             </div>
                                             {seatCounts.hasBalcony && (
-                                                <div className="mini-stat balcony" title="متاح بالبلكونة">
+                                                <div className="mini-stat balcony" title={t('events.stats.balcony')}>
                                                     <span className="mini-value">{seatCounts.balcony.available}</span>
-                                                    <span className="mini-label">بلكون</span>
+                                                    <span className="mini-label">{t('events.stats.balcony')}</span>
                                                 </div>
                                             )}
                                         </>
