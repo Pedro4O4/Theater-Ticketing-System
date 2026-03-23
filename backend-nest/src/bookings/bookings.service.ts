@@ -536,6 +536,19 @@ export class BookingsService implements OnModuleInit {
         }
         return booking;
     }
+    
+    async findReceipt(id: string): Promise<string> {
+        const booking = await this.bookingModel
+            .findById(id)
+            .select('instapayReceipt')
+            .exec();
+        
+        if (!booking) {
+            throw new NotFoundException('Booking not found');
+        }
+        
+        return booking.instapayReceipt;
+    }
 
     async findAllForUser(userId: string): Promise<BookingDocument[]> {
         const bookings = await this.bookingModel
@@ -611,6 +624,7 @@ export class BookingsService implements OnModuleInit {
     async findAllForEvent(eventId: string): Promise<BookingDocument[]> {
         return this.bookingModel
             .find({ eventId } as any)
+            .select('-instapayReceipt')
             .populate('StandardId', 'name email phone')
             .sort({ createdAt: -1 })
             .exec();
@@ -1115,6 +1129,7 @@ export class BookingsService implements OnModuleInit {
                     { 'cancellationHistory.0': { $exists: true } }
                 ],
             } as any)
+            .select('-instapayReceipt')
             .populate('StandardId', 'name email phone')
             .sort({ 'cancellationRequest.requestedAt': -1 })
             .exec();

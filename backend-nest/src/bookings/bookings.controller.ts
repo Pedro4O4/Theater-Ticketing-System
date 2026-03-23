@@ -76,6 +76,13 @@ export class BookingsController {
         return { success: true, data };
     }
 
+    @Get(':id/receipt')
+    @UseGuards(JwtAuthGuard)
+    async getReceipt(@Param('id') id: string) {
+        const data = await this.bookingsService.findReceipt(id);
+        return { success: true, data };
+    }
+
     @Delete(':id')
     @UseGuards(JwtAuthGuard)
     async remove(@Param('id') id: string, @Req() req: any) {

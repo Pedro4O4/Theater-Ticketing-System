@@ -183,12 +183,31 @@ const EventBookingsPage = () => {
         return seat.seatLabel || `${seat.row}${seat.seatNumber}`;
     };
 
-    const handleViewReceipt = (receiptBase64?: string) => {
-        if (receiptBase64) {
-            setSelectedReceipt(receiptBase64);
+    const handleViewReceipt = async (bookingId: string, currentReceipt?: string) => {
+        if (currentReceipt) {
+            setSelectedReceipt(currentReceipt);
             setIsReceiptModalOpen(true);
-        } else {
-            toast.error('Receipt image not found.');
+            return;
+        }
+
+        try {
+            setActionLoading(`receipt-${bookingId}`);
+            const res = await api.get(`/booking/${bookingId}/receipt`);
+            const receiptData = res.data.success ? res.data.data : res.data;
+            
+            if (receiptData) {
+                setSelectedReceipt(receiptData);
+                setIsReceiptModalOpen(true);
+                // Update the booking in the list so it's cached for this session
+                setBookings(prev => prev.map(b => b._id === bookingId ? { ...b, instapayReceipt: receiptData } : b));
+            } else {
+                toast.error('Receipt image not found.');
+            }
+        } catch (err: any) {
+            console.error('Error fetching receipt:', err);
+            toast.error(err.response?.data?.message || 'Failed to load receipt.');
+        } finally {
+            setActionLoading(null);
         }
     };
 
@@ -544,9 +563,10 @@ const EventBookingsPage = () => {
 
                                                     <div className="eb-actions">
                                                         {booking.isReceiptUploaded && (
-                                                            <motion.button
+                                  <motion.button
                                                                 className="eb-view-receipt-btn"
-                                                                onClick={() => handleViewReceipt(booking.instapayReceipt)}
+                                                                onClick={() => handleViewReceipt(booking._id, booking.instapayReceipt)}
+                                                                disabled={actionLoading === `receipt-${booking._id}`}
                                                                 whileHover={{ scale: 1.03 }}
                                                                 whileTap={{ scale: 0.97 }}
                                                                 style={{
@@ -555,10 +575,11 @@ const EventBookingsPage = () => {
                                                                     border: '1px solid rgba(139, 92, 246, 0.4)',
                                                                     display: 'flex', alignItems: 'center', gap: '6px',
                                                                     padding: '6px 12px', borderRadius: '6px',
-                                                                    fontSize: '0.85rem'
+                                                                    fontSize: '0.85rem',
+                                                                    opacity: actionLoading === `receipt-${booking._id}` ? 0.7 : 1
                                                                 }}
                                                             >
-                                                                <FiEye /> View Receipt
+                                                                <FiEye /> {actionLoading === `receipt-${booking._id}` ? 'Loading...' : 'View Receipt'}
                                                             </motion.button>
                                                         )}
 
