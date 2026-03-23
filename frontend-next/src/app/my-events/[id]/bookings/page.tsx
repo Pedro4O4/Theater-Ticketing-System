@@ -569,15 +569,16 @@ const EventBookingsPage = () => {
                                                                 disabled={actionLoading === `receipt-${booking._id}`}
                                                                 whileHover={{ scale: 1.03 }}
                                                                 whileTap={{ scale: 0.97 }}
-                                                                style={{
-                                                                    background: 'rgba(139, 92, 246, 0.2)',
-                                                                    color: '#a78bfa',
-                                                                    border: '1px solid rgba(139, 92, 246, 0.4)',
-                                                                    display: 'flex', alignItems: 'center', gap: '6px',
-                                                                    padding: '6px 12px', borderRadius: '6px',
-                                                                    fontSize: '0.85rem',
-                                                                    opacity: actionLoading === `receipt-${booking._id}` ? 0.7 : 1
-                                                                }}
+                                                                    style={{
+                                                                        background: 'rgba(139, 92, 246, 0.2)',
+                                                                        color: '#a78bfa',
+                                                                        border: '1px solid rgba(139, 92, 246, 0.4)',
+                                                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                                                        padding: '6px 12px', borderRadius: '6px',
+                                                                        fontSize: '0.85rem',
+                                                                        opacity: actionLoading === `receipt-${booking._id}` ? 0.7 : 1,
+                                                                        cursor: actionLoading === `receipt-${booking._id}` ? 'not-allowed' : 'pointer'
+                                                                    }}
                                                             >
                                                                 <FiEye /> {actionLoading === `receipt-${booking._id}` ? 'Loading...' : 'View Receipt'}
                                                             </motion.button>
@@ -787,28 +788,51 @@ const EventBookingsPage = () => {
                                                                     ? formatDate(req.requestedAt)
                                                                     : 'N/A'}
                                                             </span>
-                                                            {!isExpired && isPending && (
-                                                                <div className="eb-actions">
-                                                                    <motion.button
-                                                                        className="eb-approve-btn"
-                                                                        onClick={() => handleCancellationAction(booking._id, 'approve')}
-                                                                        disabled={cancellationLoading}
-                                                                        whileHover={{ scale: 1.03 }}
-                                                                        whileTap={{ scale: 0.97 }}
-                                                                    >
-                                                                        <FiCheckCircle /> Approve Return
-                                                                    </motion.button>
-                                                                    <motion.button
-                                                                        className="eb-reject-btn"
-                                                                        onClick={() => handleCancellationAction(booking._id, 'reject')}
-                                                                        disabled={cancellationLoading}
-                                                                        whileHover={{ scale: 1.03 }}
-                                                                        whileTap={{ scale: 0.97 }}
-                                                                    >
-                                                                        <FiXCircle /> Reject
-                                                                    </motion.button>
+                                                                 <div className="eb-actions">
+                                                                    {booking.isReceiptUploaded && (
+                                                                        <motion.button
+                                                                            className="eb-view-receipt-btn"
+                                                                            onClick={() => handleViewReceipt(booking._id, booking.instapayReceipt)}
+                                                                            disabled={actionLoading === `receipt-${booking._id}`}
+                                                                            whileHover={{ scale: 1.03 }}
+                                                                            whileTap={{ scale: 0.97 }}
+                                                                            style={{
+                                                                                background: 'rgba(139, 92, 246, 0.2)',
+                                                                                color: '#a78bfa',
+                                                                                border: '1px solid rgba(139, 92, 246, 0.4)',
+                                                                                display: 'flex', alignItems: 'center', gap: '6px',
+                                                                                padding: '6px 12px', borderRadius: '6px',
+                                                                                fontSize: '0.85rem',
+                                                                                opacity: actionLoading === `receipt-${booking._id}` ? 0.7 : 1,
+                                                                                cursor: actionLoading === `receipt-${booking._id}` ? 'not-allowed' : 'pointer'
+                                                                            }}
+                                                                        >
+                                                                            <FiEye /> {actionLoading === `receipt-${booking._id}` ? 'Loading...' : 'View Receipt'}
+                                                                        </motion.button>
+                                                                    )}
+                                                                    {!isExpired && isPending && (
+                                                                        <>
+                                                                            <motion.button
+                                                                                className="eb-approve-btn"
+                                                                                onClick={() => handleCancellationAction(booking._id, 'approve')}
+                                                                                disabled={cancellationLoading}
+                                                                                whileHover={{ scale: 1.03 }}
+                                                                                whileTap={{ scale: 0.97 }}
+                                                                            >
+                                                                                <FiCheckCircle /> Approve Return
+                                                                            </motion.button>
+                                                                            <motion.button
+                                                                                className="eb-reject-btn"
+                                                                                onClick={() => handleCancellationAction(booking._id, 'reject')}
+                                                                                disabled={cancellationLoading}
+                                                                                whileHover={{ scale: 1.03 }}
+                                                                                whileTap={{ scale: 0.97 }}
+                                                                            >
+                                                                                <FiXCircle /> Reject
+                                                                            </motion.button>
+                                                                        </>
+                                                                    )}
                                                                 </div>
-                                                            )}
                                                         </div>
                                                     </motion.div>
                                                 );
