@@ -10,6 +10,7 @@ import {
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { toast } from 'react-toastify';
 import '@/components/Event Components/EventBookings.css';
+import Loader from '@/components/shared/Loader';
 
 interface BookingSeat {
     row: string;
@@ -80,6 +81,12 @@ const EventBookingsPage = () => {
     const [cancellationRequests, setCancellationRequests] = useState<Booking[]>([]);
     const [cancellationLoading, setCancellationLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<'bookings' | 'cancellations'>('bookings');
+    const [lastSeenCancellations, setLastSeenCancellations] = useState<number>(0);
+
+    useEffect(() => {
+        const saved = localStorage.getItem(`lastSeenCancellations_${eventId}`);
+        if (saved) setLastSeenCancellations(parseInt(saved));
+    }, [eventId]);
 
     useEffect(() => {
         fetchBookings();
@@ -421,7 +428,11 @@ const EventBookingsPage = () => {
                                 Bookings ({bookings.length})
                             </button>
                             <button
-                                onClick={() => setActiveTab('cancellations')}
+                                onClick={() => {
+                                    setActiveTab('cancellations');
+                                    setLastSeenCancellations(cancellationRequests.length);
+                                    localStorage.setItem(`lastSeenCancellations_${eventId}`, cancellationRequests.length.toString());
+                                }}
                                 style={{
                                     padding: '10px 24px', borderRadius: '12px', cursor: 'pointer',
                                     background: activeTab === 'cancellations' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'rgba(255,255,255,0.05)',
@@ -432,15 +443,16 @@ const EventBookingsPage = () => {
                                 }}
                             >
                                 Return Requests ({cancellationRequests.length})
-                                {cancellationRequests.length > 0 && (
+                                {cancellationRequests.length > lastSeenCancellations && (
                                     <span style={{
                                         position: 'absolute', top: '-6px', right: '-6px',
                                         width: '18px', height: '18px', borderRadius: '50%',
                                         background: '#ef4444', color: 'white', fontSize: '0.7rem',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         fontWeight: 700,
+                                        boxShadow: '0 0 10px rgba(239, 68, 68, 0.5)',
                                     }}>
-                                        {cancellationRequests.length}
+                                        {cancellationRequests.length - lastSeenCancellations}
                                     </span>
                                 )}
                             </button>
@@ -451,10 +463,7 @@ const EventBookingsPage = () => {
                     {activeTab === 'bookings' && (
                         <>
                             {isLoading ? (
-                                <div className="eb-loading">
-                                    <div className="spinner-ring"></div>
-                                    <p>Loading bookings...</p>
-                                </div>
+                                <Loader message="Loading bookings..." />
                             ) : bookings.length === 0 ? (
                                 <div className="eb-empty">
                                     <FiGrid size={48} />

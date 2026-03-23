@@ -88,7 +88,6 @@
 }
 
 /* Loading & Empty */
-.eb-loading,
 .eb-empty {
     display: flex;
     flex-direction: column;
